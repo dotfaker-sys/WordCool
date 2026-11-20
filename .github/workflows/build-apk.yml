@@ -76,19 +76,6 @@ jobs:
           path: build.log
           if-no-files-found: warn
 
-      - name: 失败时把编译日志回传到 ci-debug 分支便于排查
-        if: failure()
-        shell: bash
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git checkout -B ci-debug
-          mkdir -p ci-debug
-          tail -c 120000 build.log > ci-debug/build.log
-          git add -f ci-debug/build.log
-          git commit -m "ci: build log for diagnosis" || true
-          git push -f origin ci-debug || true
-
       - name: 重命名 APK（ASCII 名，避免跨系统文件名编码问题）
         run: cp app/build/outputs/apk/debug/app-debug.apk WordCool.apk
 

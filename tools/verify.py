@@ -336,6 +336,16 @@ else:
     if "startActivity" not in u or "Intent.ACTION_VIEW" not in u:
         errors.append("发现新版后没有跳转浏览器的入口")
 
+# 本次真编译抓到的错误：Kotlin 表达式体函数（= try {...}）里不允许写 return
+expr_bodies = re.findall(
+    r'fun\s+\w+\([^)]*\)\s*:\s*[\w.]+\s*=\s*try\s*\{(.*?)\n\s*\}\s*catch',
+    u, re.S)
+for body in expr_bodies:
+    if re.search(r'\breturn\b', body):
+        errors.append("UpdateChecker 有表达式体函数内写了 return（Kotlin 编译不过）")
+if not expr_bodies:
+    errors.append("未找到表达式体 try 函数，表达式体 return 校验可能失效")
+
 stats_kt = (MAIN / "java/com/wordcool/app/StatsView.kt").read_text(encoding="utf-8")
 for token in ("btnCheckUpdate", "btnAutoUpdate", "tvVersion", "UpdateChecker.check",
               "UpdateChecker.currentVersion", "renderAutoLabel"):

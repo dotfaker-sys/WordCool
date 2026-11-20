@@ -180,28 +180,32 @@ object UpdateChecker {
         Result.Fail(e.message ?: "未知错误")
     }
 
-    /** 解析公开 Release JSON；任何字段缺失都降级，不让应用崩 */
+    /** 解析公开 Release JSON；任何字段缺失都降级，不让应用崩。
+     *  注意：表达式体函数里不能写 return，所以空版本号走 if/else 分支而不是提前返回。 */
     private fun parse(body: String): Result = try {
         val o = JSONObject(body)
         val tag = o.optString("tag_name").trim()
-        if (tag.isBlank()) return Result.Fail("返回数据里没有版本号")
-        var apk = ""
-        val arr = o.optJSONArray("assets")
-        if (arr != null) {
-            for (i in 0 until arr.length()) {
-                val u = arr.optJSONObject(i)?.optString("browser_download_url").orEmpty()
-                if (u.endsWith(".apk", true)) { apk = u; break }
+        if (tag.isBlank()) {
+            Result.Fail("返回数据里没有版本号")
+        } else {
+            var apk = ""
+            val arr = o.optJSONArray("assets")
+            if (arr != null) {
+                for (i in 0 until arr.length()) {
+                    val u = arr.optJSONObject(i)?.optString("browser_download_url").orEmpty()
+                    if (u.endsWith(".apk", true)) { apk = u; break }
+                }
             }
-        }
-        Result.Ok(
-            Info(
-                version = tag,
-                name = o.optString("name").trim(),
-                notes = o.optString("body").trim(),
-                pageUrl = o.optString("html_url").ifBlank { RELEASES_PAGE },
-                apkUrl = apk
+            Result.Ok(
+                Info(
+                    version = tag,
+                    name = o.optString("name").trim(),
+                    notes = o.optString("body").trim(),
+                    pageUrl = o.optString("html_url").ifBlank { RELEASES_PAGE },
+                    apkUrl = apk
+                )
             )
-        )
+        }
     } catch (e: Exception) {
         Result.Fail("返回数据格式不对：${e.message}")
     }
