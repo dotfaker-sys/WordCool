@@ -1,0 +1,16 @@
+{
+  "source": "open-dict-data/ipa-dict data/en_UK.txt (RP) + data/en_US.txt (General American)",
+  "license": "see LICENSES/THIRD_PARTY_NOTICES.md",
+  "entries": 146647,
+  "both_accents": 43560,
+  "uk_only": 21559,
+  "us_only": 81528,
+  "multi_pronunciation_rows": 8451,
+  "merged_duplicate_source_rows": 839,
+  "tsv_bytes": 4560518,
+  "upstream_sha256": {
+    "en_US.txt": "2af6f154a5c363275f052d1f85acedef38ed185ca9745aa4314be77f6b70de67",
+    "en_UK.txt": "221394caef0cf723b4f2df81a98ac33191293257b88aed5b1fb89466d3a0dc77"
+  },
+  "note": "多读音全部保留（v6 曾只取第一条）；词形归一与运行时一致"
+}

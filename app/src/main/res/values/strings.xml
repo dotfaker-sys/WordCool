@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">单词酷</string>
+    <string name="tab_library">词库</string>
+    <string name="tab_learn">学习</string>
+    <string name="tab_stats">统计</string>
+    <string name="tab_import">导入</string>
+</resources>

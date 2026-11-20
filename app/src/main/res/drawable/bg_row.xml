@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 词库列表行：纸白底 + 仅底边 1px 细线，无卡片、无阴影 -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/card" />
+        </shape>
+    </item>
+    <item android:gravity="bottom" android:height="1px">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/line" />
+        </shape>
+    </item>
+</layer-list>

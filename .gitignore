@@ -1,0 +1,22 @@
+# Android / Gradle 构建产物
+.gradle/
+build/
+app/build/
+*/build/
+captures/
+.externalNativeBuild
+.cxx/
+local.properties
+
+# 编译出来的安装包（源码仓库只放源码与数据）
+*.apk
+*.ap_
+*.aab
+
+# IDE 与系统文件
+*.iml
+.idea/
+.DS_Store
+Thumbs.db
+
+# 注意：app/src/main/assets/ipa.tsv 是随包数据，必须提交，不要被上面的规则误伤

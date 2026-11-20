@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 单词酷设计系统 v2「墨卡 / INK CARD」
+     纸感米白底 + 墨黑文字 + 朱红唯一强调色。所有对比度按 WCAG 2.2 AA 校验。 -->
+<resources>
+    <color name="primary">#C2402F</color>
+    <color name="primary_dark">#9E3225</color>
+    <color name="accent">#16181D</color>
+    <color name="bg">#F7F5F0</color>
+    <color name="card">#FDFCF9</color>
+    <color name="text">#16181D</color>
+    <color name="text_sub">#6B6F76</color>
+    <color name="line">#D8D3C9</color>
+    <color name="white">#FFFFFF</color>
+    <color name="locked">#5C6067</color>
+    <color name="learning">#C2402F</color>
+    <color name="mastered">#16181D</color>
+    <color name="danger">#B23A2E</color>
+    <color name="soft_blue">#EDE9E1</color>
+    <color name="soft_grey">#EFECE6</color>
+    <color name="track">#DDD8CF</color>
+    <color name="ic_bg">#16181D</color>
+</resources>

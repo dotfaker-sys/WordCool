@@ -1,0 +1,5 @@
+// 单词酷 · 零第三方依赖，仅使用 Android 官方 SDK
+plugins {
+    id 'com.android.application' version '8.1.4' apply false
+    id 'org.jetbrains.kotlin.android' version '1.9.22' apply false
+}
