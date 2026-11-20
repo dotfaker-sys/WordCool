@@ -198,8 +198,7 @@ class MainActivity : Activity() {
                 v.locale.language.equals("en", true) &&
                     v.locale.country.equals(locale.country, true) &&
                     !v.isNetworkConnectionRequired &&
-                    v.features?.contains(TextToSpeech.Engine.KEY_FEATURE_NOT_INSTALLED) != true &&
-                    v.features?.contains(TextToSpeech.Engine.KEY_FEATURE_NETWORK_SERVICE_REQUIRED) != true
+                    v.features?.contains(TextToSpeech.Engine.KEY_FEATURE_NOT_INSTALLED) != true
             }
         }
         return true // 老引擎不提供 voices 列表，setLanguage 通过即认为可用
