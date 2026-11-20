@@ -39,7 +39,7 @@ command -v "$PY" >/dev/null 2>&1 || PY=python
 if command -v "$PY" >/dev/null 2>&1; then
   "$PY" tools/verify.py || { echo "✗ 静态自检没过，先修好再上传"; exit 1; }
 else
-  echo "  （没找到 Python，跳过静态自检；GitHub Actions 里仍会自动跑）"
+  echo "  （没找到 Python，跳过静态自检；之后可自行跑 python3 tools/verify.py）"
 fi
 
 # 3) 本地仓库初始化与提交
@@ -93,8 +93,8 @@ fi
 echo
 echo "[5/5] 完成"
 echo "  仓库    : https://github.com/${GITHUB_USER}/${REPO_NAME}"
-echo "  Actions : https://github.com/${GITHUB_USER}/${REPO_NAME}/actions"
-echo "  push 会自动触发云编译；跑完进那次运行，下载 Artifact「WordCool-APK」"
-echo "  （也可在 Actions 页手动点 Run workflow）"
+echo "  Releases: https://github.com/${GITHUB_USER}/${REPO_NAME}/releases"
+echo "  工作流已移除：push 不再自动编译 / 发版；现成 APK 在 Releases 页面下载"
+echo "  想自己出包：用 Android Studio，或命令行 gradle assembleDebug"
 echo
 echo "提醒：LICENSES/ 目录必须一起传上去——英音数据上游是 GPL-3.0，公开分发需保留声明与全文。"

@@ -2,11 +2,11 @@
 
 完整的安卓应用工程：**管理词库 → 一次学一个词 → 卡片 + 测验记住 → Word / Excel / PDF 导入并自动划组**。
 
-> 仓库里是源码工程，不是已签名的 APK —— 安卓安装包必须用构建工具链编译签名才能安装。三条路任选一条都能拿到可直接安装的 `WordCool.apk`，**不用懂代码**；完整命令见 [`README.md`](README.md) 一、和 [`UPLOAD.md`](UPLOAD.md)。
+> 仓库里是源码工程，不放已签名的 APK。最省事是直接从 [Releases](https://github.com/dotfaker-sys/WordCool/releases) 下载现成的 `WordCool.apk`；想自己编译见下面两条路径。**GitHub Actions 工作流已移除，push 不再自动出包**。完整命令见 [`README.md`](README.md) 一、和 [`UPLOAD.md`](UPLOAD.md)。
 
 **v9 · 应用内检查更新（当前 v1.2）**：「统计」页底部新增「版本与更新」，点「检查更新」会读一次 GitHub 公开版本号，发现新版弹窗并跳转下载页；可打开「启动时自动检查」，之后只有真有新版才弹窗。**这是全应用唯一会联网的地方，也是唯一新增的权限（`INTERNET`）**：只在点按钮或自己开开关时发一次只读 GET，不上传词库/账号/设备信息，不自动下载、不自动安装 APK。词库、导入、音标、发音、备份**全部仍离线可用**，没网也能背；不想要就别开开关。安装包在 [Releases](https://github.com/dotfaker-sys/WordCool/releases)（v1.2.0）。
 
-**v8 · 从微信 / QQ 直接导入**：微信里点开词表 →「…」→「用其他应用打开」，或长按文件「分享」→ 选「单词酷」，文件直接进导入预览，**不用先存到手机**。支持多选文件合并成一批、把一段词表文字直接分享进来；导入页「⑦ 从微信 / QQ 导入」有详细步骤和排障。**不读微信私有目录**，导入本身不联网。安装包在 [Releases](https://github.com/dotfaker-sys/WordCool/releases) 直接下载（v1.1.0），GitHub Actions 已真编译通过；仍未做真机点按测试。
+**v8 · 从微信 / QQ 直接导入**：微信里点开词表 →「…」→「用其他应用打开」，或长按文件「分享」→ 选「单词酷」，文件直接进导入预览，**不用先存到手机**。支持多选文件合并成一批、把一段词表文字直接分享进来；导入页「⑦ 从微信 / QQ 导入」有详细步骤和排障。**不读微信私有目录**，导入本身不联网。安装包在 [Releases](https://github.com/dotfaker-sys/WordCool/releases) 直接下载（最新 v1.2.0）；仍未做真机点按测试。
 
 **v7 · 对照同行做法重做的一轮**：欧路 / 词藤 / List / Anki 都把「词表数据、音标显示、TTS 发声」三层分开，导入补全都走「只补空 + 查不到就明说」。照这个改了 5 处：单音标文档也能补出 UK/US 两列、加英美拼写别名（color↔colour）、同形异读保留全部候选、预览列出未命中词并可一键复制、数据附上游 SHA-256 可复核。用 9,894 个高频词实测：**94.9% 查得到音标，77.6% 英美双套齐全，5.1% 查不到**（多为缩写，留空不编造）。完整调研见 `docs/research_competitors_ipa.md`。
 
@@ -32,7 +32,7 @@
 ## 拿到 APK 的最快路径
 
 ### 直接下载（推荐）
-打开 <https://github.com/dotfaker-sys/WordCool/releases> → 最新一条 → Assets → **WordCool.apk** → 传到手机安装。GitHub Actions 真编译出来的包，已签名。
+打开 <https://github.com/dotfaker-sys/WordCool/releases> → 最新一条 → Assets → **WordCool.apk** → 传到手机安装。这是移除工作流前真编译出来的包，已签名，可直接使用。
 
 ### 有电脑：Android Studio（约 5 分钟）
 1. 安装 [Android Studio](https://developer.android.com/studio)
@@ -40,10 +40,8 @@
 3. 手机开「USB 调试」连电脑 → 点 ▶ **Run**，自动装上
    或 `Build → Build APK(s)`，把生成的 `app-debug.apk` 传到手机点安装
 
-### 没电脑：GitHub 云编译（手机浏览器就能操作）
-1. 按 [`UPLOAD.md`](UPLOAD.md) 新建公开仓库并推送（或跑 `bash push_to_github.sh`）
-2. push 会自动触发 `.github/workflows/build-apk.yml`；也可在 **Actions** 页手动点 Run workflow
-3. 跑完下载 Artifact **WordCool-APK**，解压出 `WordCool.apk`，传到手机安装
+### 没电脑
+工作流已移除，没有云编译入口了。直接在手机浏览器打开 [Releases](https://github.com/dotfaker-sys/WordCool/releases) 下载现成 APK；三条 Release 都保留着。
 
 ### 命令行
 JDK 17 + Android SDK 34 环境下：`gradle wrapper --gradle-version 8.2 && ./gradlew assembleDebug`

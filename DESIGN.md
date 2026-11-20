@@ -1,6 +1,8 @@
 # 单词酷 · 设计系统与架构规范 v9
 
-> 版本沿革：v2 页面重设计 → v3 加功能 → v4 修 15 项缺陷 → v5 英音 / 美音双发音与双音标 → v6 内置离线开源音标词典 → v7 对照同行产品与开源数据源做实证调研 → v8 接入微信 / QQ 文件分享并做成 CI 真编译 + 自动发版 → **v9 应用内检查更新（首次、也是唯一一次新增 `INTERNET` 权限）**。
+> 版本沿革：v2 页面重设计 → v3 加功能 → v4 修 15 项缺陷 → v5 英音 / 美音双发音与双音标 → v6 内置离线开源音标词典 → v7 对照同行产品与开源数据源做实证调研 → v8 接入微信 / QQ 文件分享并做成 CI 真编译 + 自动发版 → v9 应用内检查更新（首次、也是唯一一次新增 `INTERNET` 权限）→ **v9.1 按用户要求移除 GitHub Actions 工作流**。
+>
+> **v9.1 一句话**：`.github/workflows/build-apk.yml` 已删除，push 到 `main` 不再自动编译、也不再自动发新版 Release。已发布的三条 Release 与 APK 全部保留，应用内「检查更新」仍能读到现有的 latest（v1.2.0）；只是以后不会自动冒出新版本。源码、数据、文档、自检脚本一行没删，只少了这一个自动化文件。
 >
 > **v9 一句话**：应用内检查更新放在「统计 → 版本与更新」，点按钮才向 GitHub 发一次只读 GET 比对公开 Release 版本号；发现新版弹窗、点「去下载」才用浏览器打开下载页，绝不自动下载或安装。**这是全应用唯一联网点，也是唯一新增权限**：词库、导入、离线音标词典、双发音、复习、备份全部仍离线可用。用户明确确认「允许加 INTERNET 权限」后才做，见第 11 节。
 >
@@ -115,7 +117,7 @@
 6. **v2 的全部 `R.id` 与布局文件名**：8 个布局、90 个旧 id 一个不改名、不删除（v3 新增 10 个、v4 新增 `dialog_input.xml`、v5 新增 9 个、v6 新增 8 个，现共 9 布局 / 117 个 id）。
 7. **`Ui.kt` 的函数签名**：`Pal` 字段名、`dp` / `rounded` / `toast` / `show` / `stateName` / `stateColor` 全部保持；仅替换色值与圆角收敛系数。
 8. **Gradle 与清单**：`applicationId`、minSdk 26 / targetSdk 34、**零第三方依赖（Gradle dependencies 仍为空）**。**v1.0/v1.1 为零权限；v1.2 起按用户明确确认新增唯一一个 `<uses-permission android:name="android.permission.INTERNET" />`**，只给「检查更新」用，仍无存储 / 定位 / 通讯录等任何其他权限，`tools/verify.py` 用白名单强制只允许这一个。v8 前 `AndroidManifest.xml` 一直没有改过；v8 起**只增不改**：加 `launchMode="singleTask"` 与 3 组接收文件的 `intent-filter`，原 MAIN / LAUNCHER 过滤器与 `exported="true"` 不变。Kotlin 源文件 8 → 9（v6 `IpaDictionary.kt`）→ **10（v9 `UpdateChecker.kt`）**；v6 另新增 `assets/ipa.tsv`、`LICENSES/`、`tools/`，均为数据与脚本，不是代码依赖。
-9. **编译与安装方式**：Android Studio / GitHub Actions / 命令行三条路径不变（见 `README.md`）。
+9. **编译与安装方式**：v9.1 移除工作流后剩下 Android Studio / 命令行两条路径，外加直接下载已有 Release（见 `README.md`）。
 
 本次实际改动范围：`res/values`（色板、主题）、`res/drawable`（卡片 / 按钮 / 输入 / 进度 / 行 / 页眉）、`res/mipmap-*`（启动图标）、`Ui.kt`（数值与圆角实现）、以及布局里的纯视觉属性（字体族、字号、背景引用、去掉 emoji 的文案）。
 
@@ -365,7 +367,7 @@ Android 沙箱下，微信收到的文件在 `com.tencent.mm` 私有目录里，
 - 视觉 token 不变，`R.id` 只增（`btnWechatHelp` / `btnPickDoc2`），旧 117 个一个没改名
 - **v1.1 为零权限**；v1.2 起按用户确认新增唯一的 `INTERNET`（只给检查更新）。仍没有 `READ_EXTERNAL_STORAGE`、没有 FileProvider、没有第三方库
 - `exported="true"` 是原来就有的（LAUNCHER 必需）；新增过滤器只接收文件 Uri，不暴露 Service / Provider / 数据写入接口
-- 版本：v1.1（versionCode 2）→ **v1.2（versionCode 3）**；CI 默认 Release tag `v1.1.0` → **`v1.2.0`**
+- 版本：v1.1（versionCode 2）→ **v1.2（versionCode 3）**；当时 CI 默认 Release tag `v1.1.0` → **`v1.2.0`**（工作流现已移除）
 
 ### 10.4 诚实边界
 
@@ -407,7 +409,7 @@ Android 沙箱下，微信收到的文件在 `com.tencent.mm` 私有目录里，
 - 数据库仍 v3、备份 JSON 字段未动；`R.id` 只增 3 个，旧 119 个一个没改名
 - `MainActivity` 只加 `isIncomingIntent()` 与一行 `UpdateChecker.autoCheck(this)`；`StatsView` 只加 init 绑定，原有统计逻辑未改
 - `AndroidManifest.xml` 只加 1 条 `uses-permission`，v8 的三组文件接收过滤器、MAIN / LAUNCHER、`exported` 全部不变
-- CI 默认 tag 升 `v1.2.0`，发布说明同步写明「唯一联网点」与「不自动下载安装」
+- 当时 CI 默认 tag 升 `v1.2.0`，发布说明同步写明「唯一联网点」与「不自动下载安装」（该工作流现已移除）
 - **零第三方依赖不变**：`app/build.gradle` 的 `dependencies {}` 仍为空
 
 ### 11.4 诚实边界
@@ -425,8 +427,8 @@ Android 沙箱下，微信收到的文件在 `com.tencent.mm` 私有目录里，
 - 已做：`python3 tools/verify.py` 一键静态自检通过（25 个 XML 合法性与重复属性、122 个 id / 资源引用一致性、10 个 Kotlin 精细括号扫描、emoji 残留、`ipa.tsv` 三列格式与排序、许可证文件齐全、上游 SHA-256 与 `ipa_stats.json` 行数一致性、**Manifest 三组接收过滤器与「仅 INTERNET 一个权限」白名单校验**）
 - 已做：解析算法等价模拟与 **v7 的 8 项行为回归**（逐字段只补空、文档自带双音标不覆盖、别名补缺列、多读音保留、词组与自造词留空），断言全部通过；v8 另加了外部 Intent 的等价模拟（三种 action、Uri 去重、多文件合并、二进制拦截）；**v9 加了 9 项检查更新回归**（版本三段比较含 1.10>1.9、预发布后缀、assets 挑 APK 直链、无 assets 降级、权限白名单）
 - 已做：用真实公开高频词表 `google-10000-english-no-swears`（9,894 词）跑离线查表，得到 94.9% / 77.6% / 5.1% 三组覆盖率数字，非估算
-- 已做：**GitHub Actions（ubuntu-22.04 + JDK 17 + SDK 34 + Gradle 8.2）真实编译通过**，`assembleDebug` 产出 `WordCool.apk`，并自动发布 Release；此前两轮 CI 失败（setup-android action、SDK 34 不存在的 TTS 常量）都已按日志定位并修掉
+- 曾做（**该工作流现已按用户要求移除**）：GitHub Actions（ubuntu-22.04 + JDK 17 + SDK 34 + Gradle 8.2）真实编译通过，`assembleDebug` 产出 `WordCool.apk`，并自动发布 Release；此前两轮 CI 失败（setup-android action、SDK 34 不存在的 TTS 常量）都已按日志定位并修掉
 - 架构图通过 `archify` showcase 校验（9/9）与 4 个桌面视口浏览器检查
 - **仍未做**：真机安装与点按测试。尤其 TTS 的 `setVoice` / `isLanguageAvailable` / `UtteranceProgressListener`、v8 的微信分享入口是否出现在系统列表里、以及 v9 的实际网络请求与浏览器跳转，静态检查与 CI 都验证不了——必须装到手机上试一次才能确认
-- 静态检查与 CI 都不能证明运行时零缺陷，遇到具体报错请把截图或错误文字发来，按现象定位
+- 静态检查与曾经的 CI 都不能证明运行时零缺陷，遇到具体报错请把截图或错误文字发来，按现象定位
 - 现成 APK 在 <https://github.com/dotfaker-sys/WordCool/releases>；自行编译见 `README.md`，编译前先跑 `python3 tools/verify.py`

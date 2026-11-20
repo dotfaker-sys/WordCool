@@ -362,9 +362,12 @@ if "UpdateChecker.autoCheck(this)" not in main_kt or "isIncomingIntent" not in m
 build_gradle = (ROOT / "app/build.gradle").read_text(encoding="utf-8")
 if "versionCode 3" not in build_gradle or "versionName '1.2'" not in build_gradle:
     errors.append("app/build.gradle 版本号未升到 v1.2 / versionCode 3")
-wf = (ROOT / ".github/workflows/build-apk.yml").read_text(encoding="utf-8")
-if "'v1.2.0'" not in wf or "应用内检查更新" not in wf:
-    errors.append("CI 默认 tag / 发布说明未同步到 v1.2.0")
+# v9.1：工作流已按用户要求移除，自检不再读那个文件；同时防止有人误把它加回来
+wf_dir = ROOT / ".github/workflows"
+active_wf = (list(wf_dir.glob("*.yml")) + list(wf_dir.glob("*.yaml"))) if wf_dir.is_dir() else []
+if active_wf:
+    errors.append("工作流已移除，但 .github/workflows 下又出现 yml：" +
+                  ", ".join(f.name for f in active_wf))
 
 def py_compare(local, remote):
     """等价复刻 UpdateChecker.compare：>0 表示远端更新"""
@@ -420,6 +423,6 @@ if errors:
     print(f"\n共 {len(errors)} 项，静态自检未通过。")
     return_code = 1
 else:
-    print("静态自检全部通过。GitHub Actions 已真实编译出 APK；仍需真机点按验证（微信分享入口、检查更新请求与浏览器跳转）。")
+    print("静态自检全部通过。GitHub Actions 曾真编译出 APK（工作流现已移除）；仍需真机点按验证（微信分享入口、检查更新请求与浏览器跳转）。")
     return_code = 0
 sys.exit(return_code)

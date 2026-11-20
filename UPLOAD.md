@@ -80,14 +80,14 @@ git push -u origin main
 
 ## 4. 推完检查这三件事
 
+> **工作流已按用户要求移除**：`.github/workflows/build-apk.yml` 已删除，push 到 `main` **不会再自动编译、也不会自动发新版 Release**。已有的三条 Release 和 APK 都保留。
+
 1. **文件齐不齐**：仓库页应能看到
-   - `.github/workflows/build-apk.yml` ← 云编译靠它，**最容易漏**
    - `app/src/main/assets/ipa.tsv` + `ipa_stats.json` ← 离线音标数据
    - `LICENSES/` ← MIT + GPL-3.0 全文与署名声明，**公开发布必须保留**
    - `tools/verify.py`、`tools/build_ipa.py`、`DESIGN.md`、`QUICKSTART.md`
-2. **Actions 有没有自动跑**：<https://github.com/dotfaker-sys/WordCool/actions>
-   push 到 `main` 会自动触发；没跑就在该页手动点 **Run workflow**。
-3. **下载 APK**：进那次运行 → 底部 Artifacts → **WordCool-APK** → 解压得到 `WordCool.apk` → 传手机安装。
+2. **源码树里不该有 `.github/workflows/`**：有 yml 就说明工作流又被加回来了，push 会重新触发自动编译
+3. **下载 APK**：<https://github.com/dotfaker-sys/WordCool/releases> → 最新一条 → Assets → `WordCool.apk` → 传手机安装
 
 ---
 
@@ -98,12 +98,12 @@ git push -u origin main
 | `remote origin already exists` | `git remote remove origin` 再 `git remote add origin ...` |
 | `rejected / fetch first` | 建仓时勾了 README。执行 `git pull origin main --rebase` 后再 push；或删掉仓库重建空仓库 |
 | `Authentication failed` | 用了账号密码。改 PAT 或 `gh auth login` |
-| `.github` 没上去，Actions 不触发 | 多半是网页拖拽上传漏了隐藏目录。命令行 `git add -A` 不会漏；也可用 `git add -f .github/workflows/build-apk.yml` |
-| Actions 里 `sdkmanager` 报 licenses | 配置里已加 `yes \| sdkmanager --licenses`，若仍失败看运行日志具体步骤 |
+| 想要自动出包 | 工作流已移除，需把 `build-apk.yml` 加回 `.github/workflows/` 并 push；或本地用 Android Studio / 命令行编译 |
+| 推完 Actions 没动静 | 正常，工作流已删除；现成包在 Releases 页面下载 |
 | 想换仓库名 | 脚本用 `REPO_NAME=MyWords bash push_to_github.sh`；手写命令把两处 `WordCool` 一起改掉 |
 
 ---
 
 ## 6. 一句话边界
 
-源码仓库里**不放预编译 APK**，也**没有 gradlew**（CI 会自动 `gradle wrapper` 生成）；`UPLOAD.md` 只负责把源码推上去，出包交给 Actions。CI 编译成功后还会自动发布 / 更新 Release（默认 tag `v1.1.0`，可在 Actions 页手动填别的 tag），现成安装包在 <https://github.com/dotfaker-sys/WordCool/releases>。Android Studio 本地打开不依赖 gradlew。英音数据上游是 GPL-3.0，公开分发请保留 `LICENSES/`。
+源码仓库里**不放预编译 APK**，也**没有 gradlew**；`UPLOAD.md` 只负责把源码推上去。**GitHub Actions 工作流已按用户要求删除，push 不再自动编译 / 自动发版**。现成安装包在 <https://github.com/dotfaker-sys/WordCool/releases>（v1.0.0 / v1.1.0 / v1.2.0 三条都保留）；以后要出新包请用 Android Studio 或命令行本地编译，或把工作流加回来。Android Studio 本地打开不依赖 gradlew。英音数据上游是 GPL-3.0，公开分发请保留 `LICENSES/`。

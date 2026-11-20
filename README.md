@@ -6,7 +6,7 @@
 >
 > **v8 · 从微信 / QQ 直接导入**：微信里点开词表 → 右上角「…」→「用其他应用打开」，或长按文件「分享」→ 选「单词酷」，文件直接进导入预览，**不用先存到手机**。三种系统入口都接了（`ACTION_VIEW` / `ACTION_SEND` / `ACTION_SEND_MULTIPLE`），支持多选文件合并成一批预览、把一段词表文字直接分享进来；QQ / 企业微信 / 文件管理器同一套入口。导入页新增「⑦ 从微信 / QQ 导入」操作指引与排障。**不读微信私有目录**：只有你主动在微信里选了本应用，系统才把那一个文件的临时读取权交给它；导入本身不需要联网。详见 [`DESIGN.md`](DESIGN.md) 第 10 节。
 >
-> 版本 v1.1（versionCode 2）；GitHub Actions 已**真实编译出 APK 并自动发布 Release**，见 <https://github.com/dotfaker-sys/WordCool/releases>。仍未做的是真机点按测试。
+> 版本 **v1.2（versionCode 3）**。GitHub Actions 曾**真实编译出 APK 并自动发布 Release**（见 <https://github.com/dotfaker-sys/WordCool/releases>），但该工作流现已按用户要求移除，push 不再自动出包。仍未做的是真机点按测试。
 >
 > **v7 · 先查别人怎么做，再改代码**：对照欧路、词藤、List、Anki、Quizlet 与 6 类开源数据源做了一轮实证调研（全文见 `docs/research_competitors_ipa.md`），据此修了 5 个短板：① 音标补全从「三列全空才补」改成**逐字段只补空**（文档给了单音标也能补出 UK/US 两列）；② 加 36 组**英美拼写别名**（color↔colour、center↔centre…）；③ 同形异读**保留全部候选**，不再只取第一条；④ 导入预览列出**未命中词清单**并可一键复制；⑤ 数据附**上游 SHA-256** 可复核。用 9,894 个高频词实测：**94.9% 能查到音标，77.6% 英美双套齐全，5.1% 查不到**（多为缩写，留空不编造）。详见 [`DESIGN.md`](DESIGN.md) 第 9 节。
 >
@@ -16,7 +16,7 @@
 >
 > **v5 双发音 + 双音标**：学习卡片并列「英音 UK」「美音 US」两个按钮，点哪边用哪边口音读；文档里写 `UK /…/ US /…/` 会自动拆成两套音标，词条里也能手动补。发音走系统 TTS 的**本地离线语音包**，会检查语音包是否真的可用、缺包自动回退并引导安装。当时写的「离线应用没有内置词典、不会凭空生成音标」这句，**v6 起已被随包内置的离线开源音标词典取代**（仍然不凭空编造，只是改成查真实词典）；音色由手机装的 TTS 语音包决定。详见 [`DESIGN.md`](DESIGN.md) 第 7、8、9 节。
 >
-> **v4 缺陷修复**：对全部源码做了一轮逐行走查，修掉 15 个可确证问题（按组解锁、队列缓存、卡片/小测被跳过、词性单空格吞中文、CSV 引号、表头误收词、标题行混排、`sheet2.xml`、PDF 按 `/Length` 截流、组别自然排序等），完整清单见 [`DESIGN.md`](DESIGN.md) 第 6 节。此后 GitHub Actions 已**真实编译通过并产出 APK**，但**仍未做真机点按测试**，不能承诺运行时零缺陷；遇到具体报错请把截图或错误文字发来。
+> **v4 缺陷修复**：对全部源码做了一轮逐行走查，修掉 15 个可确证问题（按组解锁、队列缓存、卡片/小测被跳过、词性单空格吞中文、CSV 引号、表头误收词、标题行混排、`sheet2.xml`、PDF 按 `/Length` 截流、组别自然排序等），完整清单见 [`DESIGN.md`](DESIGN.md) 第 6 节。此后 GitHub Actions 曾**真实编译通过并产出 APK**（该工作流现已移除），但**仍未做真机点按测试**，不能承诺运行时零缺陷；遇到具体报错请把截图或错误文字发来。
 >
 > **v3 功能扩展**：学习页一次只看一个单词、自己点「下一个」；导入支持多格式，文档里的 `Unit 1` / `Day 2` / `第 3 单元` 标题行自动划组，导入后还能改名、按顺序自动划组、按组筛选与学习。全部旧接口只增不减，详见 [`DESIGN.md`](DESIGN.md) 第 5 节。
 >
@@ -33,7 +33,7 @@
 
 ### 方式 0：直接下载（最快）
 
-打开 <https://github.com/dotfaker-sys/WordCool/releases> → 最新一条 → **Assets → `WordCool.apk`** → 传到手机安装。这是 GitHub Actions 真编译出来的 Debug 签名包，可直接安装。
+打开 <https://github.com/dotfaker-sys/WordCool/releases> → 最新一条 → **Assets → `WordCool.apk`** → 传到手机安装。这是移除工作流之前由 GitHub Actions 真编译出来的 Debug 签名包，可直接安装；工作流移除后不会再自动产生新包。
 
 ### 方式 A：电脑 + Android Studio（最省事）
 
@@ -44,17 +44,11 @@
    - 菜单 `Build → Build APK(s) → Build APK(s)`，产物在
      `app/build/outputs/apk/debug/app-debug.apk`，传到手机上点一下安装
 
-### 方式 B：不想装 Android Studio → 用 GitHub 云编译（手机也能操作）
+### 方式 B：GitHub 云编译 —— 已移除
 
-工程已带好 `.github/workflows/build-apk.yml`，会自动产出 APK：
+仓库里的 `.github/workflows/build-apk.yml` 已按用户要求删除，**push 到 `main` 不会再自动编译、也不会自动发新版 Release**。已有三条 Release（v1.0.0 / v1.1.0 / v1.2.0）和它们的 APK 都保留，仍可从方式 0 直接下载。
 
-1. 登录 GitHub，新建 **Public** 仓库 `WordCool`（**不要**勾选 Add a README / .gitignore / license，避免冲突），用 `push_to_github.sh` 把 `WordCool` 目录里的内容推上去；完整命令见 [`UPLOAD.md`](UPLOAD.md)
-2. 用 `git add -A` 上传时 `.github` 隐藏目录会一起带上去；若用网页拖拽漏掉了，在仓库里点
-   `Add file → Create new file`，文件名填
-   `.github/workflows/build-apk.yml`，把工程里同名文件的内容粘进去提交
-3. 打开仓库的 **Actions** 页，运行「编译单词酷 APK」（push 自动触发，也可 `workflow_dispatch` 手动触发）
-4. 跑完后进入这次运行，下载 Artifact **WordCool-APK**，解压得到 `WordCool.apk`；同一轮 CI 也会自动发布 / 更新 Release（默认 tag `v1.1.0`），直接去 Releases 页面下载更方便
-5. 把 APK 传到手机，点击安装（系统提示「未知来源」时允许本次安装即可）
+以后要出新包，走方式 A（Android Studio）或方式 C（命令行）本地编译；想恢复自动发版，把工作流文件加回 `.github/workflows/` 即可。`UPLOAD.md` 只讲怎么推源码，不再涉及 Actions。
 
 ### 方式 C：命令行
 
@@ -150,7 +144,6 @@ WordCool/
 │   └── build_ipa.py            从 ipa-dict 原始数据重建 ipa.tsv
 ├── docs/architecture.html      可交互分层架构图
 ├── DESIGN.md                   设计系统与接口冻结清单
-├── .github/workflows/build-apk.yml
 └── build.gradle / settings.gradle / gradle.properties
 ```
 
