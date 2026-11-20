@@ -10,7 +10,8 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    # 固定镜像版本，预装 Android SDK 路径稳定；不依赖第三方 setup-android action
+    runs-on: ubuntu-22.04
     steps:
       - name: 拉取代码
         uses: actions/checkout@v4
@@ -24,27 +25,41 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: 安装 Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: 接受 SDK 许可
-        run: yes | sdkmanager --licenses > /dev/null || true
-
-      - name: 安装 SDK 组件
-        run: sdkmanager "platforms;android-34" "build-tools;34.0.0" > /dev/null
+      - name: 配置 Android SDK（用 runner 预装的 sdkmanager）
+        shell: bash
+        run: |
+          set -e
+          SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
+          echo "SDK=$SDK"
+          ls -d "$SDK"/cmdline-tools/*/bin 2>/dev/null || true
+          SDKMGR=""
+          for c in \
+            "$SDK/cmdline-tools/latest/bin/sdkmanager" \
+            "$SDK/cmdline-tools/bin/sdkmanager" \
+            "$SDK/tools/bin/sdkmanager" \
+            "$(command -v sdkmanager 2>/dev/null || true)"; do
+            if [ -n "$c" ] && [ -x "$c" ]; then SDKMGR="$c"; break; fi
+          done
+          if [ -z "$SDKMGR" ]; then
+            echo "找不到 sdkmanager，列出 SDK 目录："
+            ls -R "$SDK" | head -60
+            exit 1
+          fi
+          echo "sdkmanager=$SDKMGR"
+          yes | "$SDKMGR" --licenses > /dev/null 2>&1 || true
+          "$SDKMGR" "platforms;android-34" "build-tools;34.0.0" > /dev/null
+          echo "ANDROID_HOME=$SDK" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$SDK" >> "$GITHUB_ENV"
 
       - name: 准备 Gradle 8.2
         uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: '8.2'
 
-      - name: 生成 Gradle Wrapper（仓库不含 gradlew，CI 里现生成）
-        run: gradle wrapper --gradle-version 8.2 --no-daemon
-
       - name: 编译 Debug APK
-        run: ./gradlew assembleDebug --no-daemon --stacktrace
+        run: gradle assembleDebug --no-daemon --stacktrace
 
-      - name: 重命名 APK（用 ASCII 名，避免跨系统文件名编码问题）
+      - name: 重命名 APK（ASCII 名，避免跨系统文件名编码问题）
         run: cp app/build/outputs/apk/debug/app-debug.apk WordCool.apk
 
       - name: 上传可安装 APK
