@@ -1,0 +1,419 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="14dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/bg_card"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="学习"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="@color/text" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="每天解锁新词数"
+                    android:textSize="13sp"
+                    android:textColor="@color/text" />
+
+                <EditText
+                    android:id="@+id/etDaily"
+                    android:layout_width="64dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/bg_input"
+                    android:gravity="center"
+                    android:inputType="number"
+                    android:maxLines="1"
+                    android:text="10"
+                    android:textSize="14sp"
+                    android:textColor="@color/text" />
+
+                <TextView
+                    android:id="@+id/btnSaveDaily"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:layout_marginLeft="8dp"
+                    android:background="@drawable/bg_btn_primary"
+                    android:gravity="center"
+                    android:paddingLeft="14dp"
+                    android:paddingRight="14dp"
+                    android:text="保存"
+                    android:textSize="13sp"
+                    android:textColor="@color/white" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:lineSpacingExtra="3dp"
+                android:text="每天从「未解锁」里放出一批新词。学习中的词按 1/2/4/7/15/30 天回来复习，不受这个数字限制。"
+                android:textSize="11sp"
+                android:textColor="@color/text_sub" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="vertical"
+            android:background="@drawable/bg_card"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="数据管理"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="@color/text" />
+
+            <TextView
+                android:id="@+id/btnExport"
+                android:layout_width="match_parent"
+                android:layout_height="42dp"
+                android:layout_marginTop="14dp"
+                android:background="@drawable/bg_btn_primary"
+                android:gravity="center"
+                android:text="导出词库备份（JSON）"
+                android:textSize="13sp"
+                android:textColor="@color/white" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:lineSpacingExtra="3dp"
+                android:text="备份包含单词、释义、组别、学习进度与答题记录；换手机时用「选择文档并导入」选这个 JSON 恢复。建议每隔一段时间导出一份。"
+                android:textSize="11sp"
+                android:textColor="@color/text_sub" />
+
+            <TextView
+                android:id="@+id/btnReset"
+                android:layout_width="match_parent"
+                android:layout_height="42dp"
+                android:layout_marginTop="14dp"
+                android:background="@drawable/bg_btn_ghost"
+                android:gravity="center"
+                android:text="重置学习进度（保留单词）"
+                android:textSize="13sp"
+                android:textColor="@color/danger" />
+
+            <TextView
+                android:id="@+id/btnClear"
+                android:layout_width="match_parent"
+                android:layout_height="42dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_btn_ghost"
+                android:gravity="center"
+                android:text="清空整个词库"
+                android:textSize="13sp"
+                android:textColor="@color/danger" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="vertical"
+            android:background="@drawable/bg_card"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="发音"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="@color/text" />
+
+            <TextView
+                android:id="@+id/tvTtsStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="语音引擎还在准备…"
+                android:textSize="12sp"
+                android:textColor="@color/primary" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/btnAccentUs"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:layout_marginRight="6dp"
+                    android:background="@drawable/bg_btn_ghost"
+                    android:gravity="center"
+                    android:text="默认：美音 US"
+                    android:textSize="12sp"
+                    android:textColor="@color/primary" />
+
+                <TextView
+                    android:id="@+id/btnAccentUk"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:layout_marginLeft="6dp"
+                    android:background="@drawable/bg_btn_ghost"
+                    android:gravity="center"
+                    android:text="默认：英音 UK"
+                    android:textSize="12sp"
+                    android:textColor="@color/primary" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:text="朗读语速"
+                android:textSize="12sp"
+                android:textColor="@color/text_sub" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/btnRateSlow"
+                    android:layout_width="0dp"
+                    android:layout_height="36dp"
+                    android:layout_weight="1"
+                    android:layout_marginRight="4dp"
+                    android:background="@drawable/bg_btn_ghost"
+                    android:gravity="center"
+                    android:text="慢 0.7×"
+                    android:textSize="11sp"
+                    android:textColor="@color/primary" />
+
+                <TextView
+                    android:id="@+id/btnRateNormal"
+                    android:layout_width="0dp"
+                    android:layout_height="36dp"
+                    android:layout_weight="1"
+                    android:layout_marginLeft="4dp"
+                    android:layout_marginRight="4dp"
+                    android:background="@drawable/bg_btn_ghost"
+                    android:gravity="center"
+                    android:text="正常 1.0×"
+                    android:textSize="11sp"
+                    android:textColor="@color/primary" />
+
+                <TextView
+                    android:id="@+id/btnRateFast"
+                    android:layout_width="0dp"
+                    android:layout_height="36dp"
+                    android:layout_weight="1"
+                    android:layout_marginLeft="4dp"
+                    android:background="@drawable/bg_btn_ghost"
+                    android:gravity="center"
+                    android:text="快 1.3×"
+                    android:textSize="11sp"
+                    android:textColor="@color/primary" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/btnSpeakSample"
+                android:layout_width="match_parent"
+                android:layout_height="38dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/bg_btn_soft"
+                android:gravity="center"
+                android:text="试听一句英文（确认到底出不出声）"
+                android:textSize="12sp"
+                android:textColor="@color/primary" />
+
+            <TextView
+                android:id="@+id/btnTtsSettings"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/bg_btn_ghost"
+                android:gravity="center"
+                android:text="安装 / 检查英语语音包"
+                android:textSize="12sp"
+                android:textColor="@color/primary" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:lineSpacingExtra="3dp"
+                android:text="发音走系统 TTS 的本地离线语音包；没装对应口音时会自动回退到另一种并提示。音色由手机安装的语音包决定，应用不联网合成。"
+                android:textSize="11sp"
+                android:textColor="@color/text_sub" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="vertical"
+            android:background="@drawable/bg_card"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="音标"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="@color/text" />
+
+            <TextView
+                android:id="@+id/tvIpaStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="正在读取内置词典…"
+                android:textSize="12sp"
+                android:textColor="@color/primary" />
+
+            <TextView
+                android:id="@+id/btnAutoIpa"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_btn_soft"
+                android:gravity="center"
+                android:text="导入时自动补全音标：开"
+                android:textSize="12sp"
+                android:textColor="@color/primary" />
+
+            <TextView
+                android:id="@+id/btnFillIpa"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/bg_btn_ghost"
+                android:gravity="center"
+                android:text="给现有词库补一次音标"
+                android:textSize="12sp"
+                android:textColor="@color/primary" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:lineSpacingExtra="3dp"
+                android:text="音标来自随包内置的离线开源词典，只补空字段，不覆盖手填内容；查不到的词留空，不编造。数据来源与许可见 LICENSES/THIRD_PARTY_NOTICES.md。"
+                android:textSize="11sp"
+                android:textColor="@color/text_sub" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="vertical"
+            android:background="@drawable/bg_card"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="版本与更新"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="@color/text" />
+
+            <TextView
+                android:id="@+id/tvVersion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="当前版本"
+                android:fontFamily="serif"
+                android:textSize="18sp"
+                android:textColor="@color/text" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:lineSpacingExtra="4dp"
+                android:text="点「检查更新」会向 GitHub 读取一次公开的版本号，这是本应用唯一会联网的地方。不会上传词库、账号或设备信息，也不会自动下载、自动安装 APK。"
+                android:textSize="12sp"
+                android:textColor="@color/text_sub" />
+
+            <TextView
+                android:id="@+id/btnCheckUpdate"
+                android:layout_width="match_parent"
+                android:layout_height="42dp"
+                android:layout_marginTop="14dp"
+                android:background="@drawable/bg_btn_primary"
+                android:gravity="center"
+                android:text="检查更新"
+                android:textSize="14sp"
+                android:textColor="@color/white" />
+
+            <TextView
+                android:id="@+id/btnAutoUpdate"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/bg_btn_soft"
+                android:gravity="center"
+                android:text="启动时自动检查：关"
+                android:textSize="12sp"
+                android:textColor="@color/primary" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="vertical"
+            android:background="@drawable/bg_card"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="关于"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="@color/text" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:lineSpacingExtra="4dp"
+                android:text="单词酷是一个离线优先的本地词库：词库、导入、音标、发音、复习与备份都在手机上完成，不上传账号或设备信息。唯一的联网点是「检查更新」，只在点按钮或打开自动检查时读取一次 GitHub 公开版本号。\n\n考研词库（711 词 / 23 组）来自用户提供的 Unit1–5 词表，仅保存在本机；公开分发前请确认词表版权。"
+                android:textSize="12sp"
+                android:textColor="@color/text_sub" />
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

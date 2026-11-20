@@ -110,6 +110,17 @@
             android:text="@string/tab_import"
             android:textSize="13sp"
             android:textColor="@color/text_sub" />
+
+        <TextView
+            android:id="@+id/tabSettings"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:padding="9dp"
+            android:text="@string/tab_settings"
+            android:textSize="13sp"
+            android:textColor="@color/text_sub" />
     </LinearLayout>
 
 </LinearLayout>

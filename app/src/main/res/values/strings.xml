@@ -5,4 +5,5 @@
     <string name="tab_learn">学习</string>
     <string name="tab_stats">统计</string>
     <string name="tab_import">导入</string>
+    <string name="tab_settings">设置</string>
 </resources>

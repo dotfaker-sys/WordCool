@@ -29,6 +29,7 @@ class MainActivity : Activity() {
     private lateinit var learn: LearnView
     private lateinit var statsPage: StatsView
     private lateinit var importPage: ImportView
+    private lateinit var settingsPage: SettingsView
     private var current = 0
 
     private var tts: TextToSpeech? = null
@@ -60,7 +61,8 @@ class MainActivity : Activity() {
         val p1 = inflater.inflate(R.layout.page_learn, content, false)
         val p2 = inflater.inflate(R.layout.page_stats, content, false)
         val p3 = inflater.inflate(R.layout.page_import, content, false)
-        listOf(p0, p1, p2, p3).forEach {
+        val p4 = inflater.inflate(R.layout.page_settings, content, false)
+        listOf(p0, p1, p2, p3, p4).forEach {
             it.visibility = View.GONE
             content.addView(it)
             pages.add(it)
@@ -70,11 +72,13 @@ class MainActivity : Activity() {
         learn = LearnView(this, p1)
         statsPage = StatsView(this, p2)
         importPage = ImportView(this, p3)
+        settingsPage = SettingsView(this, p4)
 
         tabs.add(findViewById<TextView>(R.id.tabLibrary))
         tabs.add(findViewById<TextView>(R.id.tabLearn))
         tabs.add(findViewById<TextView>(R.id.tabStats))
         tabs.add(findViewById<TextView>(R.id.tabImport))
+        tabs.add(findViewById<TextView>(R.id.tabSettings))
         tabs.forEachIndexed { i, t -> t.setOnClickListener { switchTo(i) } }
 
         initTts()
@@ -181,6 +185,7 @@ class MainActivity : Activity() {
             1 -> learn.refresh()
             2 -> statsPage.refresh()
             3 -> importPage.refresh()
+            4 -> settingsPage.refresh()
         }
     }
 

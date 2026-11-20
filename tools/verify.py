@@ -346,22 +346,22 @@ for body in expr_bodies:
 if not expr_bodies:
     errors.append("未找到表达式体 try 函数，表达式体 return 校验可能失效")
 
-stats_kt = (MAIN / "java/com/wordcool/app/StatsView.kt").read_text(encoding="utf-8")
+settings_kt = (MAIN / "java/com/wordcool/app/SettingsView.kt").read_text(encoding="utf-8")
 for token in ("btnCheckUpdate", "btnAutoUpdate", "tvVersion", "UpdateChecker.check",
               "UpdateChecker.currentVersion", "renderAutoLabel"):
-    if token not in stats_kt:
-        errors.append(f"StatsView 未接上更新入口: {token}")
-stats_xml = (MAIN / "res/layout/page_stats.xml").read_text(encoding="utf-8")
+    if token not in settings_kt:
+        errors.append(f"SettingsView 未接上更新入口: {token}")
+settings_xml = (MAIN / "res/layout/page_settings.xml").read_text(encoding="utf-8")
 for token in ("tvVersion", "btnCheckUpdate", "btnAutoUpdate"):
-    if 'android:id="@+id/' + token + '"' not in stats_xml:
-        errors.append(f"page_stats.xml 缺少 id: {token}")
+    if 'android:id="@+id/' + token + '"' not in settings_xml:
+        errors.append(f"page_settings.xml 缺少 id: {token}")
 
 if "UpdateChecker.autoCheck(this)" not in main_kt or "isIncomingIntent" not in main_kt:
     errors.append("MainActivity 未接上启动时静默检查 / 未避开微信分享入口")
 
 build_gradle = (ROOT / "app/build.gradle").read_text(encoding="utf-8")
-if "versionCode 5" not in build_gradle or "versionName '1.4'" not in build_gradle:
-    errors.append("app/build.gradle 版本号未升到 v1.4 / versionCode 5")
+if "versionCode 6" not in build_gradle or "versionName '1.5'" not in build_gradle:
+    errors.append("app/build.gradle 版本号未升到 v1.5 / versionCode 6")
 # v9.1：工作流已按用户要求移除，自检不再读那个文件；同时防止有人误把它加回来
 wf_dir = ROOT / ".github/workflows"
 active_wf = (list(wf_dir.glob("*.yml")) + list(wf_dir.glob("*.yaml"))) if wf_dir.is_dir() else []
@@ -493,6 +493,39 @@ for token in ("loadKaoyanPack", "kaoyan.tsv", "Imported(word =", "showImportPrev
     if token not in main_kt2:
         errors.append(f"MainActivity 缺少考研词库实现: {token}")
 
+# ---- v1.5：设置页拆分 ----
+activity_xml = (MAIN / "res/layout/activity_main.xml").read_text(encoding="utf-8")
+if 'android:id="@+id/tabSettings"' not in activity_xml:
+    errors.append("activity_main.xml 缺少第 5 个 tabSettings")
+if settings_xml.count('android:id="@+id/') < 15:
+    errors.append("page_settings.xml 设置项过少，疑似没有把设置卡搬过来")
+
+for i in ("etDaily", "btnSaveDaily", "btnExport", "btnReset", "btnClear",
+          "tvTtsStatus", "btnAccentUs", "btnAccentUk", "btnTtsSettings",
+          "btnRateSlow", "btnRateNormal", "btnRateFast", "btnSpeakSample",
+          "tvIpaStatus", "btnAutoIpa", "btnFillIpa", "tvVersion",
+          "btnCheckUpdate", "btnAutoUpdate"):
+    if 'android:id="@+id/' + i + '"' not in settings_xml:
+        errors.append(f"page_settings.xml 缺少设置 id: {i}")
+
+for token in ("etDaily", "db.dailyGoal", "exportBackup", "resetProgress", "clearAll",
+              "setAccent", "setSpeechRate", "speakSample", "setAutoIpa", "fillAllPhonetics"):
+    if token not in settings_kt:
+        errors.append(f"SettingsView 缺少设置实现: {token}")
+
+for token in ("SettingsView", "settingsPage", "tabSettings", "settingsPage.refresh"):
+    if token not in main_kt2:
+        errors.append(f"MainActivity 未接上设置页: {token}")
+
+for moved in ("etDaily", "btnExport", "btnReset", "btnClear", "tvTtsStatus", "tvIpaStatus"):
+    if 'android:id="@+id/' + moved + '"' in imp_xml:
+        errors.append(f"设置项 {moved} 仍留在导入页，页面又变乱了")
+stats_page_xml = (MAIN / "res/layout/page_stats.xml").read_text(encoding="utf-8")
+for moved in ("btnReset", "tvVersion", "btnCheckUpdate"):
+    if 'android:id="@+id/' + moved + '"' in stats_page_xml:
+        errors.append(f"设置项 {moved} 仍留在统计页")
+print(f"v1.5 设置页: 5 个 tab · 设置项 {settings_xml.count('android:id=')} 个 · 导入/统计已精简")
+
 print(f"XML {len(xmls)} · Kotlin {len(kts)} · 布局 {len(layouts)} · id {len(ids)} · drawable {len(drawables)}")
 if errors:
     print("\n发现问题：")
@@ -501,7 +534,7 @@ if errors:
     print(f"\n共 {len(errors)} 项，静态自检未通过。")
     return_code = 1
 else:
-    print("静态自检全部通过。v1.4 已在 Android 37 模拟器（API 37）上真编译并点按验证拼写测试与 711 词考研词库导入；"
+    print("静态自检全部通过。v1.5 已在 Android 37 模拟器（API 37）上真编译并点按验证拼写测试、711 词考研词库导入与设置页；"
           "微信分享入口、真实 TTS 语音包与各厂商 ROM 仍需真机验证。")
     return_code = 0
 sys.exit(return_code)

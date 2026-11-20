@@ -7,10 +7,10 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 
+/** 导入页只放「把词弄进来」和「划组」；发音、音标、备份、重置、版本统一在设置页。 */
 class ImportView(private val a: MainActivity, private val root: View) {
 
     private val etPaste = root.findViewById<EditText>(R.id.etPaste)
-    private val etDaily = root.findViewById<EditText>(R.id.etDaily)
     private val tvStatus = root.findViewById<TextView>(R.id.tvImportStatus)
 
     private val tvGroupSummary = root.findViewById<TextView>(R.id.tvGroupSummary)
@@ -18,17 +18,6 @@ class ImportView(private val a: MainActivity, private val root: View) {
     private val etGroupPrefix = root.findViewById<EditText>(R.id.etGroupPrefix)
     private val etGroupSize = root.findViewById<EditText>(R.id.etGroupSize)
     private val btnAutoGroup = root.findViewById<TextView>(R.id.btnAutoGroup)
-    private val tvTtsStatus = root.findViewById<TextView>(R.id.tvTtsStatus)
-    private val btnAccentUs = root.findViewById<TextView>(R.id.btnAccentUs)
-    private val btnAccentUk = root.findViewById<TextView>(R.id.btnAccentUk)
-    private val btnTtsSettings = root.findViewById<TextView>(R.id.btnTtsSettings)
-    private val btnRateSlow = root.findViewById<TextView>(R.id.btnRateSlow)
-    private val btnRateNormal = root.findViewById<TextView>(R.id.btnRateNormal)
-    private val btnRateFast = root.findViewById<TextView>(R.id.btnRateFast)
-    private val btnSpeakSample = root.findViewById<TextView>(R.id.btnSpeakSample)
-    private val tvIpaStatus = root.findViewById<TextView>(R.id.tvIpaStatus)
-    private val btnAutoIpa = root.findViewById<TextView>(R.id.btnAutoIpa)
-    private val btnFillIpa = root.findViewById<TextView>(R.id.btnFillIpa)
 
     init {
         root.findViewById<TextView>(R.id.btnPickDoc).setOnClickListener {
@@ -68,31 +57,6 @@ class ImportView(private val a: MainActivity, private val root: View) {
                 }.show()
         }
 
-        btnAccentUs.setOnClickListener { a.setAccent(MainActivity.ACCENT_US) }
-        btnAccentUk.setOnClickListener { a.setAccent(MainActivity.ACCENT_UK) }
-        btnTtsSettings.setOnClickListener { a.openTtsSettings() }
-        btnRateSlow.setOnClickListener { a.setSpeechRate(0.7f) }
-        btnRateNormal.setOnClickListener { a.setSpeechRate(1.0f) }
-        btnRateFast.setOnClickListener { a.setSpeechRate(1.3f) }
-        btnSpeakSample.setOnClickListener { a.speakSample() }
-        btnAutoIpa.setOnClickListener { a.setAutoIpa(!a.db.autoIpa) }
-        btnFillIpa.setOnClickListener { a.fillAllPhonetics() }
-
-        root.findViewById<TextView>(R.id.btnSaveDaily).setOnClickListener {
-            val n = etDaily.text.toString().trim().toIntOrNull()
-            if (n == null || n < 1 || n > 100) {
-                a.toast("请填 1~100 之间的数字")
-                return@setOnClickListener
-            }
-            a.db.dailyGoal = n
-            a.toast("已设为每天解锁 $n 个新词")
-            a.dataChanged()
-        }
-
-        root.findViewById<TextView>(R.id.btnExport).setOnClickListener {
-            a.exportBackup()
-        }
-
         root.findViewById<TextView>(R.id.btnLoadDemo).setOnClickListener {
             AlertDialog.Builder(a)
                 .setTitle("载入示例词库？")
@@ -118,48 +82,11 @@ class ImportView(private val a: MainActivity, private val root: View) {
                 .setPositiveButton("查看导入预览") { _, _ -> a.loadKaoyanPack() }
                 .show()
         }
-
-        root.findViewById<TextView>(R.id.btnClear).setOnClickListener {
-            AlertDialog.Builder(a)
-                .setTitle("清空整个词库？")
-                .setMessage("所有单词、释义、组别和学习记录都会被删除，无法撤销。建议先「导出备份」。")
-                .setNegativeButton("取消", null)
-                .setPositiveButton("确认清空") { _, _ ->
-                    a.db.clearAll()
-                    a.toast("词库已清空")
-                    a.dataChanged()
-                }.show()
-        }
     }
 
     fun refresh() {
-        val n = a.db.dailyGoal.toString()
-        if (etDaily.text.toString() != n) {
-            etDaily.setText(n)
-            etDaily.setSelection(etDaily.text.length)
-        }
         val s = a.db.stats()
         tvStatus.text = "当前词库共 ${s.total} 个单词 · 已解锁 ${s.unlocked} 个 · 已掌握 ${s.mastered} 个"
-        tvTtsStatus.text = a.ttsStatusText()
-        val accent = a.db.accent
-        val usOn = accent == MainActivity.ACCENT_US
-        btnAccentUs.background = a.rounded(if (usOn) Pal.primary else Pal.card, 3f, Pal.line)
-        btnAccentUs.setTextColor(if (usOn) Pal.white else Pal.primary)
-        btnAccentUk.background = a.rounded(if (!usOn) Pal.primary else Pal.card, 3f, Pal.line)
-        btnAccentUk.setTextColor(if (!usOn) Pal.white else Pal.primary)
-
-        val rates = listOf(0.7f, 1.0f, 1.3f)
-        listOf(btnRateSlow, btnRateNormal, btnRateFast).forEachIndexed { i, b ->
-            val on = a.db.speechRate == rates[i]
-            b.background = a.rounded(if (on) Pal.primary else Pal.card, 3f, Pal.line)
-            b.setTextColor(if (on) Pal.white else Pal.primary)
-        }
-
-        tvIpaStatus.text = a.ipaDictStatusText()
-        val autoOn = a.db.autoIpa
-        btnAutoIpa.text = "导入时自动补全音标：" + (if (autoOn) "开" else "关")
-        btnAutoIpa.background = a.rounded(if (autoOn) Pal.softBlue else Pal.card, 3f, Pal.line)
-        btnAutoIpa.setTextColor(if (autoOn) Pal.primary else Pal.textSub)
         renderGroups()
     }
 

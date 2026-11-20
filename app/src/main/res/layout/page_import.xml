@@ -29,7 +29,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:lineSpacingExtra="4dp"
-                android:text="支持 .docx（段落 / 两列表格）、.xlsx（两列）、文字型 .pdf、.txt / .csv。Unit 1 / Day 2 / 第 3 单元 等标题行会自动划组；写 UK /…/ US /…/ 会自动拆成英 / 美两套音标。旧版 .doc / .xls 请另存为新格式，扫描版 PDF 请用「粘贴导入」。\n\n也可以直接从微信把文件发进来，见下方「⑦ 从微信 / QQ 导入」。"
+                android:text="支持 .docx（段落 / 两列表格）、.xlsx（两列）、文字型 .pdf、.txt / .csv。Unit 1 / Day 2 / 第 3 单元 等标题行会自动划组；写 UK /…/ US /…/ 会自动拆成英 / 美两套音标。旧版 .doc / .xls 请另存为新格式，扫描版 PDF 请用「粘贴导入」。\n\n也可以直接从微信把文件发进来，见下方「⑤ 从微信 / QQ 导入」。"
                 android:textSize="12sp"
                 android:textColor="@color/text_sub" />
 
@@ -216,334 +216,39 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="④ 备份与设置"
+                android:text="④ 内置词库"
                 android:textSize="15sp"
                 android:textStyle="bold"
                 android:textColor="@color/text" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="每天解锁新词数"
-                    android:textSize="13sp"
-                    android:textColor="@color/text" />
-
-                <EditText
-                    android:id="@+id/etDaily"
-                    android:layout_width="64dp"
-                    android:layout_height="40dp"
-                    android:background="@drawable/bg_input"
-                    android:gravity="center"
-                    android:inputType="number"
-                    android:maxLines="1"
-                    android:text="10"
-                    android:textSize="14sp"
-                    android:textColor="@color/text" />
-
-                <TextView
-                    android:id="@+id/btnSaveDaily"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:layout_marginLeft="8dp"
-                    android:background="@drawable/bg_btn_primary"
-                    android:gravity="center"
-                    android:paddingLeft="14dp"
-                    android:paddingRight="14dp"
-                    android:text="保存"
-                    android:textSize="13sp"
-                    android:textColor="@color/white" />
-            </LinearLayout>
-
             <TextView
-                android:id="@+id/btnExport"
-                android:layout_width="match_parent"
-                android:layout_height="42dp"
-                android:layout_marginTop="14dp"
-                android:background="@drawable/bg_btn_ghost"
-                android:gravity="center"
-                android:text="导出词库备份（JSON）"
-                android:textSize="13sp"
-                android:textColor="@color/primary" />
-
-            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/btnLoadDemo"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_weight="1"
-                    android:layout_marginRight="5dp"
-                    android:background="@drawable/bg_btn_ghost"
-                    android:gravity="center"
-                    android:text="载入示例词库"
-                    android:textSize="12sp"
-                    android:textColor="@color/primary" />
-
-                <TextView
-                    android:id="@+id/btnClear"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_weight="1"
-                    android:layout_marginLeft="5dp"
-                    android:background="@drawable/bg_btn_ghost"
-                    android:gravity="center"
-                    android:text="清空词库"
-                    android:textSize="12sp"
-                    android:textColor="@color/danger" />
-            </LinearLayout>
+                android:layout_marginTop="8dp"
+                android:lineSpacingExtra="4dp"
+                android:text="不想自己找文件时，可以直接载入内置词表。考研词库按 Unit 1 Day 1 … Unit 5 Day 3 分成 23 组，先进入导入预览，确认后才写入。"
+                android:textSize="12sp"
+                android:textColor="@color/text_sub" />
 
             <TextView
                 android:id="@+id/btnLoadKaoyan"
                 android:layout_width="match_parent"
                 android:layout_height="42dp"
-                android:layout_marginTop="8dp"
-                android:background="@drawable/bg_btn_soft"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_btn_primary"
                 android:gravity="center"
                 android:text="载入考研词库（Unit 1–5 · 711 词）"
-                android:textSize="12sp"
-                android:textColor="@color/primary" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:orientation="vertical"
-            android:background="@drawable/bg_card"
-            android:padding="16dp">
+                android:textSize="13sp"
+                android:textColor="@color/white" />
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="怎么算「解锁」？"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:textColor="@color/text" />
-
-            <TextView
+                android:id="@+id/btnLoadDemo"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="42dp"
                 android:layout_marginTop="8dp"
-                android:lineSpacingExtra="5dp"
-                android:text="新导入的词是「未解锁」→ 每天解锁一批进入「学习中」→ 用卡片自评与小测验，连续答对 3 次升级为「已掌握」。答错回到当天队列，按 1/2/4/7/15/30 天的节奏复习。\n\n全程离线，不联网、不申请任何权限；发音调用手机自带的文字转语音引擎，不上传任何数据。"
-                android:textSize="12sp"
-                android:textColor="@color/text_sub" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:orientation="vertical"
-            android:background="@drawable/bg_card"
-            android:padding="16dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="⑤ 发音与音标"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                android:textColor="@color/text" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:lineSpacingExtra="4dp"
-                android:text="学习卡片上并列「英音 UK」「美音 US」两个按钮，点哪边就用哪边口音读；有 UK / US 两套音标时并排显示。\n\n音标有三个来源：文档里写 UK /…/ US /…/ 自动拆两套、导入时用随包内置的离线开源词典自动补全、或在词条里手动填。全程不联网、不编造音标，查不到的词留空。\n\n发音用系统 TTS 的本地离线语音包；没装对应口音时会自动回退到另一种并提示，朗读出错会给出具体原因。"
-                android:textSize="12sp"
-                android:textColor="@color/text_sub" />
-
-            <TextView
-                android:id="@+id/tvTtsStatus"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="语音引擎还在准备…"
-                android:textSize="12sp"
-                android:textColor="@color/primary" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/btnAccentUs"
-                    android:layout_width="0dp"
-                    android:layout_height="40dp"
-                    android:layout_weight="1"
-                    android:layout_marginRight="6dp"
-                    android:background="@drawable/bg_btn_ghost"
-                    android:gravity="center"
-                    android:text="默认：美音 US"
-                    android:textSize="12sp"
-                    android:textColor="@color/primary" />
-
-                <TextView
-                    android:id="@+id/btnAccentUk"
-                    android:layout_width="0dp"
-                    android:layout_height="40dp"
-                    android:layout_weight="1"
-                    android:layout_marginLeft="6dp"
-                    android:background="@drawable/bg_btn_ghost"
-                    android:gravity="center"
-                    android:text="默认：英音 UK"
-                    android:textSize="12sp"
-                    android:textColor="@color/primary" />
-            </LinearLayout>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:text="朗读语速"
-                android:textSize="12sp"
-                android:textColor="@color/text_sub" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/btnRateSlow"
-                    android:layout_width="0dp"
-                    android:layout_height="36dp"
-                    android:layout_weight="1"
-                    android:layout_marginRight="4dp"
-                    android:background="@drawable/bg_btn_ghost"
-                    android:gravity="center"
-                    android:text="慢 0.7×"
-                    android:textSize="11sp"
-                    android:textColor="@color/primary" />
-
-                <TextView
-                    android:id="@+id/btnRateNormal"
-                    android:layout_width="0dp"
-                    android:layout_height="36dp"
-                    android:layout_weight="1"
-                    android:layout_marginLeft="4dp"
-                    android:layout_marginRight="4dp"
-                    android:background="@drawable/bg_btn_ghost"
-                    android:gravity="center"
-                    android:text="正常 1.0×"
-                    android:textSize="11sp"
-                    android:textColor="@color/primary" />
-
-                <TextView
-                    android:id="@+id/btnRateFast"
-                    android:layout_width="0dp"
-                    android:layout_height="36dp"
-                    android:layout_weight="1"
-                    android:layout_marginLeft="4dp"
-                    android:background="@drawable/bg_btn_ghost"
-                    android:gravity="center"
-                    android:text="快 1.3×"
-                    android:textSize="11sp"
-                    android:textColor="@color/primary" />
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/btnSpeakSample"
-                android:layout_width="match_parent"
-                android:layout_height="38dp"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/bg_btn_soft"
-                android:gravity="center"
-                android:text="试听一句英文（确认到底出不出声）"
-                android:textSize="12sp"
-                android:textColor="@color/primary" />
-
-            <TextView
-                android:id="@+id/btnTtsSettings"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_marginTop="10dp"
                 android:background="@drawable/bg_btn_ghost"
                 android:gravity="center"
-                android:text="安装 / 检查英语语音包"
-                android:textSize="12sp"
-                android:textColor="@color/primary" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:lineSpacingExtra="3dp"
-                android:text="音标写法示例：\nUnit 1\nafter  UK /ˈɑːftə/  US /ˈæftər/  在…之后\nabandon  /əˈbændən/  放弃"
-                android:textSize="11sp"
-                android:textColor="@color/text_sub" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:orientation="vertical"
-            android:background="@drawable/bg_card"
-            android:padding="16dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="⑥ 音标自动补全"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                android:textColor="@color/text" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:lineSpacingExtra="4dp"
-                android:text="Word 里只有「单词 + 汉语意思」也没关系：导入时会自动查随包内置的离线开源词典，把英 / 美音标填上，卡片上不再是空的。\n\n只补空字段——文档里写了音标的、你自己手填的，都不会被覆盖；词典没收录的生僻词、词组、自造词仍留空。不需要联网、不需要装别的 App、不申请任何权限，只是 APK 里多了一份约 4 MB 的数据。\n\n数据是开源音素转写（含 ɫ / ɝ / ɐ 等严式符号），和课本上的宽式 IPA 写法略有差异；不合适就在词条里手动改。来源与许可见工程内 LICENSES/THIRD_PARTY_NOTICES.md。"
-                android:textSize="12sp"
-                android:textColor="@color/text_sub" />
-
-            <TextView
-                android:id="@+id/tvIpaStatus"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="正在读取内置词典…"
-                android:textSize="12sp"
-                android:textColor="@color/primary" />
-
-            <TextView
-                android:id="@+id/btnAutoIpa"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_marginTop="12dp"
-                android:background="@drawable/bg_btn_soft"
-                android:gravity="center"
-                android:text="导入时自动补全音标：开"
-                android:textSize="12sp"
-                android:textColor="@color/primary" />
-
-            <TextView
-                android:id="@+id/btnFillIpa"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/bg_btn_ghost"
-                android:gravity="center"
-                android:text="给现有词库补一次音标"
+                android:text="载入 12 个示例词"
                 android:textSize="12sp"
                 android:textColor="@color/primary" />
         </LinearLayout>
@@ -559,7 +264,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="⑦ 从微信 / QQ 导入"
+                android:text="⑤ 从微信 / QQ 导入"
                 android:textSize="15sp"
                 android:textStyle="bold"
                 android:textColor="@color/text" />
@@ -595,6 +300,17 @@
                 android:textSize="12sp"
                 android:textColor="@color/primary" />
         </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:layout_marginBottom="8dp"
+            android:gravity="center"
+            android:lineSpacingExtra="3dp"
+            android:text="发音、音标、每日新词数、备份、重置与版本更新已移到「设置」页。"
+            android:textSize="11sp"
+            android:textColor="@color/text_sub" />
 
     </LinearLayout>
 </ScrollView>
