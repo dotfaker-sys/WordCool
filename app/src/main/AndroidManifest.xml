@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- 完全离线：不申请联网、存储、定位等任何权限 -->
+    <!-- v9：全应用唯一的权限，只给「统计 → 检查更新」用。
+         只在用户点按钮或自己打开「启动时自动检查」时才发一次只读 GET，
+         读取 GitHub 公开 Release 版本号；不上传任何词库 / 账号 / 设备信息。
+         词库、导入、音标、发音、复习、备份依旧全程离线。
+         仍然没有存储、定位、通讯录、后台自启等任何其他权限。 -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"

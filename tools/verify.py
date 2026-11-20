@@ -253,8 +253,12 @@ for act in ("android.intent.action.VIEW", "android.intent.action.SEND",
             "android.intent.action.SEND_MULTIPLE"):
     if act not in manifest:
         errors.append(f"Manifest 缺少外部文件接收 action: {act}")
-if "<uses-permission" in manifest:
-    errors.append("v8 破坏了零权限：Manifest 出现了 uses-permission")
+# v9 起按用户确认加了 INTERNET（应用内检查更新）；只允许这一个，禁止夹带别的权限
+perms = re.findall(r'<uses-permission[^>]*android:name="([^"]+)"', manifest)
+if perms != ["android.permission.INTERNET"]:
+    errors.append(
+        "权限白名单被破坏：只允许 android.permission.INTERNET 一个，实际 " + str(perms)
+    )
 if 'android:launchMode="singleTask"' not in manifest:
     errors.append("Manifest 缺少 singleTask，微信唤起会堆多个 Activity 实例")
 if 'android:exported="true"' not in manifest:
@@ -313,7 +317,90 @@ for ok, msg in v8:
     if not ok:
         errors.append("v8 回归失败: " + msg)
 print(f"v8 微信导入回归: {sum(1 for ok, _ in v8 if ok)}/{len(v8)} 项通过 · "
-      f"零权限 / 三组过滤器校验完成")
+      f"权限白名单 / 三组过滤器校验完成")
+
+# ---- v9：应用内检查更新 ----
+upd = (MAIN / "java/com/wordcool/app/UpdateChecker.kt")
+if not upd.is_file():
+    errors.append("缺少 UpdateChecker.kt")
+else:
+    u = upd.read_text(encoding="utf-8")
+    for token in ("HttpURLConnection", "runOnUiThread", "JSONObject", "connectTimeout",
+                  "readTimeout", "disconnect", "setRequestProperty(\"User-Agent\"",
+                  "SocketTimeoutException", "UnknownHostException", "RELEASES_PAGE",
+                  "compare(", "autoCheck", "toggleAuto", "isDestroyed"):
+        if token not in u:
+            errors.append(f"UpdateChecker 缺少: {token}")
+    if "releases/latest" not in u:
+        errors.append("UpdateChecker 未指向 GitHub latest Release 接口")
+    if "startActivity" not in u or "Intent.ACTION_VIEW" not in u:
+        errors.append("发现新版后没有跳转浏览器的入口")
+
+stats_kt = (MAIN / "java/com/wordcool/app/StatsView.kt").read_text(encoding="utf-8")
+for token in ("btnCheckUpdate", "btnAutoUpdate", "tvVersion", "UpdateChecker.check",
+              "UpdateChecker.currentVersion", "renderAutoLabel"):
+    if token not in stats_kt:
+        errors.append(f"StatsView 未接上更新入口: {token}")
+stats_xml = (MAIN / "res/layout/page_stats.xml").read_text(encoding="utf-8")
+for token in ("tvVersion", "btnCheckUpdate", "btnAutoUpdate"):
+    if 'android:id="@+id/' + token + '"' not in stats_xml:
+        errors.append(f"page_stats.xml 缺少 id: {token}")
+
+if "UpdateChecker.autoCheck(this)" not in main_kt or "isIncomingIntent" not in main_kt:
+    errors.append("MainActivity 未接上启动时静默检查 / 未避开微信分享入口")
+
+build_gradle = (ROOT / "app/build.gradle").read_text(encoding="utf-8")
+if "versionCode 3" not in build_gradle or "versionName '1.2'" not in build_gradle:
+    errors.append("app/build.gradle 版本号未升到 v1.2 / versionCode 3")
+wf = (ROOT / ".github/workflows/build-apk.yml").read_text(encoding="utf-8")
+if "'v1.2.0'" not in wf or "应用内检查更新" not in wf:
+    errors.append("CI 默认 tag / 发布说明未同步到 v1.2.0")
+
+def py_compare(local, remote):
+    """等价复刻 UpdateChecker.compare：>0 表示远端更新"""
+    def parts(v):
+        core = v.strip().lstrip("vV").split("-")[0].split("+")[0]
+        return [int("".join(c for c in x if c.isdigit()) or "0")
+                for x in core.split(".")][:4]
+    a, b = parts(local), parts(remote)
+    for i in range(max(len(a), len(b))):
+        x = a[i] if i < len(a) else 0
+        y = b[i] if i < len(b) else 0
+        if x != y:
+            return (y > x) - (y < x)
+    return 0
+
+def py_pick_apk(payload):
+    """等价复刻 parse()：从 assets 里挑第一个 .apk 下载直链"""
+    apk = ""
+    for a in payload.get("assets", []):
+        url = a.get("browser_download_url", "")
+        if url.lower().endswith(".apk"):
+            apk = url
+            break
+    return apk, payload.get("tag_name", "").strip()
+
+v9 = [
+    (py_compare("1.2", "v1.2.0") == 0, "1.2 与 v1.2.0 应视为同一版本，不弹更新"),
+    (py_compare("1.1", "v1.2.0") > 0, "远端 v1.2.0 应判为比 1.1 新"),
+    (py_compare("1.2", "v1.1.0") < 0, "本地比远端新时不应弹更新"),
+    (py_compare("1.9", "v1.10.0") > 0, "逐段数字比较，1.10 必须大于 1.9"),
+    (py_compare("1.2", "v1.2.1") > 0, "补丁号变化也应识别为新版"),
+    (py_compare("1.2", "v1.2.0-beta") == 0, "预发布后缀不参与比较"),
+    (py_pick_apk({"tag_name": "v1.3.0", "assets": [
+        {"browser_download_url": "https://x/notes.md"},
+        {"browser_download_url": "https://x/WordCool.apk"}]})
+     == ("https://x/WordCool.apk", "v1.3.0"),
+     "应从 assets 里挑出 APK 直链"),
+    (py_pick_apk({"tag_name": "v1.3.0", "assets": []}) == ("", "v1.3.0"),
+     "没有 assets 时降级为发布页，不崩溃"),
+    (perms == ["android.permission.INTERNET"], "权限白名单：仅 INTERNET 一个"),
+]
+for ok, msg in v9:
+    if not ok:
+        errors.append("v9 回归失败: " + msg)
+print(f"v9 检查更新回归: {sum(1 for ok, _ in v9 if ok)}/{len(v9)} 项通过 · "
+      f"权限白名单 {perms}")
 
 print(f"XML {len(xmls)} · Kotlin {len(kts)} · 布局 {len(layouts)} · id {len(ids)} · drawable {len(drawables)}")
 if errors:
@@ -323,6 +410,6 @@ if errors:
     print(f"\n共 {len(errors)} 项，静态自检未通过。")
     return_code = 1
 else:
-    print("静态自检全部通过。GitHub Actions 已真实编译出 APK；仍需真机点按验证（尤其微信分享入口）。")
+    print("静态自检全部通过。GitHub Actions 已真实编译出 APK；仍需真机点按验证（微信分享入口、检查更新请求与浏览器跳转）。")
     return_code = 0
 sys.exit(return_code)

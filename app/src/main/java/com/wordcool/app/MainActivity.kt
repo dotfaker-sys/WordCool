@@ -79,8 +79,19 @@ class MainActivity : Activity() {
 
         initTts()
         switchTo(0)
-        // v8：冷启动时若是从微信「用其他应用打开 / 分享」进来的，直接进导入预览
-        if (savedInstanceState == null) handleIncomingIntent(intent)
+        if (savedInstanceState != null) return
+        if (isIncomingIntent(intent)) {
+            // v8：从微信「用其他应用打开 / 分享」进来，直接进导入预览
+            handleIncomingIntent(intent)
+        } else {
+            // v9：正常点图标启动，且用户开了开关时静默查一次新版；没新版不弹窗
+            UpdateChecker.autoCheck(this)
+        }
+    }
+
+    private fun isIncomingIntent(i: Intent?): Boolean = when (i?.action) {
+        Intent.ACTION_VIEW, Intent.ACTION_SEND, Intent.ACTION_SEND_MULTIPLE -> true
+        else -> false
     }
 
     /** v8：App 已在运行（singleTask）时，微信再发一个文件会走这里 */

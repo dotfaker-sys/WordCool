@@ -1,14 +1,16 @@
-# 单词酷 · 设计系统与架构规范 v8
+# 单词酷 · 设计系统与架构规范 v9
 
-> 版本沿革：v2 页面重设计 → v3 加功能 → v4 修 15 项缺陷 → v5 英音 / 美音双发音与双音标 → v6 内置离线开源音标词典 → v7 对照同行产品与开源数据源做实证调研 → **v8 接入微信 / QQ 等外部 App 的文件分享，并把 GitHub Actions 做成真编译 + 自动发版**。
+> 版本沿革：v2 页面重设计 → v3 加功能 → v4 修 15 项缺陷 → v5 英音 / 美音双发音与双音标 → v6 内置离线开源音标词典 → v7 对照同行产品与开源数据源做实证调研 → v8 接入微信 / QQ 文件分享并做成 CI 真编译 + 自动发版 → **v9 应用内检查更新（首次、也是唯一一次新增 `INTERNET` 权限）**。
 >
-> **v8 一句话**：微信里点开词表 →「用其他应用打开」/「分享」→ 选「单词酷」，文件直接进导入预览，不用先存到手机。做法是给 `MainActivity` 加三组 `intent-filter` 接住 `ACTION_VIEW` / `ACTION_SEND` / `ACTION_SEND_MULTIPLE`，统一走原有预览流程；**不读微信私有目录、不联网、不申请任何权限**。详见第 10 节。
+> **v9 一句话**：应用内检查更新放在「统计 → 版本与更新」，点按钮才向 GitHub 发一次只读 GET 比对公开 Release 版本号；发现新版弹窗、点「去下载」才用浏览器打开下载页，绝不自动下载或安装。**这是全应用唯一联网点，也是唯一新增权限**：词库、导入、离线音标词典、双发音、复习、备份全部仍离线可用。用户明确确认「允许加 INTERNET 权限」后才做，见第 11 节。
 >
-> **v7 一句话**：先查别人怎么做，再改代码。结论是主流产品把「词表数据 / 音标显示 / TTS 发声」三层分开，且导入补全都走「只补空 + 未命中显式告知」；据此把音标补全从「三列全空才补」改成**逐字段只补空**、补上**英美拼写别名**、**保留同形异读全部候选**、**列出并可复制未命中词**、以及**数据 SHA-256 溯源**。全部离线、零权限、零第三方依赖不变。
+> **v8 一句话**：微信里点开词表 →「用其他应用打开」/「分享」→ 选「单词酷」，文件直接进导入预览，不用先存到手机。做法是给 `MainActivity` 加三组 `intent-filter` 接住 `ACTION_VIEW` / `ACTION_SEND` / `ACTION_SEND_MULTIPLE`，统一走原有预览流程；**不读微信私有目录，导入链路不联网**。详见第 10 节。
 >
-> **v5 一句话**：学习卡片上并列「英音 UK」「美音 US」两个按钮，点哪边用哪边口音读；有 UK / US 两套音标时并排显示，导入文档里写 `UK /…/ US /…/` 会自动拆成两套。发音仍走系统 TTS 的**本地离线语音包**，不引第三方库、不联网、不申请权限。
+> **v7 一句话**：先查别人怎么做，再改代码。结论是主流产品把「词表数据 / 音标显示 / TTS 发声」三层分开，且导入补全都走「只补空 + 未命中显式告知」；据此把音标补全从「三列全空才补」改成**逐字段只补空**、补上**英美拼写别名**、**保留同形异读全部候选**、**列出并可复制未命中词**、以及**数据 SHA-256 溯源**。数据层全部离线、零第三方依赖不变（权限口径变化见第 11 节）。
 >
-> **v6 修正上一版的结论**：那时说「离线应用没有内置词典，音标不会凭空生成」——现在**改为随包内置一份离线开源音标词典**（v6 为 147,488 条，v7 归一并保留多读音后重建为 146,647 条），导入时自动补全。结论变化的原因是把数据合法打包进 APK，而不是改成了联网查词：仍然不联网、不加权限、不装别的东西，只是 APK 多约 4.4 MB。**查不到的词依旧留空，不会编造。**
+> **v5 一句话**：学习卡片上并列「英音 UK」「美音 US」两个按钮，点哪边用哪边口音读；有 UK / US 两套音标时并排显示，导入文档里写 `UK /…/ US /…/` 会自动拆成两套。发音仍走系统 TTS 的**本地离线语音包**，不引第三方库，发音链路不联网。
+>
+> **v6 修正上一版的结论**：那时说「离线应用没有内置词典，音标不会凭空生成」——现在**改为随包内置一份离线开源音标词典**（v6 为 147,488 条，v7 归一并保留多读音后重建为 146,647 条），导入时自动补全。结论变化的原因是把数据合法打包进 APK，而不是改成了联网查词：仍然不联网查词、不装别的东西，只是 APK 多约 4.4 MB。**查不到的词依旧留空，不会编造。**
 >
 > **v3 三件事**：① 学习卡片页一次只显示一个单词，自评后由用户点「下一个」才换词；② 导入支持 Word / Excel / 文字型 PDF，文档里的 `Unit 1` / `Day 2` / `第 3 单元` 标题行自动划组；③ 导入后可手动改组名、按顺序自动划组，词库页与学习页都能按组筛选。视觉沿用 v2「墨卡 / INK CARD」设计系统，未改动色板与组件规则。
 
@@ -90,7 +92,7 @@
 | 设计 token | `Ui.kt` | 色板、圆角、状态色（本次只换值） |
 | 规则层 | `WordDb.kt` / `DocxParser.kt` | 解锁、间隔复习、统计、备份、词表解析 |
 | 数据层 | SQLite `words` / `checkin` + SharedPreferences | 持久化 |
-| 系统能力 | SAF 文件选择、系统 TTS、XmlPullParser | 零第三方依赖、零权限 |
+| 系统能力 | SAF 文件选择、系统 TTS、XmlPullParser、`HttpURLConnection` + `org.json` | 零第三方依赖；v1.2 起仅 `INTERNET` 一个权限 |
 
 演进建议（**仅建议，本次未改任何运行时代码**）：
 
@@ -112,7 +114,7 @@
 5. **`MainActivity.kt` 与四个 View 的构造、调用契约**：`showWordDialog` / `showImportPreview` / `pickDocument` / `exportBackup` / `switchTo` / `dataChanged` / `speak` 等；四个 View 仍以 `(MainActivity, View)` 构造。
 6. **v2 的全部 `R.id` 与布局文件名**：8 个布局、90 个旧 id 一个不改名、不删除（v3 新增 10 个、v4 新增 `dialog_input.xml`、v5 新增 9 个、v6 新增 8 个，现共 9 布局 / 117 个 id）。
 7. **`Ui.kt` 的函数签名**：`Pal` 字段名、`dp` / `rounded` / `toast` / `show` / `stateName` / `stateColor` 全部保持；仅替换色值与圆角收敛系数。
-8. **Gradle 与清单**：`applicationId`、minSdk 26 / targetSdk 34、**零第三方依赖（Gradle dependencies 仍为空）**、零权限。v8 前 `AndroidManifest.xml` 一直没有改过；v8 起**只增不改**：加 `android:launchMode="singleTask"` 与 3 组接收文件的 `intent-filter`，原来的 MAIN / LAUNCHER 过滤器、`exported="true"`、以及**零 `<uses-permission>`** 全部不变。Kotlin 源文件从 8 个增至 9 个（新增 `IpaDictionary.kt`）；v6 另新增 `assets/ipa.tsv`、`LICENSES/`、`tools/`，均为数据与脚本，不是代码依赖。
+8. **Gradle 与清单**：`applicationId`、minSdk 26 / targetSdk 34、**零第三方依赖（Gradle dependencies 仍为空）**。**v1.0/v1.1 为零权限；v1.2 起按用户明确确认新增唯一一个 `<uses-permission android:name="android.permission.INTERNET" />`**，只给「检查更新」用，仍无存储 / 定位 / 通讯录等任何其他权限，`tools/verify.py` 用白名单强制只允许这一个。v8 前 `AndroidManifest.xml` 一直没有改过；v8 起**只增不改**：加 `launchMode="singleTask"` 与 3 组接收文件的 `intent-filter`，原 MAIN / LAUNCHER 过滤器与 `exported="true"` 不变。Kotlin 源文件 8 → 9（v6 `IpaDictionary.kt`）→ **10（v9 `UpdateChecker.kt`）**；v6 另新增 `assets/ipa.tsv`、`LICENSES/`、`tools/`，均为数据与脚本，不是代码依赖。
 9. **编译与安装方式**：Android Studio / GitHub Actions / 命令行三条路径不变（见 `README.md`）。
 
 本次实际改动范围：`res/values`（色板、主题）、`res/drawable`（卡片 / 按钮 / 输入 / 进度 / 行 / 页眉）、`res/mipmap-*`（启动图标）、`Ui.kt`（数值与圆角实现）、以及布局里的纯视觉属性（字体族、字号、背景引用、去掉 emoji 的文案）。
@@ -140,7 +142,7 @@
 4. **备份 JSON**：新增 `group` / `phonetic_uk` / `phonetic_us`，`version` 仍为 `1`；旧备份缺字段按空值恢复。
 5. **`R.id`**：旧 90 个一个不改名、不删除；v3 新增 10 个、v4 新增 `dialog_input.xml`、v5 新增 9 个（双发音按钮、双音标输入、口音设置）。
 6. **视觉系统**：色板、字阶、圆角、细线规则、对比度全部沿用 v2，未重新设计。
-7. **Gradle / Manifest / 零权限 / 零第三方依赖**：不变。Excel 用 `ZipInputStream + XmlPullParser`，PDF 用 `java.util.zip.Inflater`，都不引库。
+7. **Gradle / Manifest / 零第三方依赖**：不变（该轮为零权限；v1.2 起仅新增 INTERNET，见第 11 节）。Excel 用 `ZipInputStream + XmlPullParser`，PDF 用 `java.util.zip.Inflater`，都不引库。
 
 ### 5.3 格式支持与已知限制
 
@@ -197,7 +199,7 @@
 | 口音选择 | `speak(text, accent)` 新增重载；旧 `speak(text)` 保留并按默认口音朗读。默认口音存 SharedPreferences，导入页可切换 |
 | 精确口音 | `applyAccent()` 优先 `setVoice()` 选 `en_US` / `en_GB` 的本地 voice，失败退回 `setLanguage(Locale.US / Locale.UK)` |
 | 可用性检查 | 依次过 `isLanguageAvailable()` → `voices` 里必须存在「地区匹配 + 不需联网 + 未标记 notInstalled」的 voice。**列在 voices 里不等于能用**，缺语音数据时系统会静默回退默认口音 [citation:4] |
-| 离线保证 | 硬性过滤 `isNetworkConnectionRequired` 与 `KEY_FEATURE_NETWORK_SERVICE_REQUIRED`，只选本地语音包；应用本身零权限、不联网 [citation:7] |
+| 离线保证 | 硬性过滤 `isNetworkConnectionRequired`，只选本地语音包；发音链路完全不联网，检查更新是独立的一条只读请求 [citation:7] |
 | 缺包降级 | 点英音但没装英音包 → 自动用美音读并明确提示；两种都没有 → 引导「系统设置 → 语言和输入 → 文字转语音」安装（`ACTION_INSTALL_TTS_DATA`），返回后 `onResume` 重新探测 [citation:9] |
 | 双音标解析 | 文档写 `UK /ˈɑːftə/ US /ˈæftər/`、`BrE[…] AmE[…]`、`英式/美式` 都会拆成 `phonetic_uk` / `phonetic_us`；只有一个音标则英美共用 |
 | 音标编辑 | 词条对话框加「英式音标 UK」「美式音标 US」两个输入，留空沿用通用音标 |
@@ -208,12 +210,12 @@
 - 数据库 2 → 3 只 `ALTER TABLE` 加两列；`Word` / `Imported` 只在末尾追加带默认值字段，DEMO 六参数构造不变
 - `exportJson` 多两个字段、`version` 仍为 1；旧备份缺字段按空值恢复，旧版 App 忽略多出的字段
 - 旧 100 个 `R.id` 一个没改名 / 删除，v5 新增 9 个；`speak(text)` 旧签名保留
-- 视觉 token、分组、导入、复习算法、零依赖 / 零权限全部不变
+- 视觉 token、分组、导入、复习算法、零依赖全部不变；权限口径变化见第 11 节
 
 ### 7.4 必须说清的边界（这不是 bug，是离线应用的物理限制）
 
 1. **音标不能凭空生成**（v5 状态，**v6 起已被第 8 节取代**）：v5 时包里没有词典数据，音标只能来自文档或手动填写，文档没写卡片就是空的。**v6 起改为随包内置离线开源词典自动补全**，但依然不是「凭空生成」——数据来自真实词典，查不到的词仍留空。详见第 8 节。
-2. **音色由手机的 TTS 引擎决定**：App 只能请求 `en-US` / `en-GB` 的本地 voice，装没装、音质好不好、男女声，都是系统语音包的事。国产机若只预装了中文 TTS，需要去系统设置装英语语音数据；本 App 不联网下载，也不打包音频文件（那会让 APK 变成几十 MB 且涉及词典授权）。
+2. **音色由手机的 TTS 引擎决定**：App 只能请求 `en-US` / `en-GB` 的本地 voice，装没装、音质好不好、男女声，都是系统语音包的事。国产机若只预装了中文 TTS，需要去系统设置装英语语音数据；发音资源不联网下载，也不打包音频文件（那会让 APK 变成几十 MB 且涉及词典授权）。
 3. **两个口音都可能没装时**：不会崩溃，会给出安装引导，但确实没法发声。
 4. 扫描版 PDF、CID 字体中文释义、老 `.doc`/`.xls` 的限制不变。
 
@@ -270,7 +272,7 @@
 - 数据库版本仍为 3，**表结构一列没加**；`autoIpa` / `speechRate` 只存 SharedPreferences
 - `speak(text)` 旧签名保留；新增 `speak(text, accent)` 重载不变
 - 旧 109 个 `R.id` 一个没改名 / 删除，v6 新增 8 个；备份 JSON 字段不变
-- 分组、导入解析、复习算法、视觉 token、零依赖 / 零权限 / 离线全部不变
+- 分组、导入解析、复习算法、视觉 token、零依赖 / 离线全部不变（权限口径见第 11 节）
 
 ### 8.7 必须说清的边界
 
@@ -317,7 +319,7 @@
 
 ### 9.4 明确没有采纳的方案
 
-- **联网词典 API**：能补齐任意词，但要 `INTERNET` 权限与后端，破坏「离线零权限」
+- **联网词典 API**：能补齐任意词，但要 `INTERNET` 权限与后端（v7 当时的否决理由；v9 虽加了 INTERNET，但仍**未**把查词搬到线上，词表数据依旧随包离线）
 - **完整 Kaikki / Wiktionary 数据**：2.8 GB 压缩、逐条授权混杂，不适合塞进 APK
 - **ECDICT 的 phonetic 字段**：仓库无清晰许可，且只有一个混合音标，不能拆成英美两列
 - **规则 G2P / 神经网络猜未命中词**：`colonel`、`yacht`、`read` 这类必然出错，宁可留空
@@ -361,9 +363,9 @@ Android 沙箱下，微信收到的文件在 `com.tencent.mm` 私有目录里，
 - 数据库版本仍为 3，表结构与备份 JSON 字段一列未加
 - `importFromUri(uri)` 旧签名保留；`showImportPreview` / `db.importWords` / `DocxParser.parseBytes` 全部未改
 - 视觉 token 不变，`R.id` 只增（`btnWechatHelp` / `btnPickDoc2`），旧 117 个一个没改名
-- **零权限不变**：没有 `READ_EXTERNAL_STORAGE`、没有 `INTERNET`、没有 FileProvider、没有第三方库
+- **v1.1 为零权限**；v1.2 起按用户确认新增唯一的 `INTERNET`（只给检查更新）。仍没有 `READ_EXTERNAL_STORAGE`、没有 FileProvider、没有第三方库
 - `exported="true"` 是原来就有的（LAUNCHER 必需）；新增过滤器只接收文件 Uri，不暴露 Service / Provider / 数据写入接口
-- 版本升到 v1.1（versionCode 2）；CI 默认 Release tag 升到 `v1.1.0`
+- 版本：v1.1（versionCode 2）→ **v1.2（versionCode 3）**；CI 默认 Release tag `v1.1.0` → **`v1.2.0`**
 
 ### 10.4 诚实边界
 
@@ -373,13 +375,58 @@ Android 沙箱下，微信收到的文件在 `com.tencent.mm` 私有目录里，
 
 ---
 
-## 11. 验收与诚实边界
+## 11. v9：应用内检查更新
 
-- 已做：`python3 tools/verify.py` 一键静态自检通过（25 个 XML 合法性与重复属性、117 个 id / 资源引用一致性、9 个 Kotlin 精细括号扫描、emoji 残留、`ipa.tsv` 三列格式与排序、许可证文件齐全、上游 SHA-256 与 `ipa_stats.json` 行数一致性、**Manifest 三组接收过滤器与零权限校验**）
-- 已做：解析算法等价模拟与 **v7 的 8 项行为回归**（逐字段只补空、文档自带双音标不覆盖、别名补缺列、多读音保留、词组与自造词留空），断言全部通过；v8 另加了外部 Intent 的等价模拟（三种 action、Uri 去重、多文件合并、二进制拦截）
+### 11.1 口径变化（必须写清楚）
+
+前几版一路坚持「零权限、全程离线」。用户明确选择「应用内检查更新」并**确认允许加 `INTERNET` 权限**后，v1.2 才加。这是**唯一**一次破例，且收在最窄的范围里：
+
+| 维度 | v1.0 / v1.1 | v1.2 |
+| --- | --- | --- |
+| 权限 | 0 个 | **仅 `INTERNET` 1 个** |
+| 网络请求 | 无 | 仅 `GET https://api.github.com/repos/dotfaker-sys/WordCool/releases/latest` |
+| 触发条件 | — | 用户点「检查更新」，或自己打开「启动时自动检查」 |
+| 上传内容 | — | **无**。不传词库、账号、token、设备信息；只读公开 JSON |
+| 自动下载 / 安装 | — | **没有**。发现新版只弹窗，点「去下载」才用系统浏览器打开页面 |
+| 其他功能 | 离线 | **仍全部离线**：词库、导入、IPA 词典、TTS 发音、复习、备份 |
+
+`tools/verify.py` 现在用白名单强制校验：Manifest 里**只能**出现 `android.permission.INTERNET`，多一个就报错。
+
+### 11.2 实现
+
+- 新增 `UpdateChecker.kt`（第 10 个 Kotlin 文件），系统自带 `HttpURLConnection` + `org.json`，**零第三方依赖**；设 `User-Agent`（GitHub API 不设会 403）、8 秒连接 / 读取超时、`finally { disconnect() }`
+- 后台 `Thread` 发请求，`runOnUiThread` 回主线程弹窗；弹前判断 `isFinishing / isDestroyed`，避免 Activity 已销毁时崩
+- `compare(local, remote)` 把 `1.2` 与 `v1.2.0`、`v1.2.1`、`v1.2.0-beta` 归一成数字三段逐段比较（**1.10 必须大于 1.9**），返回 >0 才判为有新版本
+- 版本号读 `PackageManager.getPackageInfo().versionName`，不写死在布局里，以后升级不会忘记改；`buildconfig=false` 时也不依赖 `BuildConfig`
+- 失败分级：超时 / 无网络 / HTTP 403 限流 / JSON 格式不对，都给**具体原因**和「打开下载页」退路；静默自动检查失败时**不弹窗**，不打扰
+- 「启动时自动检查」开关存 `SharedPreferences`，**默认关**；开启后只有真有新版才弹，已是最新时静默。从微信分享文件进来时不触发自动检查，避免打断导入预览
+- 入口在「统计」页底部：`tvVersion` / `btnCheckUpdate` / `btnAutoUpdate`，沿用既有卡片与按钮样式，视觉 token 一行未改
+
+### 11.3 接口与兼容性
+
+- 数据库仍 v3、备份 JSON 字段未动；`R.id` 只增 3 个，旧 119 个一个没改名
+- `MainActivity` 只加 `isIncomingIntent()` 与一行 `UpdateChecker.autoCheck(this)`；`StatsView` 只加 init 绑定，原有统计逻辑未改
+- `AndroidManifest.xml` 只加 1 条 `uses-permission`，v8 的三组文件接收过滤器、MAIN / LAUNCHER、`exported` 全部不变
+- CI 默认 tag 升 `v1.2.0`，发布说明同步写明「唯一联网点」与「不自动下载安装」
+- **零第三方依赖不变**：`app/build.gradle` 的 `dependencies {}` 仍为空
+
+### 11.4 诚实边界
+
+1. **GitHub 未登录接口每小时限 60 次 / IP**，触发限流会明确提示并可手动打开下载页；这是公开接口限制，不是应用崩溃。
+2. 检查更新**只比对版本号、不校验 APK 签名或完整性**；下载与安装由用户在浏览器里自行完成。
+3. 中国大陆网络环境下 `api.github.com` 可能连不上，此时给「连不上 GitHub」并保留手动打开下载页的退路；**不影响任何背单词功能**。
+4. **仍未做真机点按验证**：实际请求、弹窗、浏览器跳转属于系统行为，需在装了应用的手机上点一次确认。
+5. 不想要联网就**不要打开「启动时自动检查」、也不要点「检查更新」**；这两个都不触发，应用行为与 v1.1 完全一致。
+
+---
+
+## 12. 验收与诚实边界
+
+- 已做：`python3 tools/verify.py` 一键静态自检通过（25 个 XML 合法性与重复属性、122 个 id / 资源引用一致性、10 个 Kotlin 精细括号扫描、emoji 残留、`ipa.tsv` 三列格式与排序、许可证文件齐全、上游 SHA-256 与 `ipa_stats.json` 行数一致性、**Manifest 三组接收过滤器与「仅 INTERNET 一个权限」白名单校验**）
+- 已做：解析算法等价模拟与 **v7 的 8 项行为回归**（逐字段只补空、文档自带双音标不覆盖、别名补缺列、多读音保留、词组与自造词留空），断言全部通过；v8 另加了外部 Intent 的等价模拟（三种 action、Uri 去重、多文件合并、二进制拦截）；**v9 加了 9 项检查更新回归**（版本三段比较含 1.10>1.9、预发布后缀、assets 挑 APK 直链、无 assets 降级、权限白名单）
 - 已做：用真实公开高频词表 `google-10000-english-no-swears`（9,894 词）跑离线查表，得到 94.9% / 77.6% / 5.1% 三组覆盖率数字，非估算
 - 已做：**GitHub Actions（ubuntu-22.04 + JDK 17 + SDK 34 + Gradle 8.2）真实编译通过**，`assembleDebug` 产出 `WordCool.apk`，并自动发布 Release；此前两轮 CI 失败（setup-android action、SDK 34 不存在的 TTS 常量）都已按日志定位并修掉
 - 架构图通过 `archify` showcase 校验（9/9）与 4 个桌面视口浏览器检查
-- **仍未做**：真机安装与点按测试。尤其 TTS 的 `setVoice` / `isLanguageAvailable` / `UtteranceProgressListener`、以及 v8 的微信分享入口是否真的出现在系统列表里，静态检查与 CI 都验证不了——必须装到手机上试一次才能确认
+- **仍未做**：真机安装与点按测试。尤其 TTS 的 `setVoice` / `isLanguageAvailable` / `UtteranceProgressListener`、v8 的微信分享入口是否出现在系统列表里、以及 v9 的实际网络请求与浏览器跳转，静态检查与 CI 都验证不了——必须装到手机上试一次才能确认
 - 静态检查与 CI 都不能证明运行时零缺陷，遇到具体报错请把截图或错误文字发来，按现象定位
 - 现成 APK 在 <https://github.com/dotfaker-sys/WordCool/releases>；自行编译见 `README.md`，编译前先跑 `python3 tools/verify.py`
