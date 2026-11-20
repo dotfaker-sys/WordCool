@@ -3,6 +3,8 @@ package com.wordcool.app
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
+import android.media.AudioAttributes
+import android.media.AudioManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.OpenableColumns
@@ -201,6 +203,7 @@ class MainActivity : Activity() {
         try {
             tts = TextToSpeech(this) { status ->
                 if (status == TextToSpeech.SUCCESS) {
+                    configureTtsAudio(tts)
                     installTtsListener(tts)
                     ttsReady = true
                     refreshVoiceAvailability()
@@ -210,6 +213,22 @@ class MainActivity : Activity() {
             }
         } catch (e: Exception) {
             ttsReady = false
+        }
+    }
+
+    /** 明确走媒体音量 / 语音内容，避免个别引擎把 TTS 归到辅助功能或通话流，
+     *  出现「媒体音量明明不小、朗读却很小」的情况。 */
+    private fun configureTtsAudio(engine: TextToSpeech?) {
+        val e = engine ?: return
+        try {
+            e.setAudioAttributes(
+                AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                    .build()
+            )
+        } catch (ignored: Exception) {
+            // 老引擎不支持 setAudioAttributes 时保持系统默认
         }
     }
 
@@ -319,19 +338,42 @@ class MainActivity : Activity() {
         }
         val ok = if (accent == ACCENT_UK) ukAvailable else usAvailable
         if (ok && applyAccent(accent)) {
-            tts?.setSpeechRate(db.speechRate)
-            tts?.speak(text, TextToSpeech.QUEUE_FLUSH, Bundle(), "wordcool")
+            speakNow(text)
             return
         }
         val fallback = if (accent == ACCENT_UK) ACCENT_US else ACCENT_UK
         val fallbackOk = if (fallback == ACCENT_UK) ukAvailable else usAvailable
         if (fallbackOk && applyAccent(fallback)) {
             toast("这台手机没有${accentName(accent)}语音包，已用${accentName(fallback)}朗读；可在系统「文字转语音」里安装")
-            tts?.setSpeechRate(db.speechRate)
-            tts?.speak(text, TextToSpeech.QUEUE_FLUSH, Bundle(), "wordcool")
+            speakNow(text)
             return
         }
         toast("还没装英语语音包：系统设置 → 语言和输入 → 文字转语音 → 安装英语（美国 / 英国）语音数据")
+    }
+
+    /** 真正下发 TTS；音量 0 / 系统拒绝时给出可执行提示，而不是点了没反应 */
+    private fun speakNow(text: String) {
+        val am = getSystemService(AUDIO_SERVICE) as? AudioManager
+        if (am != null) {
+            val vol = am.getStreamVolume(AudioManager.STREAM_MUSIC)
+            val max = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC).coerceAtLeast(1)
+            if (vol == 0) {
+                toast("媒体音量为 0：先按音量键调高媒体音量，再点发音")
+                return
+            }
+            if (vol * 100 / max < 30) {
+                toast("媒体音量偏低（$vol/$max），按音量键调高后再听")
+            }
+        }
+        val engine = tts ?: return
+        engine.setSpeechRate(db.speechRate)
+        val params = Bundle().apply {
+            putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME, 1.0f)
+        }
+        val result = engine.speak(text, TextToSpeech.QUEUE_FLUSH, params, "wordcool")
+        if (result == TextToSpeech.ERROR) {
+            toast("系统拒绝了朗读请求：到「设置 → 发音」检查 TTS 引擎和英语语音包")
+        }
     }
 
     fun accentName(accent: Int): String = if (accent == ACCENT_UK) "英音" else "美音"
