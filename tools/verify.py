@@ -360,8 +360,8 @@ if "UpdateChecker.autoCheck(this)" not in main_kt or "isIncomingIntent" not in m
     errors.append("MainActivity 未接上启动时静默检查 / 未避开微信分享入口")
 
 build_gradle = (ROOT / "app/build.gradle").read_text(encoding="utf-8")
-if "versionCode 6" not in build_gradle or "versionName '1.5'" not in build_gradle:
-    errors.append("app/build.gradle 版本号未升到 v1.5 / versionCode 6")
+if "versionCode 7" not in build_gradle or "versionName '1.6'" not in build_gradle:
+    errors.append("app/build.gradle 版本号未升到 v1.6 / versionCode 7")
 # v9.1：工作流已按用户要求移除，自检不再读那个文件；同时防止有人误把它加回来
 wf_dir = ROOT / ".github/workflows"
 active_wf = (list(wf_dir.glob("*.yml")) + list(wf_dir.glob("*.yaml"))) if wf_dir.is_dir() else []
@@ -526,6 +526,29 @@ for moved in ("btnReset", "tvVersion", "btnCheckUpdate"):
         errors.append(f"设置项 {moved} 仍留在统计页")
 print(f"v1.5 设置页: 5 个 tab · 设置项 {settings_xml.count('android:id=')} 个 · 导入/统计已精简")
 
+# ---- v1.6：学习顺序 + 多组混合学习 ----
+learn_xml_v16 = (MAIN / "res/layout/page_learn.xml").read_text(encoding="utf-8")
+learn_kt_v16 = (MAIN / "java/com/wordcool/app/LearnView.kt").read_text(encoding="utf-8")
+db_kt_v16 = (MAIN / "java/com/wordcool/app/WordDb.kt").read_text(encoding="utf-8")
+main_kt_v16 = (MAIN / "java/com/wordcool/app/MainActivity.kt").read_text(encoding="utf-8")
+if 'android:id="@+id/btnStudyOrder"' not in learn_xml_v16:
+    errors.append("page_learn.xml 缺少顺序切换按钮 btnStudyOrder")
+for token in ("learnGroups", "showMultiGroupPicker", "dueWordsForGroups",
+              "unlockNewForGroups", "quizWordsForGroups", "shuffleOrder", "rangeLabel",
+              "studyGroups", "loadSavedGroups"):
+    if token not in learn_kt_v16:
+        errors.append(f"LearnView 缺少 v1.6 多组 / 顺序实现: {token}")
+for token in ("dueWordsForGroups", "unlockNewForGroups", "quizWordsForGroups",
+              "appendGroupsWhere", "shuffleOrder", "studyGroups"):
+    if token not in db_kt_v16:
+        errors.append(f"WordDb 缺少 v1.6 多组 / 顺序实现: {token}")
+for token in ("showMultiGroupPicker", "setMultiChoiceItems", "全选"):
+    if token not in main_kt_v16:
+        errors.append(f"MainActivity 缺少多选范围实现: {token}")
+if "group_name IN (" not in db_kt_v16:
+    errors.append("多组筛选没有生成 SQL IN 子句，可能退化成单组")
+print("v1.6 学习范围: 多选 Unit/Day · 顺序 / 打乱 · 解锁 / 复习 / 小测共用同一范围")
+
 print(f"XML {len(xmls)} · Kotlin {len(kts)} · 布局 {len(layouts)} · id {len(ids)} · drawable {len(drawables)}")
 if errors:
     print("\n发现问题：")
@@ -534,7 +557,7 @@ if errors:
     print(f"\n共 {len(errors)} 项，静态自检未通过。")
     return_code = 1
 else:
-    print("静态自检全部通过。v1.5 已在 Android 37 模拟器（API 37）上真编译并点按验证拼写测试、711 词考研词库导入与设置页；"
+    print("静态自检全部通过。v1.6 已在 Android 37 模拟器（API 37）上真编译并点按验证多选范围、顺序 / 打乱切换、拼写测试、711 词考研词库与设置页；"
           "微信分享入口、真实 TTS 语音包与各厂商 ROM 仍需真机验证。")
     return_code = 0
 sys.exit(return_code)

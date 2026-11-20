@@ -738,6 +738,47 @@ class MainActivity : Activity() {
             .show()
     }
 
+    /** v1.6：学习页的多选范围。回调 null 表示「全部词组」；空选也归一为全部。 */
+    fun showMultiGroupPicker(selected: Set<String>, onPick: (Set<String>?) -> Unit) {
+        val gs = db.groups()
+        if (gs.isEmpty()) {
+            toast("还没有分组，先导入带 Unit / Day 标题的词表，或用「自动划组」")
+            return
+        }
+        val labels = gs.map {
+            "${db.groupLabel(it.name)} · ${it.total} 词 · 已解锁 ${it.unlocked}"
+        }
+        val allChecked = selected.isEmpty() || gs.all { it.name in selected }
+        val checked = BooleanArray(gs.size) { allChecked || gs[it].name in selected }
+        val builder = AlertDialog.Builder(this)
+            .setTitle("选择学习范围（可多选，不选=全部）")
+            .setMultiChoiceItems(labels.toTypedArray(), checked) { _, which, isChecked ->
+                checked[which] = isChecked
+            }
+            .setNegativeButton("清空", null)
+            .setNeutralButton("全选", null)
+            .setPositiveButton("确定") { _, _ ->
+                val picked = gs.indices.filter { checked[it] }.map { gs[it].name }.toSet()
+                onPick(if (picked.isEmpty() || picked.size == gs.size) null else picked)
+            }
+        val dlg = builder.create()
+        dlg.setOnShowListener {
+            dlg.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener {
+                for (i in checked.indices) {
+                    checked[i] = false
+                    dlg.listView?.setItemChecked(i, false)
+                }
+            }
+            dlg.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener {
+                for (i in checked.indices) {
+                    checked[i] = true
+                    dlg.listView?.setItemChecked(i, true)
+                }
+            }
+        }
+        dlg.show()
+    }
+
     /** 词库页 / 学习页共用的组别筛选器；回调 null 表示「全部词组」 */
     fun showGroupPicker(current: String?, onPick: (String?) -> Unit) {
         val gs = db.groups()

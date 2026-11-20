@@ -24,6 +24,7 @@ class LearnView(private val a: MainActivity, private val root: View) {
     private val tvTodayInfo = root.findViewById<TextView>(R.id.tvTodayInfo)
     private val todayBar = root.findViewById<ProgressBar>(R.id.todayBar)
     private val btnPickGroup = root.findViewById<TextView>(R.id.btnPickGroup)
+    private val btnStudyOrder = root.findViewById<TextView>(R.id.btnStudyOrder)
     private val btnUnlockNew = root.findViewById<TextView>(R.id.btnUnlockNew)
     private val btnStart = root.findViewById<TextView>(R.id.btnStart)
     private val btnSpellStart = root.findViewById<TextView>(R.id.btnSpellStart)
@@ -81,7 +82,7 @@ class LearnView(private val a: MainActivity, private val root: View) {
     private var answerIndex = 0
     private var quizAnswered = false
     private var studiedSinceQuiz = 0
-    private var learnGroup: String? = null   // null=全部词组；""=未分组
+    private var learnGroups: Set<String>? = loadSavedGroups()   // null=全部词组；空串代表「未分组」
 
     // v10：拼写测试独立于认词队列，避免答完卡后又被旧队列带回已拼过的词
     private var spellQueue: MutableList<Word> = mutableListOf()
@@ -94,8 +95,9 @@ class LearnView(private val a: MainActivity, private val root: View) {
 
     init {
         btnPickGroup.setOnClickListener {
-            a.showGroupPicker(learnGroup) { picked ->
-                learnGroup = picked
+            a.showMultiGroupPicker(learnGroups ?: emptySet()) { picked ->
+                learnGroups = picked
+                a.db.studyGroups = picked
                 queue.clear()
                 spellQueue.clear()
                 spellCurrent = null
@@ -106,16 +108,25 @@ class LearnView(private val a: MainActivity, private val root: View) {
                 a.dataChanged()
             }
         }
+        btnStudyOrder.setOnClickListener {
+            val shuffle = !a.db.shuffleOrder
+            a.db.shuffleOrder = shuffle
+            a.toast(
+                if (shuffle) "已改为打乱顺序；下一次开始学习 / 拼写时生效"
+                else "已改为按顺序学习；下一次开始学习 / 拼写时生效"
+            )
+            a.dataChanged()
+        }
         btnUnlockNew.setOnClickListener {
-            val n = a.db.unlockNew(a.db.dailyGoal, learnGroup)
+            val n = a.db.unlockNewForGroups(a.db.dailyGoal, learnGroups)
             // 清掉缓存队列，否则刚解锁的词要等旧队列排完才出现
             queue.clear()
-            a.toast(if (n > 0) "解锁了 $n 个新词，开始学吧" else "这一组没有待解锁的新词了")
+            a.toast(if (n > 0) "解锁了 $n 个新词，开始学吧" else "所选范围里没有待解锁的新词了")
             a.dataChanged()
         }
         btnStart.setOnClickListener { startOrNext() }
         btnMore.setOnClickListener {
-            val n = a.db.unlockNew(a.db.dailyGoal, learnGroup)
+            val n = a.db.unlockNewForGroups(a.db.dailyGoal, learnGroups)
             if (n > 0) {
                 queue.clear()
                 a.toast("又解锁了 $n 个新词")
@@ -171,12 +182,27 @@ class LearnView(private val a: MainActivity, private val root: View) {
         }
     }
 
+    /** 读取上次保存的范围；组被改名 / 删除后只保留仍然存在的组 */
+    private fun loadSavedGroups(): Set<String>? {
+        val saved = a.db.studyGroups ?: return null
+        val valid = a.db.groups().map { it.name }.toSet()
+        return saved.filter { it in valid }.toSet().ifEmpty { null }
+    }
+
+    /** 顶部「范围」文案：全部 / 单组名 / N 个组 */
+    private fun rangeLabel(): String {
+        val g = learnGroups ?: return "全部词组"
+        if (g.isEmpty()) return "全部词组"
+        if (g.size == 1) return a.db.groupLabel(g.first())
+        return "${g.size} 个组"
+    }
+
     /** 只更新概览；正在看卡片/做题时不被打断 */
     fun refresh() {
         val s = a.db.stats()
-        val due = a.db.dueWords(groupFilter = learnGroup)
-        btnPickGroup.text = "组别：" +
-            (if (learnGroup == null) "全部词组" else a.db.groupLabel(learnGroup!!))
+        val due = a.db.dueWordsForGroups(groups = learnGroups)
+        btnPickGroup.text = "范围：${rangeLabel()}"
+        btnStudyOrder.text = "顺序：${if (a.db.shuffleOrder) "打乱" else "顺序"}"
         tvTodayTitle.text = "今日计划 · " +
             SimpleDateFormat("M月d日", Locale.getDefault()).format(Date())
         tvTodayInfo.text = "待学 ${due.size} 个 · 今日已学 ${s.today} 个 · 连续 ${s.streak} 天"
@@ -191,7 +217,7 @@ class LearnView(private val a: MainActivity, private val root: View) {
         cardQuiz.show(false)
         cardSpell.show(false)
         learnEmpty.show(true)
-        val scope = if (learnGroup == null) "" else "「${a.db.groupLabel(learnGroup!!)}」"
+        val scope = if (learnGroups == null) "" else "「${rangeLabel()}」"
         when {
             noDue && todayCount > 0 -> {
                 tvEmptyTitle.text = "今天的词都学完啦"
@@ -221,7 +247,10 @@ class LearnView(private val a: MainActivity, private val root: View) {
             a.toast("先看答案并自评，再点「下一个」")
             return
         }
-        if (queue.isEmpty()) queue = a.db.dueWords(groupFilter = learnGroup).toMutableList()
+        if (queue.isEmpty()) {
+            queue = a.db.dueWordsForGroups(groups = learnGroups).toMutableList()
+            if (a.db.shuffleOrder) queue.shuffle()
+        }
         if (studiedSinceQuiz >= 3) {
             if (tryQuiz()) return
             // 释义不足以出小测时别每次翻页都白跑一遍查询
@@ -255,12 +284,13 @@ class LearnView(private val a: MainActivity, private val root: View) {
             a.toast("先看答案并自评，再开始拼写")
             return
         }
-        val due = a.db.dueWords(groupFilter = learnGroup).filter { it.meaning.isNotBlank() }
+        val due = a.db.dueWordsForGroups(groups = learnGroups).filter { it.meaning.isNotBlank() }
         if (due.isEmpty()) {
-            a.toast("今天没有可拼写的词：先解锁新词，或给词条补上释义")
+            a.toast("所选范围今天没有可拼写的词：先解锁新词，或给词条补上释义")
             return
         }
         spellQueue = due.toMutableList()
+        if (a.db.shuffleOrder) spellQueue.shuffle()
         spellRight = 0
         spellWrong = 0
         spellFinished = false
@@ -458,7 +488,7 @@ class LearnView(private val a: MainActivity, private val root: View) {
 
     /** 每学 3 张卡插入一道 4 选 1；释义不足时自动跳过 */
     private fun tryQuiz(): Boolean {
-        val pool = a.db.quizWords(learnGroup).filter { it.id != current?.id }
+        val pool = a.db.quizWordsForGroups(learnGroups).filter { it.id != current?.id }
         if (pool.isEmpty()) return false
         val w = pool.random()
         val distractors = a.db.randomMeanings(w.word, 8)

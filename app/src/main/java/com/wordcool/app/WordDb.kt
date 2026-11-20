@@ -154,6 +154,23 @@ class WordDb(ctx: Context) : SQLiteOpenHelper(ctx.applicationContext, "wordcool.
             prefs.edit().putInt("daily", value.coerceIn(1, 100)).apply()
         }
 
+    /** v1.6：学习顺序。false=按到期日 / id 顺序，true=每轮开始前打乱 */
+    var shuffleOrder: Boolean
+        get() = prefs.getBoolean("shuffle_order", false)
+        set(value) {
+            prefs.edit().putBoolean("shuffle_order", value).apply()
+        }
+
+    /** v1.6：学习范围。null=全部词组；空集合也按全部处理；空串表示「未分组」 */
+    var studyGroups: Set<String>?
+        get() = prefs.getStringSet("study_groups", null)?.toSet()
+        set(value) {
+            prefs.edit().apply {
+                if (value == null || value.isEmpty()) remove("study_groups")
+                else putStringSet("study_groups", value)
+            }.apply()
+        }
+
     private fun Cursor.readWord(): Word = Word(
         id = getLong(getColumnIndexOrThrow("id")),
         word = getString(getColumnIndexOrThrow("word")) ?: "",
@@ -215,6 +232,27 @@ class WordDb(ctx: Context) : SQLiteOpenHelper(ctx.applicationContext, "wordcool.
         } else {
             where.append(" AND group_name=?")
             args.add(groupFilter)
+        }
+    }
+
+    /** v1.6：多组筛选。null 或空集合 = 全部；集合里用空串表示「未分组」。 */
+    private fun appendGroupsWhere(
+        where: StringBuilder,
+        args: MutableList<String>,
+        groups: Set<String>?
+    ) {
+        if (groups.isNullOrEmpty()) return
+        val names = groups.filter { it.isNotEmpty() }
+        val clauses = mutableListOf<String>()
+        if (names.isNotEmpty()) {
+            clauses.add("group_name IN (" + names.joinToString(",") { "?" } + ")")
+            args.addAll(names)
+        }
+        if (groups.contains("")) {
+            clauses.add("(group_name IS NULL OR group_name='')")
+        }
+        if (clauses.isNotEmpty()) {
+            where.append(" AND (").append(clauses.joinToString(" OR ")).append(")")
         }
     }
 
@@ -285,11 +323,46 @@ class WordDb(ctx: Context) : SQLiteOpenHelper(ctx.applicationContext, "wordcool.
         return ids.size
     }
 
+    /** v1.6：从多个组里解锁一批新词。groups=null / 空集合表示全部。 */
+    fun unlockNewForGroups(limit: Int, groups: Set<String>? = null): Int {
+        val db = writableDatabase
+        val ids = mutableListOf<Long>()
+        val where = StringBuilder("state=0")
+        val args = mutableListOf<String>()
+        appendGroupsWhere(where, args, groups)
+        db.rawQuery(
+            "SELECT id FROM words WHERE $where ORDER BY id ASC LIMIT ?",
+            (args + limit.coerceIn(1, 100).toString()).toTypedArray()
+        ).use { c -> while (c.moveToNext()) ids.add(c.getLong(0)) }
+        val cv = ContentValues().apply { put("state", 1); put("next_review", today()) }
+        ids.forEach { db.update("words", cv, "id=?", arrayOf(it.toString())) }
+        return ids.size
+    }
+
     /** 今天该学的词：已解锁且复习日已到；学习中的排前面。可按组缩小范围 */
     fun dueWords(limit: Int = 200, groupFilter: String? = null): List<Word> {
         val where = StringBuilder("state>0 AND next_review<=?")
         val args = mutableListOf<String>(today().toString())
         appendGroupWhere(where, args, groupFilter)
+        args.add(limit.toString())
+        val c = readableDatabase.rawQuery(
+            """SELECT * FROM words WHERE $where
+               ORDER BY CASE state WHEN 1 THEN 0 ELSE 1 END, next_review ASC, id ASC
+               LIMIT ?""",
+            args.toTypedArray()
+        )
+        return c.use { cur ->
+            val out = mutableListOf<Word>()
+            while (cur.moveToNext()) out.add(cur.readWord())
+            out
+        }
+    }
+
+    /** v1.6：多组一起取今天该学的词。groups=null / 空集合表示全部。 */
+    fun dueWordsForGroups(limit: Int = 200, groups: Set<String>? = null): List<Word> {
+        val where = StringBuilder("state>0 AND next_review<=?")
+        val args = mutableListOf<String>(today().toString())
+        appendGroupsWhere(where, args, groups)
         args.add(limit.toString())
         val c = readableDatabase.rawQuery(
             """SELECT * FROM words WHERE $where
@@ -379,6 +452,12 @@ class WordDb(ctx: Context) : SQLiteOpenHelper(ctx.applicationContext, "wordcool.
 
     fun quizWords(groupFilter: String? = null): List<Word> =
         getWords(groupFilter = groupFilter).filter { it.meaning.isNotBlank() }
+
+    /** v1.6：小测词池支持多组；groups=null / 空集合表示全部 */
+    fun quizWordsForGroups(groups: Set<String>? = null): List<Word> =
+        getWords().filter {
+            it.meaning.isNotBlank() && (groups == null || groups.isEmpty() || it.groupName in groups)
+        }
 
     // ---------- v3：划组管理 ----------
 

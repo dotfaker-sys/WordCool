@@ -1,6 +1,6 @@
-# 单词酷 · 设计系统与架构规范 v1.5
+# 单词酷 · 设计系统与架构规范 v1.6
 
-> 版本沿革：v2 页面重设计 → v3 加功能 → v4 修 15 项缺陷 → v5 英音 / 美音双发音与双音标 → v6 内置离线开源音标词典 → v7 对照同行产品与开源数据源做实证调研 → v8 接入微信 / QQ 文件分享并做成 CI 真编译 + 自动发版 → v9 应用内检查更新（首次、也是唯一一次新增 `INTERNET` 权限）→ **v9.1 按用户要求移除 GitHub Actions 工作流** → **v10 拼写测试（v1.3）** → **v1.4 内置考研词库（versionCode 5）** → **v1.5 独立设置页（versionCode 6）**。
+> 版本沿革：v2 页面重设计 → v3 加功能 → v4 修 15 项缺陷 → v5 英音 / 美音双发音与双音标 → v6 内置离线开源音标词典 → v7 对照同行产品与开源数据源做实证调研 → v8 接入微信 / QQ 文件分享并做成 CI 真编译 + 自动发版 → v9 应用内检查更新（首次、也是唯一一次新增 `INTERNET` 权限）→ **v9.1 按用户要求移除 GitHub Actions 工作流** → **v10 拼写测试（v1.3）** → **v1.4 内置考研词库（versionCode 5）** → **v1.5 独立设置页（versionCode 6）** → **v1.6 多选范围与顺序 / 打乱（versionCode 7）**。
 >
 > **v9.1 一句话**：`.github/workflows/build-apk.yml` 已删除，push 到 `main` 不再自动编译、也不再自动发新版 Release。已发布的三条 Release 与 APK 全部保留，应用内「检查更新」仍能读到现有的 latest（v1.2.0）；只是以后不会自动冒出新版本。源码、数据、文档、自检脚本一行没删，只少了这一个自动化文件。
 >
@@ -9,6 +9,8 @@
 > **v1.4 一句话**：把用户提供的 Unit1–5 考研词表整理成 `assets/kaoyan.tsv`（711 个唯一词 / 23 组），导入页点一次「载入考研词库」就进入原有预览流程：自动补离线音标、显示未命中词、确认后写入。同形异读合并为一条，英式拼写写在 note 里；不新增权限、不改数据库结构。
 >
 > **v1.5 一句话**：导入页太挤，把「设置」拆成第 5 个 tab。导入页只留文档 / 粘贴 / 划组 / 内置词库 / 微信；统计页只留统计；每天解锁数、备份、重置、清空、发音、音标、版本更新全部搬到设置页。只是搬家，数据库、备份格式、权限与既有操作逻辑不变。
+>
+> **v1.6 一句话**：学习页顶部把「组别」升级成「范围」，可以多选 Unit / Day；旁边加「顺序」在按顺序与打乱之间切换。解锁、今日复习、小测、拼写全部走同一组筛选条件；顺序在每轮开始时打乱一次，不改变已有进度和复习间隔。
 >
 > **v9 一句话**：应用内检查更新放在「统计 → 版本与更新」，点按钮才向 GitHub 发一次只读 GET 比对公开 Release 版本号；发现新版弹窗、点「去下载」才用浏览器打开下载页，绝不自动下载或安装。**这是全应用唯一联网点，也是唯一新增权限**：词库、导入、离线音标词典、双发音、复习、备份全部仍离线可用。用户明确确认「允许加 INTERNET 权限」后才做，见第 11 节。
 >
@@ -120,7 +122,7 @@
 3. **`DocxParser.kt`**：`parseBytes` / `parseDocx` / `parseText` / `parseLines` / `isZip` 的行为，以及 Word 导入格式（普通段落、两列表格、Tab / 冒号 / 分号 / 音标 / 行首序号）。
 4. **备份 JSON 字段**：`app` / `version` / `exported_at` / `words[]` 及词条字段名，换机恢复逻辑不变。
 5. **`MainActivity.kt` 与四个 View 的构造、调用契约**：`showWordDialog` / `showImportPreview` / `pickDocument` / `exportBackup` / `switchTo` / `dataChanged` / `speak` 等；四个 View 仍以 `(MainActivity, View)` 构造。
-6. **v2 的全部 `R.id` 与布局文件名**：8 个布局、90 个旧 id 一个不改名、不删除（v3 新增 10 个、v4 新增 `dialog_input.xml`、v5 新增 9 个、v6 新增 8 个、v8 新增 2 个、v9 新增 3 个、v10 新增 13 个、v1.4 新增 1 个、v1.5 新增 1 个，现共 10 布局 / 137 个 id）。
+6. **v2 的全部 `R.id` 与布局文件名**：8 个布局、90 个旧 id 一个不改名、不删除（v3 新增 10 个、v4 新增 `dialog_input.xml`、v5 新增 9 个、v6 新增 8 个、v8 新增 2 个、v9 新增 3 个、v10 新增 13 个、v1.4 新增 1 个、v1.5 新增 1 个、v1.6 新增 1 个，现共 10 布局 / 138 个 id）。
 7. **`Ui.kt` 的函数签名**：`Pal` 字段名、`dp` / `rounded` / `toast` / `show` / `stateName` / `stateColor` 全部保持；仅替换色值与圆角收敛系数。
 8. **Gradle 与清单**：`applicationId`、minSdk 26 / targetSdk 34、**零第三方依赖（Gradle dependencies 仍为空）**。**v1.0/v1.1 为零权限；v1.2 起按用户明确确认新增唯一一个 `<uses-permission android:name="android.permission.INTERNET" />`**，只给「检查更新」用，仍无存储 / 定位 / 通讯录等任何其他权限，`tools/verify.py` 用白名单强制只允许这一个。v8 前 `AndroidManifest.xml` 一直没有改过；v8 起**只增不改**：加 `launchMode="singleTask"` 与 3 组接收文件的 `intent-filter`，原 MAIN / LAUNCHER 过滤器与 `exported="true"` 不变。Kotlin 源文件 8 → 9（v6 `IpaDictionary.kt`）→ 10（v9 `UpdateChecker.kt`）→ **11（v1.5 `SettingsView.kt`）**；v6 另新增 `assets/ipa.tsv`、`LICENSES/`、`tools/`，均为数据与脚本，不是代码依赖。
 9. **编译与安装方式**：v9.1 移除工作流后剩下 Android Studio / 命令行两条路径，外加直接下载已有 Release（见 `README.md`）。
@@ -513,7 +515,7 @@ Android 沙箱下，微信收到的文件在 `com.tencent.mm` 私有目录里，
 - 新增 `R.id.tabSettings`；设置项沿用原 id（`etDaily` / `btnExport` / `btnReset` / `btnClear` / `tvTtsStatus` / `btnAccentUs` / `btnAccentUk` / `btnRateSlow` / `btnRateNormal` / `btnRateFast` / `btnSpeakSample` / `btnTtsSettings` / `tvIpaStatus` / `btnAutoIpa` / `btnFillIpa` / `tvVersion` / `btnCheckUpdate` / `btnAutoUpdate`），一个没改名
 - `ImportView` 删掉已搬走的 findViewById 与监听，避免在精简后的布局上取到 null；`StatsView` 删掉版本与重置逻辑
 - 数据库仍 v3、备份 JSON 字段不变、权限仍只有 `INTERNET`；`UpdateChecker.autoCheck(this)` 仍在 `MainActivity.onCreate` 的正常启动分支里
-- 版本：v1.4（versionCode 5）→ **v1.5（versionCode 6）**；当前 10 个布局 / 137 个 id / 11 个 Kotlin 文件
+- 版本：v1.4（versionCode 5）→ **v1.5（versionCode 6）**；v1.5 当时 10 个布局 / 137 个 id / 11 个 Kotlin 文件，v1.6 再加 `btnStudyOrder` 后为 138 个 id
 
 ### 14.3 诚实边界
 
@@ -524,16 +526,55 @@ Android 沙箱下，微信收到的文件在 `com.tencent.mm` 私有目录里，
 
 ---
 
-## 15. 验收与诚实边界
+## 15. v1.6：多选学习范围与顺序 / 打乱
 
-- 已做：`python3 tools/verify.py` 一键静态自检通过（26 个 XML 合法性与重复属性、137 个 id / 资源引用一致性、11 个 Kotlin 精细括号扫描、emoji 残留、`ipa.tsv` 三列格式与排序、许可证文件齐全、上游 SHA-256 与 `ipa_stats.json` 行数一致性、**Manifest 三组接收过滤器与「仅 INTERNET 一个权限」白名单校验**、v10 拼写判分等价回归、v1.4 考研词库 711 词 / 23 组 / 无重复词校验、**v1.5 设置页 5 tab / 设置项搬离导入与统计页校验**）
+### 15.1 范围
+
+- 学习页顶部原来的「组别」按钮改成「范围」：弹窗里用 checkbox 多选 `Unit 1 Day 1` … `Unit 5 Day 3`，另有「清空 / 全选 / 确定」
+- 语义：`null` = 全部词组；空选也归一为全部（避免进入一个永远没词的死范围）；选了部分组则用 `Set<String>` 保存，空串代表「未分组」
+- 范围存 SharedPreferences `study_groups`，重启应用后仍生效；加载时会过滤掉已改名 / 已删除的组，全部失效则回到「全部词组」
+- 「范围：全部词组 / Unit 1 Day 2 / 2 个组」直接显示在按钮上
+- `WordDb` 新增：
+  - `dueWordsForGroups(limit, groups)`：今日复习
+  - `unlockNewForGroups(limit, groups)`：解锁新词
+  - `quizWordsForGroups(groups)`：小测词池
+  - `appendGroupsWhere()`：生成 `group_name IN (?,?)`；含未分组时补 `group_name IS NULL OR group_name=''`
+- 认词队列、拼写队列、解锁、小测全部使用同一个范围；切换范围会清空当前队列并回到空闲态，避免旧队列混入新范围
+
+### 15.2 顺序
+
+- 学习页新增「顺序：顺序 / 打乱」按钮，偏好存 `WordDb.shuffleOrder`（SharedPreferences `shuffle_order`，默认关）
+- 每次 `startOrNext()` 重新取队列、或 `startSpelling()` 新建拼写队列时，按偏好 `shuffle()` 一次；已经开始的这一轮不会被中途打乱
+- 打乱只改变本轮取出顺序，不改变 `next_review`、连对、正确率和任何复习间隔
+
+### 15.3 接口与兼容性
+
+- 数据库仍 v3、备份 JSON 字段不变、权限仍只有 `INTERNET`、第三方依赖仍为空
+- 新增 `R.id.btnStudyOrder`；`R.id` 从 137 增至 138，旧 id 一个没改名
+- 旧 `dueWords` / `unlockNew` / `quizWords` 保留，新方法只增不改；词库页仍用单选 `showGroupPicker`，只有学习页用多选 `showMultiGroupPicker`
+- 版本：v1.5（versionCode 6）→ **v1.6（versionCode 7）**
+
+### 15.4 诚实边界
+
+1. 「打乱」是每轮一次 `shuffle()`，不是严格均衡抽样；同一轮内每个词仍只出现一次，但不同轮可能连续抽到同一批。
+2. 范围多选只在学习页生效；词库页的组筛选仍是单选，这是刻意的，避免两个页面各有一套多选状态。
+3. 没有做「排除某组」「按来源 / 词频排序」；当前只有按到期日 / id 顺序与随机打乱两种。
+4. 选中很多组时，范围弹窗是一个可滚动列表；组特别多时仍需真机检查滚动与按钮位置。
+5. 仍未做真机点按验证；v1.6 在 Android 37 模拟器上验证了清空 → 勾选 Unit 1 Day 1 + Unit 1 Day 2 → 范围显示「2 个组」→ 待学数变为该范围 → 顺序切到「打乱」→ 开始学习。
+
+---
+
+## 16. 验收与诚实边界
+
+- 已做：`python3 tools/verify.py` 一键静态自检通过（26 个 XML 合法性与重复属性、138 个 id / 资源引用一致性、11 个 Kotlin 精细括号扫描、emoji 残留、`ipa.tsv` 三列格式与排序、许可证文件齐全、上游 SHA-256 与 `ipa_stats.json` 行数一致性、**Manifest 三组接收过滤器与「仅 INTERNET 一个权限」白名单校验**、v10 拼写判分等价回归、v1.4 考研词库 711 词 / 23 组 / 无重复词校验、v1.5 设置页 5 tab / 设置项搬离导入与统计页校验、**v1.6 多组 SQL IN / 多选范围 / 顺序切换校验**）
 - 已做（v10）：本机 Android 37 模拟器（API 37、1080×2400、Play Store 镜像）用 `assembleDebug` 真编译、`adb install` 安装并点按验证：加载示例词库 → 解锁 → 拼写测试 → 输入正确 / 错误答案 / 提示 / 看答案 → 完成页「拼对 1 / 10」→ 再来一轮（9 个错词）；同时确认拼写卡在认词 / 小测 / 完成态会正确隐藏
 - 已做（v1.4）：同一模拟器上清空词库 → 导入页「载入考研词库」→ 确认 → 预览显示「711 个单词 / 23 组 / 自动补 706 个音标 / 未命中 5 个」→ 导入成功 → 词库顶栏「已解锁 0 / 711」、划组列表显示 23 组（Unit 2 Day 3 为 34 个）；随后把 `Pre-` 修正为 `prefix`，最终资产为 711 词 / 23 组 / 10 条拼写备注。修正后重装并再次导入：预览为 707 个音标、未命中 4 个，词库 0 / 711
 - 已做（v1.5）：同一模拟器安装 v1.5，确认底部 5 个 tab（词库 / 学习 / 统计 / 导入 / 设置）都能切换；设置页渲染出学习、数据管理、发音、音标、版本与更新、关于六张卡；导入页精简为 5 张卡（文档 / 粘贴 / 划组 / 内置词库 / 微信），统计页底部不再有重置与版本卡。设置项复用旧监听逻辑，未改数据库与偏好键
+- 已做（v1.6）：同一模拟器安装 v1.6 → 学习页「范围」→「清空」→ 勾选 Unit 1 Day 1 + Unit 1 Day 2 → 确定，按钮显示「范围：2 个组」，待学数变为该范围；「顺序」切到「打乱」后开始学习，卡片仍来自所选组；重新打开范围弹窗能保留勾选状态
 - 已做：解析算法等价模拟与 **v7 的 8 项行为回归**（逐字段只补空、文档自带双音标不覆盖、别名补缺列、多读音保留、词组与自造词留空），断言全部通过；v8 另加了外部 Intent 的等价模拟（三种 action、Uri 去重、多文件合并、二进制拦截）；**v9 加了 9 项检查更新回归**（版本三段比较含 1.10>1.9、预发布后缀、assets 挑 APK 直链、无 assets 降级、权限白名单）
 - 已做：用真实公开高频词表 `google-10000-english-no-swears`（9,894 词）跑离线查表，得到 94.9% / 77.6% / 5.1% 三组覆盖率数字，非估算
 - 曾做（**该工作流现已按用户要求移除**）：GitHub Actions（ubuntu-22.04 + JDK 17 + SDK 34 + Gradle 8.2）真实编译通过，`assembleDebug` 产出 `WordCool.apk`，并自动发布 Release；此前两轮 CI 失败（setup-android action、SDK 34 不存在的 TTS 常量）都已按日志定位并修掉
 - 架构图通过 `archify` showcase 校验（9/9）与 4 个桌面视口浏览器检查
-- **仍未做**：真机安装与点按测试。尤其 TTS 的 `setVoice` / `isLanguageAvailable` / `UtteranceProgressListener`、v8 的微信分享入口是否出现在系统列表里、v9 的实际网络请求与浏览器跳转、v1.4 在真实手机上的 711 词导入与滚动性能、v1.5 在窄屏 / 大字号下 5 个 tab 的显示，静态检查与模拟器都验证不了——必须装到手机上试一次才能确认
+- **仍未做**：真机安装与点按测试。尤其 TTS 的 `setVoice` / `isLanguageAvailable` / `UtteranceProgressListener`、v8 的微信分享入口是否出现在系统列表里、v9 的实际网络请求与浏览器跳转、v1.4 在真实手机上的 711 词导入与滚动性能、v1.5 在窄屏 / 大字号下 5 个 tab 的显示、v1.6 多选范围弹窗在组特别多时的滚动，静态检查与模拟器都验证不了——必须装到手机上试一次才能确认
 - 静态检查与曾经的 CI 都不能证明运行时零缺陷，遇到具体报错请把截图或错误文字发来，按现象定位
 - 现成 APK 在 <https://github.com/dotfaker-sys/WordCool/releases>；自行编译见 `README.md`，编译前先跑 `python3 tools/verify.py`
