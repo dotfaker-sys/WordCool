@@ -62,7 +62,7 @@ for p in kts:
     for kind, defined in (("id", ids), ("layout", layouts),
                           ("drawable", drawables), ("color", colors),
                           ("string", strings)):
-        for n in re.findall(r"R\." + kind + r"\.(\w+)", s):
+        for n in re.findall(r"(?<!android\.)R\." + kind + r"\.(\w+)", s):
             if n not in defined:
                 errors.append(f"{p.relative_to(ROOT)}: R.{kind}.{n} 未定义")
     # 精细括号扫描：跳过 // 注释、三引号、普通字符串、字符字面量
@@ -360,8 +360,8 @@ if "UpdateChecker.autoCheck(this)" not in main_kt or "isIncomingIntent" not in m
     errors.append("MainActivity 未接上启动时静默检查 / 未避开微信分享入口")
 
 build_gradle = (ROOT / "app/build.gradle").read_text(encoding="utf-8")
-if "versionCode 7" not in build_gradle or "versionName '1.6'" not in build_gradle:
-    errors.append("app/build.gradle 版本号未升到 v1.6 / versionCode 7")
+if "versionCode 10" not in build_gradle or "versionName '1.9'" not in build_gradle:
+    errors.append("app/build.gradle 版本号未升到 v1.9 / versionCode 10")
 # v9.1：工作流已按用户要求移除，自检不再读那个文件；同时防止有人误把它加回来
 wf_dir = ROOT / ".github/workflows"
 active_wf = (list(wf_dir.glob("*.yml")) + list(wf_dir.glob("*.yaml"))) if wf_dir.is_dir() else []
@@ -549,6 +549,65 @@ if "group_name IN (" not in db_kt_v16:
     errors.append("多组筛选没有生成 SQL IN 子句，可能退化成单组")
 print("v1.6 学习范围: 多选 Unit/Day · 顺序 / 打乱 · 解锁 / 复习 / 小测共用同一范围")
 
+# ---- v1.7：词库页折叠头 + 行内发音 + 主按钮换位 ----
+page_library_xml = (MAIN / "res/layout/page_library.xml").read_text(encoding="utf-8")
+header_xml = (MAIN / "res/layout/view_library_header.xml").read_text(encoding="utf-8")
+item_xml = (MAIN / "res/layout/item_word.xml").read_text(encoding="utf-8")
+lib_kt = (MAIN / "java/com/wordcool/app/LibraryView.kt").read_text(encoding="utf-8")
+if not (MAIN / "res/layout/view_library_header.xml").is_file():
+    errors.append("缺少 view_library_header.xml，词库页无法折叠头")
+for i in ("etSearch", "btnAdd", "chipAll", "chipLocked", "chipLearning",
+          "chipMastered", "btnGroupFilter", "tvCount", "btnUnlock", "unlockBar"):
+    if 'android:id="@+id/' + i + '"' not in header_xml:
+        errors.append(f"词库折叠头缺少 id: {i}")
+if 'android:id="@+id/etSearch"' in page_library_xml:
+    errors.append("etSearch 不应再留在 page_library，否则不会随列表折叠")
+for token in ("addHeaderView", "headerViewsCount", "btnItemSpeak", "a.speak("):
+    if token not in lib_kt:
+        errors.append(f"LibraryView 缺少 v1.7 实现: {token}")
+if 'android:id="@+id/btnItemSpeak"' not in item_xml:
+    errors.append("item_word.xml 缺少每行发音按钮 btnItemSpeak")
+if learn_xml_v16.index('android:id="@+id/btnStart"') > learn_xml_v16.index('android:id="@+id/btnUnlockNew"'):
+    errors.append("学习页主按钮顺序不对：开始学习应在解锁新词之前")
+print("v1.7 词库页: 折叠头 / 行内发音 · 学习页主按钮 开始学习 → 解锁新词")
+
+# ---- v1.8：词库 Unit → Day 分组折叠 ----
+unit_xml = (MAIN / "res/layout/item_library_unit.xml").read_text(encoding="utf-8")
+day_xml = (MAIN / "res/layout/item_library_day.xml").read_text(encoding="utf-8")
+for i in ("tvUnitTitle", "tvUnitInfo", "tvUnitArrow"):
+    if 'android:id="@+id/' + i + '"' not in unit_xml:
+        errors.append(f"item_library_unit.xml 缺少 id: {i}")
+for i in ("tvDayTitle", "tvDayInfo", "tvDayArrow"):
+    if 'android:id="@+id/' + i + '"' not in day_xml:
+        errors.append(f"item_library_day.xml 缺少 id: {i}")
+for token in ("buildSections", "UnitHeader", "DayHeader", "foldedUnits", "foldedDays"):
+    if token not in lib_kt:
+        errors.append(f"LibraryView 缺少 Unit/Day 分组折叠实现: {token}")
+print("v1.8 词库分组: Unit → Day 二级标题 / 可折叠 / 搜索时全展开")
+
+# ---- v1.9：词库只读 / 英音单列 / 完整词形 / 编辑移到导入页 ----
+ui_kt = (MAIN / "java/com/wordcool/app/Ui.kt").read_text(encoding="utf-8")
+pick_xml = (MAIN / "res/layout/dialog_pick_word.xml").read_text(encoding="utf-8")
+if "tvState" in item_xml:
+    errors.append("item_word.xml 仍保留未解锁 / 已掌握状态标签")
+if "待解锁" in lib_kt:
+    errors.append("LibraryView 仍显示「待解锁」")
+if "setOnItemLongClickListener" in lib_kt or "is Row.WordRow -> a.showWordDialog" in lib_kt:
+    errors.append("词库页仍可直接编辑 / 长按删除，应统一到导入页")
+if "英美双音标" in ui_kt:
+    errors.append("词库行音标仍显示「英美双音标」，应只显示英音")
+word_attrs = item_xml.split('android:id="@+id/tvWord"', 1)[-1][:600]
+if "android:ellipsize" in word_attrs or "android:maxLines" in word_attrs:
+    errors.append("单词行仍有省略 / 行数限制，长单词会被截断")
+if 'android:id="@+id/btnEditWord"' not in imp_xml:
+    errors.append("导入页缺少「编辑单词」入口 btnEditWord")
+if "showWordPicker" not in imp_kt or "showWordPicker" not in main_kt2:
+    errors.append("导入页 / MainActivity 未接上 showWordPicker")
+for i in ("etPickSearch", "listPickWords", "tvPickEmpty"):
+    if 'android:id="@+id/' + i + '"' not in pick_xml:
+        errors.append(f"dialog_pick_word.xml 缺少 id: {i}")
+print("v1.9 词库行: 无未解锁标签 / 只显示英音 / 完整词形 · 编辑统一到导入页")
+
 print(f"XML {len(xmls)} · Kotlin {len(kts)} · 布局 {len(layouts)} · id {len(ids)} · drawable {len(drawables)}")
 if errors:
     print("\n发现问题：")
@@ -557,7 +616,7 @@ if errors:
     print(f"\n共 {len(errors)} 项，静态自检未通过。")
     return_code = 1
 else:
-    print("静态自检全部通过。v1.6 已在 Android 37 模拟器（API 37）上真编译并点按验证多选范围、顺序 / 打乱切换、拼写测试、711 词考研词库与设置页；"
+    print("静态自检全部通过。v1.9 已在 Android 37 模拟器（API 37）上真编译并点按验证词库只读、英音单列、完整词形、Unit→Day 折叠、行内发音、导入页编辑、多选范围、拼写测试与设置页；"
           "微信分享入口、真实 TTS 语音包与各厂商 ROM 仍需真机验证。")
     return_code = 0
 sys.exit(return_code)

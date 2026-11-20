@@ -8,10 +8,15 @@ import android.os.Bundle
 import android.provider.OpenableColumns
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.FrameLayout
+import android.widget.ListView
 import android.widget.TextView
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -422,6 +427,53 @@ class MainActivity : Activity() {
     }
 
     // ---------- 词条编辑 / 详情 ----------
+
+    /** v1.9：词库页只读；从导入页「编辑单词」搜索后打开现有编辑框。 */
+    fun showWordPicker() {
+        val v = layoutInflater.inflate(R.layout.dialog_pick_word, null)
+        val et = v.findViewById<EditText>(R.id.etPickSearch)
+        val list = v.findViewById<ListView>(R.id.listPickWords)
+        val empty = v.findViewById<TextView>(R.id.tvPickEmpty)
+
+        val all = db.getWords()
+        var filtered = all
+        val labels = mutableListOf<String>()
+        val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, labels)
+        list.adapter = adapter
+
+        fun apply(query: String) {
+            val q = query.trim()
+            filtered = if (q.isEmpty()) all else all.filter {
+                it.word.contains(q, ignoreCase = true) || it.meaning.contains(q, ignoreCase = true)
+            }
+            labels.clear()
+            filtered.forEach { labels.add(it.word) }
+            adapter.notifyDataSetChanged()
+            empty.show(filtered.isEmpty())
+            list.show(filtered.isNotEmpty())
+        }
+        apply("")
+        et.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) =
+                apply(s?.toString().orEmpty())
+            override fun afterTextChanged(s: Editable?) {}
+        })
+
+        val dlg = AlertDialog.Builder(this)
+            .setTitle("编辑单词")
+            .setView(v)
+            .setNegativeButton("取消", null)
+            .create()
+        list.onItemClickListener = AdapterView.OnItemClickListener { _, _, pos, _ ->
+            if (pos in filtered.indices) {
+                val word = filtered[pos]
+                dlg.dismiss()
+                showWordDialog(word)
+            }
+        }
+        dlg.show()
+    }
 
     fun showWordDialog(word: Word?) {
         val existing = word

@@ -29,7 +29,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:lineSpacingExtra="4dp"
-                android:text="支持 .docx（段落 / 两列表格）、.xlsx（两列）、文字型 .pdf、.txt / .csv。Unit 1 / Day 2 / 第 3 单元 等标题行会自动划组；写 UK /…/ US /…/ 会自动拆成英 / 美两套音标。旧版 .doc / .xls 请另存为新格式，扫描版 PDF 请用「粘贴导入」。\n\n也可以直接从微信把文件发进来，见下方「⑤ 从微信 / QQ 导入」。"
+                android:text="支持 .docx（段落 / 两列表格）、.xlsx（两列）、文字型 .pdf、.txt / .csv。Unit 1 / Day 2 / 第 3 单元 等标题行会自动划组；写 UK /…/ US /…/ 会自动拆成英 / 美两套音标。旧版 .doc / .xls 请另存为新格式，扫描版 PDF 请用「粘贴导入」。\n\n也可以直接从微信把文件发进来，见下方「⑥ 从微信 / QQ 导入」。"
                 android:textSize="12sp"
                 android:textColor="@color/text_sub" />
 
@@ -264,7 +264,44 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="⑤ 从微信 / QQ 导入"
+                android:text="⑤ 编辑单词"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="@color/text" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:lineSpacingExtra="4dp"
+                android:text="词库页只读，不再直接点开编辑。要改释义、音标、例句、组别，或删除单词，都在这里搜索后编辑。"
+                android:textSize="12sp"
+                android:textColor="@color/text_sub" />
+
+            <TextView
+                android:id="@+id/btnEditWord"
+                android:layout_width="match_parent"
+                android:layout_height="42dp"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_btn_primary"
+                android:gravity="center"
+                android:text="搜索 / 编辑单词"
+                android:textSize="13sp"
+                android:textColor="@color/white" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="vertical"
+            android:background="@drawable/bg_card"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="⑥ 从微信 / QQ 导入"
                 android:textSize="15sp"
                 android:textStyle="bold"
                 android:textColor="@color/text" />

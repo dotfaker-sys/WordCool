@@ -80,10 +80,8 @@ fun phoneticText(w: Word): String {
     }
 }
 
-/** 词库列表用的紧凑版：两套时只显示主音标 + 「英美双音标」标记，避免行高被撑爆 */
+/** 词库列表只展示英音；没有英音时才回退到美音 / 通用音标，不编造 */
 fun phoneticShort(w: Word): String = when {
-    w.phoneticUk.isNotBlank() && w.phoneticUs.isNotBlank() ->
-        "${w.phoneticUk.trim()}  ·  英美双音标"
     w.phoneticUk.isNotBlank() -> w.phoneticUk.trim()
     w.phoneticUs.isNotBlank() -> w.phoneticUs.trim()
     else -> w.phonetic.trim()

@@ -29,6 +29,9 @@ class ImportView(private val a: MainActivity, private val root: View) {
         root.findViewById<TextView>(R.id.btnWechatHelp).setOnClickListener {
             showWechatHelp()
         }
+        root.findViewById<TextView>(R.id.btnEditWord).setOnClickListener {
+            a.showWordPicker()
+        }
 
         root.findViewById<TextView>(R.id.btnPasteImport).setOnClickListener {
             val text = etPaste.text.toString()

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 词库页二级分组：Day 小标题（缩进在 Unit 下，可点按折叠） -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingLeft="20dp"
+    android:paddingRight="8dp"
+    android:paddingTop="6dp"
+    android:paddingBottom="6dp">
+
+    <View
+        android:layout_width="1dp"
+        android:layout_height="14dp"
+        android:layout_marginRight="10dp"
+        android:background="@color/line" />
+
+    <TextView
+        android:id="@+id/tvDayTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:text="Day 1"
+        android:textColor="@color/text"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tvDayInfo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:text="0 词 · 已解锁 0"
+        android:textColor="@color/text_sub"
+        android:textSize="11sp" />
+
+    <TextView
+        android:id="@+id/tvDayArrow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:text="▾"
+        android:textColor="@color/primary"
+        android:textSize="13sp" />
+
+</LinearLayout>

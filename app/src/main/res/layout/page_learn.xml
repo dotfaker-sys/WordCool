@@ -85,26 +85,26 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/btnUnlockNew"
+                    android:id="@+id/btnStart"
                     android:layout_width="0dp"
                     android:layout_height="42dp"
                     android:layout_weight="1"
                     android:layout_marginRight="6dp"
                     android:background="@drawable/bg_btn_primary"
                     android:gravity="center"
-                    android:text="解锁今日新词"
+                    android:text="开始学习"
                     android:textSize="13sp"
                     android:textColor="@color/white" />
 
                 <TextView
-                    android:id="@+id/btnStart"
+                    android:id="@+id/btnUnlockNew"
                     android:layout_width="0dp"
                     android:layout_height="42dp"
                     android:layout_weight="1"
                     android:layout_marginLeft="6dp"
                     android:background="@drawable/bg_btn_soft"
                     android:gravity="center"
-                    android:text="开始学习"
+                    android:text="解锁今日新词"
                     android:textSize="13sp"
                     android:textColor="@color/primary" />
             </LinearLayout>
