@@ -4,9 +4,14 @@ on:
   push:
     branches: [ main, master ]
   workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release 标签（留空用 v1.0.0）'
+        required: false
+        default: 'v1.0.0'
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -74,9 +79,53 @@ jobs:
       - name: 重命名 APK（ASCII 名，避免跨系统文件名编码问题）
         run: cp app/build/outputs/apk/debug/app-debug.apk WordCool.apk
 
-      - name: 上传可安装 APK
+      - name: 上传可安装 APK（Actions Artifact）
         uses: actions/upload-artifact@v4
         with:
           name: WordCool-APK
           path: WordCool.apk
           if-no-files-found: error
+
+      - name: 发布 Release（附带可安装 APK）
+        if: success()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.event.inputs.tag || 'v1.0.0' }}
+        shell: bash
+        run: |
+          set -e
+          cat > RELEASE_NOTES.md <<'EOF'
+          ## 单词酷 v1.0.0
+
+          一个离线、零权限、零第三方依赖的 Android 背单词应用。把你的 Word / Excel / PDF 词表导进来，按 Unit / Day 分组，一次学一个词，卡片自评 + 小测 + 间隔复习，直到记住。
+
+          ### 这一版有什么
+
+          - **导入**：`.docx`（段落与两列表格）、`.xlsx`、文字型 `.pdf`、`.txt` / `.csv`、粘贴文本；`Unit 1` / `Day 2` / `第 3 单元` 标题行自动划组，导入后还能改名、按顺序重划、按组筛选
+          - **音标**：随包内置离线开源音标词典 146,647 条（英 / 美两套）。Word 里只有「单词 + 汉语意思」也会自动补出 UK / US 音标；只补空字段、不覆盖手写内容，查不到的词留空，不会编造。不需要联网、不装别的 App、不加权限
+          - **发音**：学习卡片并列「英音 UK」「美音 US」两个按钮各读各的，走手机系统 TTS 的本地离线语音包；缺包自动回退并提示，朗读失败给具体原因，语速三档，导入页可一键试听
+          - **学习**：一次只显示一个单词，自评后自己点「下一个」才换词；每 3 张穿插一道 4 选 1 小测，连对 3 次升级「已掌握」，按 1 / 2 / 4 / 7 / 15 / 30 天复习
+          - **数据**：词库、学习进度、打卡、组别全存手机本地；支持导出 / 恢复 JSON 备份
+
+          ### 安装
+
+          下载本页 Assets 里的 **WordCool.apk**，传到 Android 8.0+ 手机点安装（系统提示「未知来源」时允许本次安装即可）。Debug 包已签名，可直接使用。
+
+          ### 如实说明的边界
+
+          - 音标数据是开源严式音素转写（含 `ɫ` `ɝ` `ɐ`），与课本宽式 IPA 写法略有差异，可在词条里手动改；词组、生造词、未收录词会留空
+          - 发音是否响、是否真是英音 / 美音，取决于手机自带的语音包；**未做真机点按验证**
+          - 扫描图片版 PDF 没有文字层导不出；CID 字体的中文释义可能乱码，优先用 Word / Excel
+          - 英音数据上游为 GPL-3.0，分发时请保留仓库内 `LICENSES/` 的声明与全文；美音数据为 MIT
+
+          完整文档见仓库 `README.md` / `QUICKSTART.md` / `DESIGN.md`，编译与上传说明见 `UPLOAD.md`。
+          EOF
+          echo "TAG=$TAG"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release 已存在，覆盖上传 APK"
+            gh release upload "$TAG" WordCool.apk --clobber
+          else
+            gh release create "$TAG" WordCool.apk \
+              --title "单词酷 $TAG" \
+              --notes-file RELEASE_NOTES.md
+          fi
