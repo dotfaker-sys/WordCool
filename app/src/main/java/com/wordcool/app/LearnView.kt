@@ -2,6 +2,8 @@ package com.wordcool.app
 
 import android.graphics.Color
 import android.view.View
+import android.view.inputmethod.EditorInfo
+import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.TextView
 import java.text.SimpleDateFormat
@@ -14,6 +16,7 @@ class LearnView(private val a: MainActivity, private val root: View) {
         private const val IDLE = 0
         private const val STUDY = 1
         private const val QUIZ = 2
+        private const val SPELL = 3
         private val LETTERS = listOf("A", "B", "C", "D")
     }
 
@@ -23,9 +26,22 @@ class LearnView(private val a: MainActivity, private val root: View) {
     private val btnPickGroup = root.findViewById<TextView>(R.id.btnPickGroup)
     private val btnUnlockNew = root.findViewById<TextView>(R.id.btnUnlockNew)
     private val btnStart = root.findViewById<TextView>(R.id.btnStart)
+    private val btnSpellStart = root.findViewById<TextView>(R.id.btnSpellStart)
 
     private val cardStudy = root.findViewById<View>(R.id.cardStudy)
     private val cardQuiz = root.findViewById<View>(R.id.cardQuiz)
+    private val cardSpell = root.findViewById<View>(R.id.cardSpell)
+    private val tvSpellLabel = root.findViewById<TextView>(R.id.tvSpellLabel)
+    private val tvSpellMeta = root.findViewById<TextView>(R.id.tvSpellMeta)
+    private val tvSpellMeaning = root.findViewById<TextView>(R.id.tvSpellMeaning)
+    private val tvSpellHint = root.findViewById<TextView>(R.id.tvSpellHint)
+    private val etSpell = root.findViewById<EditText>(R.id.etSpell)
+    private val btnSpellSpeak = root.findViewById<TextView>(R.id.btnSpellSpeak)
+    private val btnSpellHint = root.findViewById<TextView>(R.id.btnSpellHint)
+    private val btnSpellCheck = root.findViewById<TextView>(R.id.btnSpellCheck)
+    private val btnSpellGiveUp = root.findViewById<TextView>(R.id.btnSpellGiveUp)
+    private val tvSpellResult = root.findViewById<TextView>(R.id.tvSpellResult)
+    private val btnSpellNext = root.findViewById<TextView>(R.id.btnSpellNext)
     private val learnEmpty = root.findViewById<View>(R.id.learnEmpty)
     private val tvEmptyTitle = root.findViewById<TextView>(R.id.tvEmptyTitle)
     private val tvEmptyHint = root.findViewById<TextView>(R.id.tvEmptyHint)
@@ -67,11 +83,23 @@ class LearnView(private val a: MainActivity, private val root: View) {
     private var studiedSinceQuiz = 0
     private var learnGroup: String? = null   // null=全部词组；""=未分组
 
+    // v10：拼写测试独立于认词队列，避免答完卡后又被旧队列带回已拼过的词
+    private var spellQueue: MutableList<Word> = mutableListOf()
+    private var spellCurrent: Word? = null
+    private var spellAnswered = false
+    private var spellHinted = false
+    private var spellFinished = false
+    private var spellRight = 0
+    private var spellWrong = 0
+
     init {
         btnPickGroup.setOnClickListener {
             a.showGroupPicker(learnGroup) { picked ->
                 learnGroup = picked
                 queue.clear()
+                spellQueue.clear()
+                spellCurrent = null
+                spellFinished = false
                 mode = IDLE
                 current = null
                 studiedSinceQuiz = 0
@@ -113,6 +141,34 @@ class LearnView(private val a: MainActivity, private val root: View) {
         btnStudyNext.setOnClickListener { startOrNext() }
         options.forEachIndexed { i, t -> t.setOnClickListener { onOption(i) } }
         btnQuizNext.setOnClickListener { startOrNext() }
+
+        // v10：拼写测试。默认把当前组里今天到期的词都过一遍
+        btnSpellStart.setOnClickListener { startSpelling() }
+        btnSpellCheck.setOnClickListener { checkSpelling() }
+        btnSpellHint.setOnClickListener { showSpellHint() }
+        btnSpellSpeak.setOnClickListener {
+            val w = spellCurrent ?: return@setOnClickListener
+            spellHinted = true
+            a.speak(w.word)
+        }
+        btnSpellNext.setOnClickListener {
+            if (spellFinished) startSpelling() else nextSpell()
+        }
+        btnSpellGiveUp.setOnClickListener {
+            if (spellFinished) {
+                mode = IDLE
+                spellCurrent = null
+                a.dataChanged()
+            } else {
+                revealSpelling()
+            }
+        }
+        etSpell.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                checkSpelling()
+                true
+            } else false
+        }
     }
 
     /** 只更新概览；正在看卡片/做题时不被打断 */
@@ -133,6 +189,7 @@ class LearnView(private val a: MainActivity, private val root: View) {
     private fun showIdle(noDue: Boolean, todayCount: Int) {
         cardStudy.show(false)
         cardQuiz.show(false)
+        cardSpell.show(false)
         learnEmpty.show(true)
         val scope = if (learnGroup == null) "" else "「${a.db.groupLabel(learnGroup!!)}」"
         when {
@@ -181,11 +238,190 @@ class LearnView(private val a: MainActivity, private val root: View) {
         showStudy(queue.removeAt(0))
     }
 
+    // ---------- v10：拼写测试 ----------
+
+    /** 从当前组里取今天到期的词，看中文释义写英文。
+     *  不改变认词队列；拼写结果直接写回同一套间隔复习记录。 */
+    private fun startSpelling() {
+        if (mode == SPELL && !spellFinished) {
+            a.toast("先在当前这张拼写卡上点「检查拼写」或「不会，看答案」")
+            return
+        }
+        if (mode == QUIZ && !quizAnswered) {
+            a.toast("先答完这道小测")
+            return
+        }
+        if (mode == STUDY && btnStudyNext.visibility != View.VISIBLE) {
+            a.toast("先看答案并自评，再开始拼写")
+            return
+        }
+        val due = a.db.dueWords(groupFilter = learnGroup).filter { it.meaning.isNotBlank() }
+        if (due.isEmpty()) {
+            a.toast("今天没有可拼写的词：先解锁新词，或给词条补上释义")
+            return
+        }
+        spellQueue = due.toMutableList()
+        spellRight = 0
+        spellWrong = 0
+        spellFinished = false
+        queue.clear()
+        mode = SPELL
+        current = null
+        cardStudy.show(false)
+        cardQuiz.show(false)
+        learnEmpty.show(false)
+        cardSpell.show(true)
+        nextSpell()
+    }
+
+    private fun nextSpell() {
+        if (spellFinished) {
+            startSpelling()
+            return
+        }
+        if (spellQueue.isEmpty()) {
+            showSpellDone()
+            return
+        }
+        val w = spellQueue.removeAt(0)
+        spellCurrent = w
+        spellAnswered = false
+        spellHinted = false
+        val index = spellRight + spellWrong + 1
+        val total = index + spellQueue.size
+        tvSpellLabel.text = "拼写测试 · 看释义写单词"
+        tvSpellMeta.text = "${a.db.groupLabel(w.groupName)} · 第 $index / $total 个 · 连对 ${w.streak} 次"
+        tvSpellMeaning.text = w.meaning
+        tvSpellHint.text = ""
+        tvSpellHint.show(false)
+        etSpell.setText("")
+        etSpell.isEnabled = true
+        etSpell.show(true)
+        etSpell.requestFocus()
+        btnSpellSpeak.show(true)
+        btnSpellHint.show(true)
+        btnSpellHint.text = "提示首字母"
+        btnSpellCheck.show(true)
+        btnSpellCheck.text = "检查拼写"
+        btnSpellGiveUp.show(true)
+        btnSpellGiveUp.text = "不会，看答案"
+        btnSpellGiveUp.setTextColor(Pal.danger)
+        tvSpellResult.show(false)
+        btnSpellNext.show(false)
+        btnSpellNext.text = "下一个"
+    }
+
+    private fun checkSpelling() {
+        if (spellAnswered || spellFinished) return
+        val w = spellCurrent ?: return
+        val typed = etSpell.text.toString()
+        if (typed.isBlank()) {
+            a.toast("先写一个答案；不会就点「不会，看答案」")
+            return
+        }
+        spellAnswered = true
+        val correct = normalizeAnswer(typed) == normalizeAnswer(w.word)
+        if (correct) {
+            spellRight++
+            a.db.recordGrade(w.id, 2)
+            tvSpellResult.text = if (spellHinted) "拼写正确（用过提示）· 连对 +1" else "拼写正确 · 连对 +1"
+            tvSpellResult.setTextColor(Pal.mastered)
+        } else {
+            spellWrong++
+            a.db.recordGrade(w.id, 0)
+            tvSpellResult.text = "拼错了\n正确拼写：${w.word}\n已记入错词，今天会再出现"
+            tvSpellResult.setTextColor(Pal.danger)
+        }
+        finishSpellAnswer()
+    }
+
+    /** 主动看答案，按「不认识」记一次，进入当天复习队列 */
+    private fun revealSpelling() {
+        if (spellAnswered || spellFinished) return
+        val w = spellCurrent ?: return
+        spellAnswered = true
+        spellWrong++
+        a.db.recordGrade(w.id, 0)
+        tvSpellResult.text = "正确拼写：${w.word}\n已记入错词，今天会再出现"
+        tvSpellResult.setTextColor(Pal.danger)
+        finishSpellAnswer()
+    }
+
+    private fun finishSpellAnswer() {
+        etSpell.isEnabled = false
+        hideSpellKeyboard()
+        tvSpellHint.show(false)
+        btnSpellSpeak.show(false)
+        btnSpellHint.show(false)
+        btnSpellCheck.show(false)
+        btnSpellGiveUp.show(false)
+        tvSpellResult.show(true)
+        btnSpellNext.show(true)
+        btnSpellNext.text = "下一个"
+        a.dataChanged()
+    }
+
+    private fun showSpellHint() {
+        val w = spellCurrent ?: return
+        if (w.word.isEmpty()) return
+        spellHinted = true
+        // 首字母照常显示，其余字母变成下划线；空格与连字符保留，词组也能看出结构
+        val pattern = w.word.mapIndexed { i, c ->
+            if (i == 0 || !c.isLetter()) c else '_'
+        }.joinToString(" ")
+        tvSpellHint.text = "提示：$pattern（${w.word.count { it.isLetter() }} 个字母）"
+        tvSpellHint.show(true)
+        btnSpellHint.show(false)
+    }
+
+    private fun showSpellDone() {
+        spellFinished = true
+        val total = spellRight + spellWrong
+        tvSpellLabel.text = "本轮拼写完成"
+        tvSpellMeta.text = if (spellWrong == 0) {
+            "全部拼对 · 这些词会按复习间隔回来"
+        } else {
+            "拼错的词今天还会出现，可以再来一轮"
+        }
+        tvSpellMeaning.text = "拼对 $spellRight / $total 个"
+        tvSpellHint.show(false)
+        etSpell.show(false)
+        hideSpellKeyboard()
+        btnSpellSpeak.show(false)
+        btnSpellHint.show(false)
+        btnSpellCheck.show(false)
+        tvSpellResult.text = if (total == 0) "" else "正确率 ${spellRight * 100 / total}%"
+        tvSpellResult.setTextColor(Pal.textSub)
+        tvSpellResult.show(total > 0)
+        btnSpellNext.text = "再来一轮"
+        btnSpellNext.show(true)
+        btnSpellGiveUp.text = "返回学习"
+        btnSpellGiveUp.setTextColor(Pal.textSub)
+        btnSpellGiveUp.show(true)
+        a.dataChanged()
+    }
+
+    private fun hideSpellKeyboard() {
+        try {
+            val imm = a.getSystemService(android.content.Context.INPUT_METHOD_SERVICE)
+                as? android.view.inputmethod.InputMethodManager
+            imm?.hideSoftInputFromWindow(etSpell.windowToken, 0)
+        } catch (ignored: Exception) {
+        }
+    }
+
+    /** 大小写、首尾空格、连续空格不扣分；冠词、连字符、拼写本身仍必须正确 */
+    private fun normalizeAnswer(s: String): String =
+        s.trim().lowercase(Locale.ROOT)
+            .replace('\u2019', '\'')
+            .replace(Regex("\\s+"), " ")
+
     private fun showStudy(w: Word) {
         mode = STUDY
         current = w
         cardStudy.show(true)
         cardQuiz.show(false)
+        cardSpell.show(false)
         learnEmpty.show(false)
         answerBox.show(false)
         btnReveal.show(true)
@@ -238,6 +474,7 @@ class LearnView(private val a: MainActivity, private val root: View) {
         mode = QUIZ
         cardStudy.show(false)
         cardQuiz.show(true)
+        cardSpell.show(false)
         learnEmpty.show(false)
         tvQuizWord.text = w.word
         options.forEachIndexed { i, t ->

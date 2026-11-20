@@ -1,8 +1,10 @@
-# 单词酷 · 设计系统与架构规范 v9
+# 单词酷 · 设计系统与架构规范 v10
 
-> 版本沿革：v2 页面重设计 → v3 加功能 → v4 修 15 项缺陷 → v5 英音 / 美音双发音与双音标 → v6 内置离线开源音标词典 → v7 对照同行产品与开源数据源做实证调研 → v8 接入微信 / QQ 文件分享并做成 CI 真编译 + 自动发版 → v9 应用内检查更新（首次、也是唯一一次新增 `INTERNET` 权限）→ **v9.1 按用户要求移除 GitHub Actions 工作流**。
+> 版本沿革：v2 页面重设计 → v3 加功能 → v4 修 15 项缺陷 → v5 英音 / 美音双发音与双音标 → v6 内置离线开源音标词典 → v7 对照同行产品与开源数据源做实证调研 → v8 接入微信 / QQ 文件分享并做成 CI 真编译 + 自动发版 → v9 应用内检查更新（首次、也是唯一一次新增 `INTERNET` 权限）→ **v9.1 按用户要求移除 GitHub Actions 工作流** → **v10 拼写测试（v1.3 / versionCode 4）**。
 >
 > **v9.1 一句话**：`.github/workflows/build-apk.yml` 已删除，push 到 `main` 不再自动编译、也不再自动发新版 Release。已发布的三条 Release 与 APK 全部保留，应用内「检查更新」仍能读到现有的 latest（v1.2.0）；只是以后不会自动冒出新版本。源码、数据、文档、自检脚本一行没删，只少了这一个自动化文件。
+>
+> **v10 一句话**：学习页加「拼写测试 · 看释义写单词」。从当前组里取当天到期的词，看中文释义输入英文；提示首字母、听发音、不会看答案、结束后再来一轮都齐。判分直接复用 `recordGrade`（拼对按「认识」、拼错按「不认识」），不新增数据库字段、不新增权限、不新增依赖；所以拼写结果和认词结果共用同一套 1/2/4/7/15/30 天复习节奏。
 >
 > **v9 一句话**：应用内检查更新放在「统计 → 版本与更新」，点按钮才向 GitHub 发一次只读 GET 比对公开 Release 版本号；发现新版弹窗、点「去下载」才用浏览器打开下载页，绝不自动下载或安装。**这是全应用唯一联网点，也是唯一新增权限**：词库、导入、离线音标词典、双发音、复习、备份全部仍离线可用。用户明确确认「允许加 INTERNET 权限」后才做，见第 11 节。
 >
@@ -114,7 +116,7 @@
 3. **`DocxParser.kt`**：`parseBytes` / `parseDocx` / `parseText` / `parseLines` / `isZip` 的行为，以及 Word 导入格式（普通段落、两列表格、Tab / 冒号 / 分号 / 音标 / 行首序号）。
 4. **备份 JSON 字段**：`app` / `version` / `exported_at` / `words[]` 及词条字段名，换机恢复逻辑不变。
 5. **`MainActivity.kt` 与四个 View 的构造、调用契约**：`showWordDialog` / `showImportPreview` / `pickDocument` / `exportBackup` / `switchTo` / `dataChanged` / `speak` 等；四个 View 仍以 `(MainActivity, View)` 构造。
-6. **v2 的全部 `R.id` 与布局文件名**：8 个布局、90 个旧 id 一个不改名、不删除（v3 新增 10 个、v4 新增 `dialog_input.xml`、v5 新增 9 个、v6 新增 8 个，现共 9 布局 / 117 个 id）。
+6. **v2 的全部 `R.id` 与布局文件名**：8 个布局、90 个旧 id 一个不改名、不删除（v3 新增 10 个、v4 新增 `dialog_input.xml`、v5 新增 9 个、v6 新增 8 个、v8 新增 2 个、v9 新增 3 个、v10 新增 13 个，现共 9 布局 / 135 个 id）。
 7. **`Ui.kt` 的函数签名**：`Pal` 字段名、`dp` / `rounded` / `toast` / `show` / `stateName` / `stateColor` 全部保持；仅替换色值与圆角收敛系数。
 8. **Gradle 与清单**：`applicationId`、minSdk 26 / targetSdk 34、**零第三方依赖（Gradle dependencies 仍为空）**。**v1.0/v1.1 为零权限；v1.2 起按用户明确确认新增唯一一个 `<uses-permission android:name="android.permission.INTERNET" />`**，只给「检查更新」用，仍无存储 / 定位 / 通讯录等任何其他权限，`tools/verify.py` 用白名单强制只允许这一个。v8 前 `AndroidManifest.xml` 一直没有改过；v8 起**只增不改**：加 `launchMode="singleTask"` 与 3 组接收文件的 `intent-filter`，原 MAIN / LAUNCHER 过滤器与 `exported="true"` 不变。Kotlin 源文件 8 → 9（v6 `IpaDictionary.kt`）→ **10（v9 `UpdateChecker.kt`）**；v6 另新增 `assets/ipa.tsv`、`LICENSES/`、`tools/`，均为数据与脚本，不是代码依赖。
 9. **编译与安装方式**：v9.1 移除工作流后剩下 Android Studio / 命令行两条路径，外加直接下载已有 Release（见 `README.md`）。
@@ -422,9 +424,46 @@ Android 沙箱下，微信收到的文件在 `com.tencent.mm` 私有目录里，
 
 ---
 
-## 12. 验收与诚实边界
+## 12. v10：拼写测试
 
-- 已做：`python3 tools/verify.py` 一键静态自检通过（25 个 XML 合法性与重复属性、122 个 id / 资源引用一致性、10 个 Kotlin 精细括号扫描、emoji 残留、`ipa.tsv` 三列格式与排序、许可证文件齐全、上游 SHA-256 与 `ipa_stats.json` 行数一致性、**Manifest 三组接收过滤器与「仅 INTERNET 一个权限」白名单校验**）
+### 12.1 为什么加这一步
+
+认词卡片测的是「看到英文能不能想起中文」，4 选 1 也只测再认；这两条链路都允许「看着眼熟就蒙对」。真正要会用一个词，至少还要能**从中文反推英文拼写**。v10 不改原有认词 / 小测流程，只在学习页加一条独立的拼写会话：**看释义 → 输入英文 → 立即判分**。
+
+### 12.2 行为
+
+- **取词范围**：当前组别里 `state>0` 且 `next_review<=today` 的词，且释义非空；没有可拼写的词时明确提示，不静默失败
+- **判分**：拼对调用 `recordGrade(id, 2)`，拼错 / 看答案调用 `recordGrade(id, 0)`。复用原有间隔复习与打卡，不新开一套「拼写等级」
+- **宽松规则**：只忽略大小写、首尾空格、连续空格和弯撇号（`’`→`'`）；多写 / 少写字母、把 `take off` 写成 `takeoff` 都判错
+- **三种求助**：
+  - 「提示首字母」：显示首字母 + 其余字母下划线，空格 / 连字符保留；同一条答案只提示一次
+  - 「听发音（有提示）」：调用系统 TTS 读这个词；会提示本轮用过提示
+  - 「不会，看答案」：直接显示正确拼写，并按「不认识」记一次
+- **节奏**：作答后停在当前卡，由用户点「下一个」；全部过完显示「拼对 X / Y」与正确率，可「再来一轮」（只包含今天仍到期的错词）或「返回学习」
+- **不打断**：拼写会话有独立队列；开始拼写会清空认词缓存队列，避免学完拼写后又被旧队列带回已拼过的词。正在看认词答案 / 未作答小测时，点拼写按钮会先提示完成当前卡
+
+### 12.3 接口与兼容性
+
+- 数据库仍为 v3，`words` / `checkin` 表结构、备份 JSON 字段**一列未加**；`recordGrade` 仍是唯一判分入口
+- 新增 13 个 `R.id`（`btnSpellStart` / `cardSpell` / `tvSpellLabel` / `tvSpellMeta` / `tvSpellMeaning` / `tvSpellHint` / `etSpell` / `btnSpellSpeak` / `btnSpellHint` / `btnSpellCheck` / `btnSpellGiveUp` / `tvSpellResult` / `btnSpellNext`），旧 id 一个没改名
+- `LearnView` 新增内部状态 `SPELL=3`，没有改 `MainActivity` / `WordDb` 的公开方法签名
+- 权限仍只有 `INTERNET` 一个；不新增存储、麦克风、通知等权限，`tools/verify.py` 的白名单继续强制这一条
+- 版本：v1.2（versionCode 3）→ **v1.3（versionCode 4）**；GitHub 上现有 Release 仍是 v1.2.0，v1.3 需自行编译
+
+### 12.4 诚实边界
+
+1. 「听发音」和「提示首字母」都会泄露答案，只是降低难度；它们的正确率不能当作独立拼写能力。
+2. 一个词拼对一次就按「认识」推进复习间隔，和认词卡共享进度；**没有单独的拼写熟练度**，也不区分「会拼但不会用」。
+3. 词组仍按原样比对空格；`take off` / `takeoff`、连字符写法、英美拼写差异（`color` / `colour`）都按不同答案处理，不会自动判等。
+4. 释义为空或只有词性的词无法用来提示中文，已从拼写队列里过滤；这类词要先去词库补释义。
+5. **仍未做全量真机回归**：v1.3 已在 Android 37 模拟器（API 37、1080×2400）上真实安装并点按验证「正确 / 拼错 / 提示 / 看答案 / 完成 / 再来一轮」主流程；系统 TTS 真实语音包、不同厂商输入法与键盘、微信分享入口仍需在真机确认。
+
+---
+
+## 13. 验收与诚实边界
+
+- 已做：`python3 tools/verify.py` 一键静态自检通过（25 个 XML 合法性与重复属性、135 个 id / 资源引用一致性、10 个 Kotlin 精细括号扫描、emoji 残留、`ipa.tsv` 三列格式与排序、许可证文件齐全、上游 SHA-256 与 `ipa_stats.json` 行数一致性、**Manifest 三组接收过滤器与「仅 INTERNET 一个权限」白名单校验**、v10 拼写判分等价回归）
+- 已做（v10）：本机 Android 37 模拟器（API 37、1080×2400、Play Store 镜像）用 `assembleDebug` 真编译、`adb install` 安装并点按验证：加载示例词库 → 解锁 → 拼写测试 → 输入正确 / 错误答案 / 提示 / 看答案 → 完成页「拼对 1 / 10」→ 再来一轮（9 个错词）；同时确认拼写卡在认词 / 小测 / 完成态会正确隐藏
 - 已做：解析算法等价模拟与 **v7 的 8 项行为回归**（逐字段只补空、文档自带双音标不覆盖、别名补缺列、多读音保留、词组与自造词留空），断言全部通过；v8 另加了外部 Intent 的等价模拟（三种 action、Uri 去重、多文件合并、二进制拦截）；**v9 加了 9 项检查更新回归**（版本三段比较含 1.10>1.9、预发布后缀、assets 挑 APK 直链、无 assets 降级、权限白名单）
 - 已做：用真实公开高频词表 `google-10000-english-no-swears`（9,894 词）跑离线查表，得到 94.9% / 77.6% / 5.1% 三组覆盖率数字，非估算
 - 曾做（**该工作流现已按用户要求移除**）：GitHub Actions（ubuntu-22.04 + JDK 17 + SDK 34 + Gradle 8.2）真实编译通过，`assembleDebug` 产出 `WordCool.apk`，并自动发布 Release；此前两轮 CI 失败（setup-android action、SDK 34 不存在的 TTS 常量）都已按日志定位并修掉

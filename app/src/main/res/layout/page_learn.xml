@@ -88,6 +88,17 @@
                     android:textSize="13sp"
                     android:textColor="@color/primary" />
             </LinearLayout>
+
+            <TextView
+                android:id="@+id/btnSpellStart"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_btn_ghost"
+                android:gravity="center"
+                android:text="拼写测试 · 看释义写单词"
+                android:textSize="12sp"
+                android:textColor="@color/primary" />
         </LinearLayout>
 
         <!-- 认词卡片 -->
@@ -391,6 +402,153 @@
                 android:background="@drawable/bg_btn_primary"
                 android:gravity="center"
                 android:text="继续"
+                android:textSize="14sp"
+                android:textColor="@color/white"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <!-- 拼写测试 -->
+        <LinearLayout
+            android:id="@+id/cardSpell"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="vertical"
+            android:background="@drawable/bg_card"
+            android:padding="18dp"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/tvSpellLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="拼写测试 · 看释义写单词"
+                android:textSize="12sp"
+                android:textColor="@color/primary" />
+
+            <TextView
+                android:id="@+id/tvSpellMeta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text=""
+                android:textSize="12sp"
+                android:textColor="@color/text_sub" />
+
+            <TextView
+                android:id="@+id/tvSpellMeaning"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center"
+                android:lineSpacingExtra="4dp"
+                android:text=""
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/text" />
+
+            <TextView
+                android:id="@+id/tvSpellHint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center"
+                android:text=""
+                android:textSize="13sp"
+                android:textColor="@color/primary"
+                android:visibility="gone" />
+
+            <EditText
+                android:id="@+id/etSpell"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="14dp"
+                android:background="@drawable/bg_input"
+                android:fontFamily="serif"
+                android:gravity="center"
+                android:hint="在这里输入英文单词"
+                android:imeOptions="actionDone"
+                android:inputType="textNoSuggestions"
+                android:maxLines="1"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:textSize="22sp"
+                android:textColor="@color/text"
+                android:textColorHint="@color/text_sub" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/btnSpellSpeak"
+                    android:layout_width="0dp"
+                    android:layout_height="38dp"
+                    android:layout_weight="1"
+                    android:layout_marginRight="6dp"
+                    android:background="@drawable/bg_btn_ghost"
+                    android:gravity="center"
+                    android:text="听发音（有提示）"
+                    android:textSize="12sp"
+                    android:textColor="@color/primary" />
+
+                <TextView
+                    android:id="@+id/btnSpellHint"
+                    android:layout_width="0dp"
+                    android:layout_height="38dp"
+                    android:layout_weight="1"
+                    android:layout_marginLeft="6dp"
+                    android:background="@drawable/bg_btn_soft"
+                    android:gravity="center"
+                    android:text="提示首字母"
+                    android:textSize="12sp"
+                    android:textColor="@color/primary" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/btnSpellCheck"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_btn_primary"
+                android:gravity="center"
+                android:text="检查拼写"
+                android:textSize="14sp"
+                android:textColor="@color/white" />
+
+            <TextView
+                android:id="@+id/btnSpellGiveUp"
+                android:layout_width="match_parent"
+                android:layout_height="38dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_btn_ghost"
+                android:gravity="center"
+                android:text="不会，看答案"
+                android:textSize="12sp"
+                android:textColor="@color/danger" />
+
+            <TextView
+                android:id="@+id/tvSpellResult"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:gravity="center"
+                android:lineSpacingExtra="3dp"
+                android:text=""
+                android:textSize="14sp"
+                android:textColor="@color/text"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/btnSpellNext"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/bg_btn_primary"
+                android:gravity="center"
+                android:text="下一个"
                 android:textSize="14sp"
                 android:textColor="@color/white"
                 android:visibility="gone" />

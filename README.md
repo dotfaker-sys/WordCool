@@ -2,11 +2,13 @@
 
 一个**以离线为主**的安卓单词本（唯一联网点是「检查更新」，见 v9）：管理自己的词库、按「解锁 → 学习 → 已掌握」把单词真正学会，还能把 **Word / Excel / 文字型 PDF** 里的单词表导进来并自动划成 Unit / Day 小组，卡片上**英音 / 美音都能点、UK / US 双音标并排显示**。
 
-> **v9 · 应用内检查更新（当前 v1.2 / versionCode 3）**：「统计」页底部新增「版本与更新」，显示当前版本，点「检查更新」读取一次 GitHub 公开 Release 版本号，发现新版弹窗并跳转下载页；也能打开「启动时自动检查」，之后只有真有新版才弹窗。**这是全应用唯一会联网的地方，也是相对前几版唯一新增的权限（`INTERNET`）**：只在用户点按钮或自己开开关时发一次只读 GET，不上传词库、账号、设备信息，**不自动下载、不自动安装** APK。词库、导入、离线音标词典、双发音、复习、备份**全部仍离线可用**，没网也能背单词；不想要就别开开关。详见 [`DESIGN.md`](DESIGN.md) 第 11 节。
+> **v10 · 拼写测试（当前源码 v1.3 / versionCode 4；GitHub Release 仍是 v1.2.0）**：学习页新增「拼写测试 · 看释义写单词」。它从当前组里取今天到期的词，看中文释义输入英文，支持「提示首字母 / 听发音 / 不会看答案」，**拼对与拼错直接写回同一套 1/2/4/7/15/30 天复习记录**；大小写、首尾空格、连续空格不扣分，词组中间的空格仍要写对。零新增权限、零新增依赖，词库 / 导入 / 音标 / 发音全部不变。v1.3 还没有发 Release，想装新版请按下面「方式 A / 方式 C」自行编译。
+>
+> **v9 · 应用内检查更新（v1.2 / versionCode 3）**：「统计」页底部新增「版本与更新」，显示当前版本，点「检查更新」读取一次 GitHub 公开 Release 版本号，发现新版弹窗并跳转下载页；也能打开「启动时自动检查」，之后只有真有新版才弹窗。**这是全应用唯一会联网的地方，也是相对前几版唯一新增的权限（`INTERNET`）**：只在用户点按钮或自己开开关时发一次只读 GET，不上传词库、账号、设备信息，**不自动下载、不自动安装** APK。词库、导入、离线音标词典、双发音、复习、备份**全部仍离线可用**，没网也能背单词；不想要就别开开关。详见 [`DESIGN.md`](DESIGN.md) 第 11 节。
 >
 > **v8 · 从微信 / QQ 直接导入**：微信里点开词表 → 右上角「…」→「用其他应用打开」，或长按文件「分享」→ 选「单词酷」，文件直接进导入预览，**不用先存到手机**。三种系统入口都接了（`ACTION_VIEW` / `ACTION_SEND` / `ACTION_SEND_MULTIPLE`），支持多选文件合并成一批预览、把一段词表文字直接分享进来；QQ / 企业微信 / 文件管理器同一套入口。导入页新增「⑦ 从微信 / QQ 导入」操作指引与排障。**不读微信私有目录**：只有你主动在微信里选了本应用，系统才把那一个文件的临时读取权交给它；导入本身不需要联网。详见 [`DESIGN.md`](DESIGN.md) 第 10 节。
 >
-> 版本 **v1.2（versionCode 3）**。GitHub Actions 曾**真实编译出 APK 并自动发布 Release**（见 <https://github.com/dotfaker-sys/WordCool/releases>），但该工作流现已按用户要求移除，push 不再自动出包。仍未做的是真机点按测试。
+> 当前源码 **v1.3（versionCode 4）**，GitHub 上现成 Release 仍是 **v1.2.0（versionCode 3）**。v1.3 已在本机用 Android 37 模拟器（API 37）真实编译、安装并点按验证过拼写测试主流程；微信分享入口、真实 TTS 语音包与各厂商 ROM 仍未逐台验证。
 >
 > **v7 · 先查别人怎么做，再改代码**：对照欧路、词藤、List、Anki、Quizlet 与 6 类开源数据源做了一轮实证调研（全文见 `docs/research_competitors_ipa.md`），据此修了 5 个短板：① 音标补全从「三列全空才补」改成**逐字段只补空**（文档给了单音标也能补出 UK/US 两列）；② 加 36 组**英美拼写别名**（color↔colour、center↔centre…）；③ 同形异读**保留全部候选**，不再只取第一条；④ 导入预览列出**未命中词清单**并可一键复制；⑤ 数据附**上游 SHA-256** 可复核。用 9,894 个高频词实测：**94.9% 能查到音标，77.6% 英美双套齐全，5.1% 查不到**（多为缩写，留空不编造）。详见 [`DESIGN.md`](DESIGN.md) 第 9 节。
 >
@@ -52,13 +54,16 @@
 
 ### 方式 C：命令行
 
-需要 JDK 17 + Android SDK（platform 34、build-tools 34.0.0）：
+需要 JDK 17 + Android SDK（platform 34、build-tools 34.0.0）。仓库已带 Gradle 8.2 Wrapper，不必另外装 Gradle：
 
 ```bash
-gradle wrapper --gradle-version 8.2
+export JAVA_HOME=/path/to/jdk-17
+export ANDROID_HOME=/path/to/android-sdk
 ./gradlew assembleDebug
 # 产物：app/build/outputs/apk/debug/app-debug.apk
 ```
+
+Windows 上用 `gradlew.bat assembleDebug`。SDK 里缺 platform 34 时，首次构建会按已接受的 SDK 许可自动补装（或先在 Android Studio 的 SDK Manager 里装 Android 14 / API 34）。
 
 > Debug 包已用自动生成的 debug 证书签名，可以直接安装自用。若要正式发布，请在 `app/build.gradle` 里换成自己的签名配置。
 
@@ -69,7 +74,7 @@ gradle wrapper --gradle-version 8.2
 | 页面 | 能做什么 |
 | --- | --- |
 | 词库 | 搜索、按状态筛选、**按组筛选**、添加/编辑/删除（含组别、英/美音标）、查看掌握进度与下次复习时间、一键解锁新词 |
-| 学习 | **一次一张单词卡、答完自己点「下一个」**、按组学习、**英音 UK / 美音 US 双按钮 + 双音标**、三档自评、4 选 1 小测验、今日进度条 |
+| 学习 | **一次一张单词卡、答完自己点「下一个」**、按组学习、**英音 UK / 美音 US 双按钮 + 双音标**、三档自评、4 选 1 小测验、**看释义写单词的拼写测试（提示 / 听发音 / 看答案 / 再来一轮）**、今日进度条 |
 | 统计 | 词库总量 / 已解锁 / 已掌握 / 今日已学、解锁进度、答题正确率、连续打卡、近 7 天柱状图、**版本与更新（检查更新 / 启动时自动检查开关）** |
 | 导入 | **微信 / QQ 直接分享进来（含多选与文本分享）**、**Word / .xlsx / 文字型 PDF** 导入、**Unit/Day 自动划组**、`UK /…/ US /…/` 双音标识别、**离线词典自动补全音标**、划组管理、**发音设置（默认口音 / 语速 / 试听 / 语音包安装入口）**、粘贴导入、导入预览中统一改组、JSON 备份与恢复、每日新词数、示例词库、清空词库 |
 
@@ -134,7 +139,7 @@ WordCool/
 │   │   ├── DocxParser.kt       docx/xlsx/PDF/txt → 词条 + 自动划组
 │   │   ├── Ui.kt               颜色、圆角、toast、音标显示
 │   │   ├── LibraryView.kt      词库页
-│   │   ├── LearnView.kt        学习页（卡片 + 测验）
+│   │   ├── LearnView.kt        学习页（卡片 + 测验 + 拼写测试）
 │   │   ├── StatsView.kt        统计页
 │   │   └── ImportView.kt       导入与设置页
 │   └── res/                    布局、颜色、样式、圆角、启动图标
@@ -144,6 +149,8 @@ WordCool/
 │   └── build_ipa.py            从 ipa-dict 原始数据重建 ipa.tsv
 ├── docs/architecture.html      可交互分层架构图
 ├── DESIGN.md                   设计系统与接口冻结清单
+├── gradlew / gradlew.bat       Gradle 8.2 Wrapper（v10 起随仓库提供）
+├── gradle/wrapper/             wrapper jar 与 distributionUrl
 └── build.gradle / settings.gradle / gradle.properties
 ```
 

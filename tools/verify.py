@@ -360,8 +360,8 @@ if "UpdateChecker.autoCheck(this)" not in main_kt or "isIncomingIntent" not in m
     errors.append("MainActivity 未接上启动时静默检查 / 未避开微信分享入口")
 
 build_gradle = (ROOT / "app/build.gradle").read_text(encoding="utf-8")
-if "versionCode 3" not in build_gradle or "versionName '1.2'" not in build_gradle:
-    errors.append("app/build.gradle 版本号未升到 v1.2 / versionCode 3")
+if "versionCode 4" not in build_gradle or "versionName '1.3'" not in build_gradle:
+    errors.append("app/build.gradle 版本号未升到 v1.3 / versionCode 4")
 # v9.1：工作流已按用户要求移除，自检不再读那个文件；同时防止有人误把它加回来
 wf_dir = ROOT / ".github/workflows"
 active_wf = (list(wf_dir.glob("*.yml")) + list(wf_dir.glob("*.yaml"))) if wf_dir.is_dir() else []
@@ -415,6 +415,43 @@ for ok, msg in v9:
 print(f"v9 检查更新回归: {sum(1 for ok, _ in v9 if ok)}/{len(v9)} 项通过 · "
       f"权限白名单 {perms}")
 
+# ---- v10：拼写测试 ----
+learn_kt_path = MAIN / "java/com/wordcool/app/LearnView.kt"
+learn_xml_path = MAIN / "res/layout/page_learn.xml"
+if not learn_kt_path.is_file() or not learn_xml_path.is_file():
+    errors.append("缺少拼写测试的 LearnView.kt / page_learn.xml")
+else:
+    learn_kt = learn_kt_path.read_text(encoding="utf-8")
+    learn_xml = learn_xml_path.read_text(encoding="utf-8")
+    for i in ("btnSpellStart", "cardSpell", "tvSpellMeaning", "etSpell", "btnSpellCheck",
+              "btnSpellHint", "btnSpellGiveUp", "tvSpellResult", "btnSpellNext"):
+        if 'android:id="@+id/' + i + '"' not in learn_xml:
+            errors.append(f"page_learn.xml 缺少拼写测试 id: {i}")
+    for token in ("SPELL", "startSpelling", "nextSpell", "checkSpelling", "revealSpelling",
+                  "showSpellDone", "normalizeAnswer", "recordGrade(w.id, 2)",
+                  "recordGrade(w.id, 0)", "cardSpell.show(false)"):
+        if token not in learn_kt:
+            errors.append(f"LearnView 缺少拼写测试实现: {token}")
+
+    def py_spell_norm(s):
+        """等价复刻 LearnView.normalizeAnswer：只忽略大小写与多余空格"""
+        return " ".join(s.strip().lower().replace("\u2019", "'").split())
+
+    v10 = [
+        (py_spell_norm(" Abandon ") == "abandon", "首尾空格 / 大小写不应扣分"),
+        (py_spell_norm("take   off") == "take off", "连续空格应归一成一个空格"),
+        (py_spell_norm("don\u2019t") == "don't", "弯撇号应按直撇号处理"),
+        (py_spell_norm("takeoff") != py_spell_norm("take off"), "词组拼写不能把空格吞掉"),
+        (py_spell_norm("abandonn") != py_spell_norm("abandon"), "多写字母必须判错"),
+        ("cardSpell.show(false)" in learn_kt, "认词 / 小测 / 完成态应隐藏拼写卡，避免叠卡"),
+        ("a.dataChanged()" in learn_kt, "拼写结果应刷新顶栏与统计"),
+    ]
+    for ok, msg in v10:
+        if not ok:
+            errors.append("v10 回归失败: " + msg)
+    print(f"v10 拼写测试回归: {sum(1 for ok, _ in v10 if ok)}/{len(v10)} 项通过 · "
+          f"逐词判分 / 提示 / 看答案 / 再来一轮")
+
 print(f"XML {len(xmls)} · Kotlin {len(kts)} · 布局 {len(layouts)} · id {len(ids)} · drawable {len(drawables)}")
 if errors:
     print("\n发现问题：")
@@ -423,6 +460,7 @@ if errors:
     print(f"\n共 {len(errors)} 项，静态自检未通过。")
     return_code = 1
 else:
-    print("静态自检全部通过。GitHub Actions 曾真编译出 APK（工作流现已移除）；仍需真机点按验证（微信分享入口、检查更新请求与浏览器跳转）。")
+    print("静态自检全部通过。v1.3 已在 Android 37 模拟器（API 37）上真编译并点按验证拼写测试；"
+          "微信分享入口、真实 TTS 语音包与各厂商 ROM 仍需真机验证。")
     return_code = 0
 sys.exit(return_code)
