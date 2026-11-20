@@ -105,6 +105,20 @@ class ImportView(private val a: MainActivity, private val root: View) {
                 }.show()
         }
 
+        root.findViewById<TextView>(R.id.btnLoadKaoyan).setOnClickListener {
+            AlertDialog.Builder(a)
+                .setTitle("载入考研词库？")
+                .setMessage(
+                    "加入 711 个考研词，按 Unit 1 Day 1 … Unit 5 Day 3 分成 23 组。\n\n" +
+                        "会先打开导入预览：自动补英 / 美音标、列出未命中词，确认后才写入词库。\n" +
+                        "已存在的词只补空字段，不覆盖你改过的释义与学习进度。\n\n" +
+                        "词表来自你提供的文件，仅保存在本机，不上传。"
+                )
+                .setNegativeButton("取消", null)
+                .setPositiveButton("查看导入预览") { _, _ -> a.loadKaoyanPack() }
+                .show()
+        }
+
         root.findViewById<TextView>(R.id.btnClear).setOnClickListener {
             AlertDialog.Builder(a)
                 .setTitle("清空整个词库？")

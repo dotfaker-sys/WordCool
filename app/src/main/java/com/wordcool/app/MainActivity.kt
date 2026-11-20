@@ -375,6 +375,34 @@ class MainActivity : Activity() {
         dataChanged()
     }
 
+    /** v1.4：内置考研词库。assets/kaoyan.tsv 每行「单词<TAB>释义<TAB>组别<TAB>备注」，
+     *  先走和文件导入相同的预览流程：自动补音标、显示划组与未命中词，确认后才入库。 */
+    fun loadKaoyanPack() {
+        try {
+            val text = assets.open("kaoyan.tsv").bufferedReader(Charsets.UTF_8).use { it.readText() }
+            val items = mutableListOf<Imported>()
+            text.lineSequence().forEach { raw ->
+                val line = raw.trimEnd('\r')
+                if (line.isBlank() || line.startsWith("#")) return@forEach
+                val cols = line.split('\t')
+                if (cols.size < 3) return@forEach
+                val word = cols[0].trim()
+                val meaning = cols[1].trim()
+                val group = cols[2].trim()
+                val note = cols.getOrElse(3) { "" }.trim()
+                if (word.isEmpty() || meaning.isEmpty() || group.isEmpty()) return@forEach
+                items.add(Imported(word = word, meaning = meaning, group = group, note = note))
+            }
+            if (items.isEmpty()) {
+                toast("内置考研词库为空或读取失败")
+                return
+            }
+            showImportPreview(items, "内置考研词库")
+        } catch (e: Exception) {
+            toast("读取内置考研词库失败：${e.message}")
+        }
+    }
+
     /** 跳到系统 TTS 数据安装页；回来后 onResume 会重新探测 */
     fun openTtsSettings() {
         try {

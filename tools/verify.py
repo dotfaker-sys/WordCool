@@ -360,8 +360,8 @@ if "UpdateChecker.autoCheck(this)" not in main_kt or "isIncomingIntent" not in m
     errors.append("MainActivity 未接上启动时静默检查 / 未避开微信分享入口")
 
 build_gradle = (ROOT / "app/build.gradle").read_text(encoding="utf-8")
-if "versionCode 4" not in build_gradle or "versionName '1.3'" not in build_gradle:
-    errors.append("app/build.gradle 版本号未升到 v1.3 / versionCode 4")
+if "versionCode 5" not in build_gradle or "versionName '1.4'" not in build_gradle:
+    errors.append("app/build.gradle 版本号未升到 v1.4 / versionCode 5")
 # v9.1：工作流已按用户要求移除，自检不再读那个文件；同时防止有人误把它加回来
 wf_dir = ROOT / ".github/workflows"
 active_wf = (list(wf_dir.glob("*.yml")) + list(wf_dir.glob("*.yaml"))) if wf_dir.is_dir() else []
@@ -452,6 +452,47 @@ else:
     print(f"v10 拼写测试回归: {sum(1 for ok, _ in v10 if ok)}/{len(v10)} 项通过 · "
           f"逐词判分 / 提示 / 看答案 / 再来一轮")
 
+# ---- v1.4：内置考研词库 ----
+kaoyan = MAIN / "assets/kaoyan.tsv"
+if not kaoyan.is_file():
+    errors.append("缺少 assets/kaoyan.tsv（内置考研词库）")
+else:
+    krows = [l for l in kaoyan.read_text(encoding="utf-8").splitlines()
+             if l.strip() and not l.startswith("#")]
+    kgroups = {}
+    kwords = []
+    for i, l in enumerate(krows, 1):
+        c = l.split("\t")
+        if len(c) < 3:
+            errors.append(f"kaoyan.tsv 第 {i} 行列数不足 3")
+            continue
+        if not c[0].strip() or not c[1].strip() or not c[2].strip():
+            errors.append(f"kaoyan.tsv 第 {i} 行有空字段")
+        kwords.append(c[0].strip().lower())
+        kgroups[c[2].strip()] = kgroups.get(c[2].strip(), 0) + 1
+    if len(krows) != 711:
+        errors.append(f"kaoyan.tsv 应有 711 个唯一词，实际 {len(krows)}")
+    if len(kgroups) != 23:
+        errors.append(f"kaoyan.tsv 应有 23 个 Unit/Day 组，实际 {len(kgroups)}")
+    if len(set(kwords)) != len(kwords):
+        errors.append("kaoyan.tsv 存在重复词，导入时会被 UNIQUE 约束吞掉")
+    if any(len(w) > 60 for w in kwords):
+        errors.append("kaoyan.tsv 存在超过 60 字符的词")
+    print(f"v1.4 考研词库: {len(krows)} 词 · {len(kgroups)} 组 · "
+          f"{sum(1 for l in krows if len(l.split(chr(9))) > 3 and l.split(chr(9))[3].strip())} 条拼写备注")
+
+imp_kt = (MAIN / "java/com/wordcool/app/ImportView.kt").read_text(encoding="utf-8")
+main_kt2 = (MAIN / "java/com/wordcool/app/MainActivity.kt").read_text(encoding="utf-8")
+imp_xml = (MAIN / "res/layout/page_import.xml").read_text(encoding="utf-8")
+if 'android:id="@+id/btnLoadKaoyan"' not in imp_xml:
+    errors.append("page_import.xml 缺少 btnLoadKaoyan")
+for token in ("btnLoadKaoyan", "loadKaoyanPack"):
+    if token not in imp_kt:
+        errors.append(f"ImportView 缺少考研词库入口: {token}")
+for token in ("loadKaoyanPack", "kaoyan.tsv", "Imported(word =", "showImportPreview"):
+    if token not in main_kt2:
+        errors.append(f"MainActivity 缺少考研词库实现: {token}")
+
 print(f"XML {len(xmls)} · Kotlin {len(kts)} · 布局 {len(layouts)} · id {len(ids)} · drawable {len(drawables)}")
 if errors:
     print("\n发现问题：")
@@ -460,7 +501,7 @@ if errors:
     print(f"\n共 {len(errors)} 项，静态自检未通过。")
     return_code = 1
 else:
-    print("静态自检全部通过。v1.3 已在 Android 37 模拟器（API 37）上真编译并点按验证拼写测试；"
+    print("静态自检全部通过。v1.4 已在 Android 37 模拟器（API 37）上真编译并点按验证拼写测试与 711 词考研词库导入；"
           "微信分享入口、真实 TTS 语音包与各厂商 ROM 仍需真机验证。")
     return_code = 0
 sys.exit(return_code)
