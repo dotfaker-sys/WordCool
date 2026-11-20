@@ -106,4 +106,4 @@ git push -u origin main
 
 ## 6. 一句话边界
 
-源码仓库里**不放预编译 APK**；v10 起仓库自带 Gradle 8.2 Wrapper（`gradlew` / `gradlew.bat` / `gradle/wrapper/`），`UPLOAD.md` 只负责把源码推上去。**GitHub Actions 工作流已按用户要求删除，push 不再自动编译 / 自动发版**。现成安装包在 <https://github.com/dotfaker-sys/WordCool/releases>（仍为 v1.0.0 / v1.1.0 / v1.2.0 三条）；v1.9 的拼写测试、考研词库、设置页、多选学习范围、词库折叠头、Unit/Day 分组、行内发音与导入页编辑目前只存在于源码，以后要出新包请用 Android Studio 或命令行 `./gradlew assembleDebug` 本地编译，或把工作流加回来。英音数据上游是 GPL-3.0，公开分发请保留 `LICENSES/`；`kaoyan.tsv` 是用户提供的词表，公开分发前请确认版权。
+源码仓库里**不放预编译 APK**；v10 起仓库自带 Gradle 8.2 Wrapper（`gradlew` / `gradlew.bat` / `gradle/wrapper/`），`UPLOAD.md` 只负责把源码推上去。**GitHub Actions 工作流已按用户要求删除，push 不再自动编译 / 自动发版**。现成安装包在 <https://github.com/dotfaker-sys/WordCool/releases>（仍为 v1.0.0 / v1.1.0 / v1.2.0 三条）；v1.10 的拼写测试、考研词库、设置页、词库/学习双端多选范围、词库折叠头、Unit/Day 分组、行内发音与导入页编辑目前只存在于源码，以后要出新包请用 Android Studio 或命令行 `./gradlew assembleDebug` 本地编译，或把工作流加回来。英音数据上游是 GPL-3.0，公开分发请保留 `LICENSES/`；`kaoyan.tsv` 是用户提供的词表，公开分发前请确认版权。

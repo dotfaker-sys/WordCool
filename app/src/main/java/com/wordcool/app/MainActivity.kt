@@ -832,8 +832,12 @@ class MainActivity : Activity() {
             .show()
     }
 
-    /** v1.6：学习页的多选范围。回调 null 表示「全部词组」；空选也归一为全部。 */
-    fun showMultiGroupPicker(selected: Set<String>, onPick: (Set<String>?) -> Unit) {
+    /** v1.6 / v1.10：学习页与词库页共用的多选范围。回调 null 表示「全部词组」。 */
+    fun showMultiGroupPicker(
+        selected: Set<String>,
+        title: String = "选择学习范围（可多选，不选=全部）",
+        onPick: (Set<String>?) -> Unit
+    ) {
         val gs = db.groups()
         if (gs.isEmpty()) {
             toast("还没有分组，先导入带 Unit / Day 标题的词表，或用「自动划组」")
@@ -845,7 +849,7 @@ class MainActivity : Activity() {
         val allChecked = selected.isEmpty() || gs.all { it.name in selected }
         val checked = BooleanArray(gs.size) { allChecked || gs[it].name in selected }
         val builder = AlertDialog.Builder(this)
-            .setTitle("选择学习范围（可多选，不选=全部）")
+            .setTitle(title)
             .setMultiChoiceItems(labels.toTypedArray(), checked) { _, which, isChecked ->
                 checked[which] = isChecked
             }

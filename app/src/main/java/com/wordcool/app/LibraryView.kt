@@ -26,7 +26,7 @@ class LibraryView(private val a: MainActivity, private val root: View) {
     private lateinit var chips: List<TextView>
 
     private var filter = -1                 // -1 全部 / 0 未解锁 / 1 学习中 / 2 已掌握
-    private var groupFilter: String? = null // null 全部 / "" 未分组 / 其他精确组名
+    private var groupFilter: Set<String>? = null // null=全部；空串代表「未分组」
     private var items: List<Word> = emptyList()
 
     // v1.8：词库按 Unit → Day 两层折叠，折叠状态只保存在本页面实例里
@@ -155,7 +155,10 @@ class LibraryView(private val a: MainActivity, private val root: View) {
             }
         }
         btnGroupFilter.setOnClickListener {
-            a.showGroupPicker(groupFilter) { picked ->
+            a.showMultiGroupPicker(
+                groupFilter ?: emptySet(),
+                "选择组别（可多选，不选=全部）"
+            ) { picked ->
                 groupFilter = picked
                 refresh()
             }
@@ -170,7 +173,7 @@ class LibraryView(private val a: MainActivity, private val root: View) {
         }
         header.findViewById<TextView>(R.id.btnUnlock).setOnClickListener {
             // 按组筛选时，只解锁当前组的词，别把别的组一起放出来
-            val n = a.db.unlockNew(a.db.dailyGoal, groupFilter)
+            val n = a.db.unlockNewForGroups(a.db.dailyGoal, groupFilter)
             a.toast(if (n > 0) "解锁了 $n 个新词，去「学习」页开始吧" else "这一组没有可解锁的新词了")
             a.dataChanged()
         }
@@ -193,10 +196,14 @@ class LibraryView(private val a: MainActivity, private val root: View) {
     }
 
     fun refresh() {
-        items = a.db.getWords(filter, etSearch.text.toString(), groupFilter)
+        items = a.db.getWordsForGroups(filter, etSearch.text.toString(), groupFilter)
         val s = a.db.stats()
-        btnGroupFilter.text = "组别：" +
-            (if (groupFilter == null) "全部词组" else a.db.groupLabel(groupFilter!!))
+        val scope = when {
+            groupFilter == null -> "全部词组"
+            groupFilter!!.size == 1 -> a.db.groupLabel(groupFilter!!.first())
+            else -> "${groupFilter!!.size} 个组"
+        }
+        btnGroupFilter.text = "组别：$scope"
         tvCount.text = "共 ${s.total} 个单词 · 当前显示 ${items.size} 个"
         bar.max = 100
         bar.progress = if (s.total == 0) 0 else s.unlocked * 100 / s.total

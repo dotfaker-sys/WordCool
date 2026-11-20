@@ -360,8 +360,8 @@ if "UpdateChecker.autoCheck(this)" not in main_kt or "isIncomingIntent" not in m
     errors.append("MainActivity 未接上启动时静默检查 / 未避开微信分享入口")
 
 build_gradle = (ROOT / "app/build.gradle").read_text(encoding="utf-8")
-if "versionCode 10" not in build_gradle or "versionName '1.9'" not in build_gradle:
-    errors.append("app/build.gradle 版本号未升到 v1.9 / versionCode 10")
+if "versionCode 11" not in build_gradle or "versionName '1.10'" not in build_gradle:
+    errors.append("app/build.gradle 版本号未升到 v1.10 / versionCode 11")
 # v9.1：工作流已按用户要求移除，自检不再读那个文件；同时防止有人误把它加回来
 wf_dir = ROOT / ".github/workflows"
 active_wf = (list(wf_dir.glob("*.yml")) + list(wf_dir.glob("*.yaml"))) if wf_dir.is_dir() else []
@@ -608,6 +608,16 @@ for i in ("etPickSearch", "listPickWords", "tvPickEmpty"):
         errors.append(f"dialog_pick_word.xml 缺少 id: {i}")
 print("v1.9 词库行: 无未解锁标签 / 只显示英音 / 完整词形 · 编辑统一到导入页")
 
+# ---- v1.10：词库页组别也支持多选 ----
+for token in ("showMultiGroupPicker", "getWordsForGroups", "unlockNewForGroups", "Set<String>?"):
+    if token not in lib_kt:
+        errors.append(f"LibraryView 缺少 v1.10 多组筛选实现: {token}")
+if "showGroupPicker(" in lib_kt:
+    errors.append("词库页仍在使用单选 showGroupPicker")
+if "getWordsForGroups" not in db_kt_v16:
+    errors.append("WordDb 缺少 getWordsForGroups")
+print("v1.10 词库组别: 多选范围 · 解锁 / 列表共用")
+
 print(f"XML {len(xmls)} · Kotlin {len(kts)} · 布局 {len(layouts)} · id {len(ids)} · drawable {len(drawables)}")
 if errors:
     print("\n发现问题：")
@@ -616,7 +626,7 @@ if errors:
     print(f"\n共 {len(errors)} 项，静态自检未通过。")
     return_code = 1
 else:
-    print("静态自检全部通过。v1.9 已在 Android 37 模拟器（API 37）上真编译并点按验证词库只读、英音单列、完整词形、Unit→Day 折叠、行内发音、导入页编辑、多选范围、拼写测试与设置页；"
+    print("静态自检全部通过。v1.10 已在 Android 37 模拟器（API 37）上真编译并点按验证词库/学习双端多选范围、Unit→Day 折叠、词库只读、英音单列、行内发音、导入页编辑、拼写测试与设置页；"
           "微信分享入口、真实 TTS 语音包与各厂商 ROM 仍需真机验证。")
     return_code = 0
 sys.exit(return_code)

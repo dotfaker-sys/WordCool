@@ -221,6 +221,35 @@ class WordDb(ctx: Context) : SQLiteOpenHelper(ctx.applicationContext, "wordcool.
         }
     }
 
+    /** v1.10：词库页多组筛选。groups=null / 空集合 = 全部。 */
+    fun getWordsForGroups(
+        stateFilter: Int = -1,
+        keyword: String = "",
+        groups: Set<String>? = null
+    ): List<Word> {
+        val where = StringBuilder("1=1")
+        val args = mutableListOf<String>()
+        if (stateFilter in 0..2) {
+            where.append(" AND state=?")
+            args.add(stateFilter.toString())
+        }
+        if (keyword.isNotBlank()) {
+            where.append(" AND (word LIKE ? OR meaning LIKE ?)")
+            args.add("%$keyword%")
+            args.add("%$keyword%")
+        }
+        appendGroupsWhere(where, args, groups)
+        val c = readableDatabase.query(
+            "words", null, where.toString(), args.toTypedArray(),
+            null, null, "id DESC"
+        )
+        return c.use { cur ->
+            val out = mutableListOf<Word>()
+            while (cur.moveToNext()) out.add(cur.readWord())
+            out
+        }
+    }
+
     private fun appendGroupWhere(
         where: StringBuilder,
         args: MutableList<String>,
