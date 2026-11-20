@@ -1,6 +1,8 @@
-# 单词酷 · 设计系统与架构规范 v7
+# 单词酷 · 设计系统与架构规范 v8
 
-> 版本沿革：v2 页面重设计 → v3 加功能 → v4 修 15 项缺陷 → v5 英音 / 美音双发音与双音标 → v6 内置离线开源音标词典 → **v7 对照同行产品与开源数据源做了一轮实证调研，据此修掉「自己拍脑袋」留下的 5 个短板，并用真实高频词表测出覆盖率**。
+> 版本沿革：v2 页面重设计 → v3 加功能 → v4 修 15 项缺陷 → v5 英音 / 美音双发音与双音标 → v6 内置离线开源音标词典 → v7 对照同行产品与开源数据源做实证调研 → **v8 接入微信 / QQ 等外部 App 的文件分享，并把 GitHub Actions 做成真编译 + 自动发版**。
+>
+> **v8 一句话**：微信里点开词表 →「用其他应用打开」/「分享」→ 选「单词酷」，文件直接进导入预览，不用先存到手机。做法是给 `MainActivity` 加三组 `intent-filter` 接住 `ACTION_VIEW` / `ACTION_SEND` / `ACTION_SEND_MULTIPLE`，统一走原有预览流程；**不读微信私有目录、不联网、不申请任何权限**。详见第 10 节。
 >
 > **v7 一句话**：先查别人怎么做，再改代码。结论是主流产品把「词表数据 / 音标显示 / TTS 发声」三层分开，且导入补全都走「只补空 + 未命中显式告知」；据此把音标补全从「三列全空才补」改成**逐字段只补空**、补上**英美拼写别名**、**保留同形异读全部候选**、**列出并可复制未命中词**、以及**数据 SHA-256 溯源**。全部离线、零权限、零第三方依赖不变。
 >
@@ -110,7 +112,7 @@
 5. **`MainActivity.kt` 与四个 View 的构造、调用契约**：`showWordDialog` / `showImportPreview` / `pickDocument` / `exportBackup` / `switchTo` / `dataChanged` / `speak` 等；四个 View 仍以 `(MainActivity, View)` 构造。
 6. **v2 的全部 `R.id` 与布局文件名**：8 个布局、90 个旧 id 一个不改名、不删除（v3 新增 10 个、v4 新增 `dialog_input.xml`、v5 新增 9 个、v6 新增 8 个，现共 9 布局 / 117 个 id）。
 7. **`Ui.kt` 的函数签名**：`Pal` 字段名、`dp` / `rounded` / `toast` / `show` / `stateName` / `stateColor` 全部保持；仅替换色值与圆角收敛系数。
-8. **Gradle 与清单**：`applicationId`、minSdk 26 / targetSdk 34、**零第三方依赖（Gradle dependencies 仍为空）**、零权限、`AndroidManifest.xml` 不变。Kotlin 源文件从 8 个增至 9 个（新增 `IpaDictionary.kt`）；v6 另新增 `assets/ipa.tsv`、`LICENSES/`、`tools/`，均为数据与脚本，不是代码依赖。
+8. **Gradle 与清单**：`applicationId`、minSdk 26 / targetSdk 34、**零第三方依赖（Gradle dependencies 仍为空）**、零权限。v8 前 `AndroidManifest.xml` 一直没有改过；v8 起**只增不改**：加 `android:launchMode="singleTask"` 与 3 组接收文件的 `intent-filter`，原来的 MAIN / LAUNCHER 过滤器、`exported="true"`、以及**零 `<uses-permission>`** 全部不变。Kotlin 源文件从 8 个增至 9 个（新增 `IpaDictionary.kt`）；v6 另新增 `assets/ipa.tsv`、`LICENSES/`、`tools/`，均为数据与脚本，不是代码依赖。
 9. **编译与安装方式**：Android Studio / GitHub Actions / 命令行三条路径不变（见 `README.md`）。
 
 本次实际改动范围：`res/values`（色板、主题）、`res/drawable`（卡片 / 按钮 / 输入 / 进度 / 行 / 页眉）、`res/mipmap-*`（启动图标）、`Ui.kt`（数值与圆角实现）、以及布局里的纯视觉属性（字体族、字号、背景引用、去掉 emoji 的文案）。
@@ -330,12 +332,54 @@
 
 ---
 
-## 10. 验收与诚实边界
+## 10. v8：从微信 / QQ 导入文件
 
-- 已做：`python3 tools/verify.py` 一键静态自检通过（25 个 XML 合法性与重复属性、117 个 id / 资源引用一致性、9 个 Kotlin 精细括号扫描、emoji 残留、`ipa.tsv` 三列格式与排序、许可证文件齐全、**上游 SHA-256 与 `ipa_stats.json` 行数一致性**）
-- 已做：解析算法等价模拟（分组、词条行、双音标、xlsx 列聚合、PDF 按 `/Length` 截流）与 **v7 的 8 项行为回归**（逐字段只补空、文档自带双音标不覆盖、别名补缺列、多读音保留、词组与自造词留空），断言全部通过
+### 10.1 为什么是「接住分享」而不是「读微信目录」
+
+Android 沙箱下，微信收到的文件在 `com.tencent.mm` 私有目录里，第三方应用既没有权限也不该去读。查过微信的实际行为后确认是两条系统级入口 [citation:3][citation:6]：
+
+| 用户在微信里的动作 | 系统发出的 Intent | 文件在哪 |
+| --- | --- | --- |
+| 点文件 →「…」→「用其他应用打开」 | `ACTION_VIEW` + `data`（`content://` Uri）+ `FLAG_GRANT_READ_URI_PERMISSION` | `intent.data` |
+| 长按文件 →「分享 / 发送给朋友」→ 更多应用 | `ACTION_SEND` | `EXTRA_STREAM`（Uri） |
+| 多选文件分享 | `ACTION_SEND_MULTIPLE` | `EXTRA_STREAM`（Uri 列表） |
+| 部分版本 / 文件管理器 | 同上 | `clipData.itemAt(i).uri` |
+
+拿到的是 `content://` 临时授权 Uri（Android 7+ 禁止跨应用暴露 `file://`），必须走 `ContentResolver.openInputStream`，**不能拼文件路径**，也不需要任何存储权限 [citation:6][citation:11]。所以本应用只注册接收端，不扫描任何目录。
+
+### 10.2 落地清单
+
+- `AndroidManifest.xml`：加 3 组 `intent-filter`。VIEW 限定 `content` / `file` scheme 与具体 MIME（含微信常给的 `application/octet-stream`、`text/*`），避免网页链接也把本应用列进去；SEND / SEND_MULTIPLE 用 `*/*` 兜住各版本微信不设或乱设 MIME 的情况，顺带让「分享一段词表文字」也能进来 [citation:7]。`launchMode="singleTask"` 避免微信唤起时堆多个 Activity 实例 [citation:3]。
+- `MainActivity.handleIncomingIntent()`：同时读 `data` / `EXTRA_STREAM` / `clipData`，按 Uri 字符串去重；冷启动走 `onCreate`、已运行走 `onNewIntent`；`lastIncomingKey` 防止同一 Intent 重发时弹两遍预览；`ACTION_MAIN` 直接跳过。
+- 解析链路复用：抽出 `readIncoming()` 给单文件与多文件共用，`importFromUri(uri)` 旧行为不变（只加带默认值的参数），新增 `importFromUris()` 把多选文件合并成**一次**预览；备份 JSON 仍单独恢复。
+- 微信的 FileProvider 常不返回 `DISPLAY_NAME`：`displayName()` 加异常保护，`guessName()` 用 MIME 补扩展名。格式判断本来靠魔数（`%PDF-` / `PK` / zip 内条目），文件名只用于提示，拿不到名字也能解析 [citation:6]。
+- 误发图片 / 音频时不再把二进制当 UTF-8 文本生成垃圾词条：`looksLikeText()` 用替换字符与控制字符比例拦截，给出明确提示。
+- 纯文本 `EXTRA_TEXT` 分享直接当「粘贴导入」；导入页新增「⑦ 从微信 / QQ 导入」说明卡与步骤弹窗。
+
+### 10.3 接口与兼容性
+
+- 数据库版本仍为 3，表结构与备份 JSON 字段一列未加
+- `importFromUri(uri)` 旧签名保留；`showImportPreview` / `db.importWords` / `DocxParser.parseBytes` 全部未改
+- 视觉 token 不变，`R.id` 只增（`btnWechatHelp` / `btnPickDoc2`），旧 117 个一个没改名
+- **零权限不变**：没有 `READ_EXTERNAL_STORAGE`、没有 `INTERNET`、没有 FileProvider、没有第三方库
+- `exported="true"` 是原来就有的（LAUNCHER 必需）；新增过滤器只接收文件 Uri，不暴露 Service / Provider / 数据写入接口
+- 版本升到 v1.1（versionCode 2）；CI 默认 Release tag 升到 `v1.1.0`
+
+### 10.4 诚实边界
+
+1. 微信各版本给出的 MIME 不统一，**不能保证「用其他应用打开」列表里一定出现「单词酷」**。找不到时先在微信里「保存到手机」，再用本应用「选择文档并导入」；导入页 ⑦ 写了这套退路。
+2. 分享的是图片、语音、链接或已被微信清理的文件时，会给出具体失败原因，不会静默失败。
+3. **未做真机点按验证**：Intent 匹配、`onNewIntent`、微信实际弹出的应用列表都属于系统行为，只能在装了微信的手机上确认。
+
+---
+
+## 11. 验收与诚实边界
+
+- 已做：`python3 tools/verify.py` 一键静态自检通过（25 个 XML 合法性与重复属性、117 个 id / 资源引用一致性、9 个 Kotlin 精细括号扫描、emoji 残留、`ipa.tsv` 三列格式与排序、许可证文件齐全、上游 SHA-256 与 `ipa_stats.json` 行数一致性、**Manifest 三组接收过滤器与零权限校验**）
+- 已做：解析算法等价模拟与 **v7 的 8 项行为回归**（逐字段只补空、文档自带双音标不覆盖、别名补缺列、多读音保留、词组与自造词留空），断言全部通过；v8 另加了外部 Intent 的等价模拟（三种 action、Uri 去重、多文件合并、二进制拦截）
 - 已做：用真实公开高频词表 `google-10000-english-no-swears`（9,894 词）跑离线查表，得到 94.9% / 77.6% / 5.1% 三组覆盖率数字，非估算
+- 已做：**GitHub Actions（ubuntu-22.04 + JDK 17 + SDK 34 + Gradle 8.2）真实编译通过**，`assembleDebug` 产出 `WordCool.apk`，并自动发布 Release；此前两轮 CI 失败（setup-android action、SDK 34 不存在的 TTS 常量）都已按日志定位并修掉
 - 架构图通过 `archify` showcase 校验（9/9）与 4 个桌面视口浏览器检查
-- **未做**：这台机器只有 Java 11，没有 Kotlin 编译器、Gradle、Android SDK 或真机，因此**没有实际编译、安装和点按测试**。尤其 TTS 的 `setVoice` / `isLanguageAvailable` / `UtteranceProgressListener` 属于系统引擎行为，静态检查无法验证真机上是否真的发出英音 / 美音、错误回调是否如期触发——必须装到手机上听一次才能确认
-- 静态检查不能证明运行时零缺陷，遇到具体报错请把截图或错误文字发来，按现象定位
-- APK 仍需按 `README.md` 编译；编译前可在工程根目录先跑 `python3 tools/verify.py`
+- **仍未做**：真机安装与点按测试。尤其 TTS 的 `setVoice` / `isLanguageAvailable` / `UtteranceProgressListener`、以及 v8 的微信分享入口是否真的出现在系统列表里，静态检查与 CI 都验证不了——必须装到手机上试一次才能确认
+- 静态检查与 CI 都不能证明运行时零缺陷，遇到具体报错请把截图或错误文字发来，按现象定位
+- 现成 APK 在 <https://github.com/dotfaker-sys/WordCool/releases>；自行编译见 `README.md`，编译前先跑 `python3 tools/verify.py`

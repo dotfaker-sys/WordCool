@@ -34,6 +34,12 @@ class ImportView(private val a: MainActivity, private val root: View) {
         root.findViewById<TextView>(R.id.btnPickDoc).setOnClickListener {
             a.pickDocument()
         }
+        root.findViewById<TextView>(R.id.btnPickDoc2).setOnClickListener {
+            a.pickDocument()
+        }
+        root.findViewById<TextView>(R.id.btnWechatHelp).setOnClickListener {
+            showWechatHelp()
+        }
 
         root.findViewById<TextView>(R.id.btnPasteImport).setOnClickListener {
             val text = etPaste.text.toString()
@@ -141,6 +147,33 @@ class ImportView(private val a: MainActivity, private val root: View) {
         btnAutoIpa.background = a.rounded(if (autoOn) Pal.softBlue else Pal.card, 3f, Pal.line)
         btnAutoIpa.setTextColor(if (autoOn) Pal.primary else Pal.textSub)
         renderGroups()
+    }
+
+    /** v8：微信 / QQ 分享入口的详细操作与排障 */
+    private fun showWechatHelp() {
+        val msg = StringBuilder()
+            .append("【正常路径】\n")
+            .append("1. 在微信聊天里点开那个 .docx / .xlsx / .pdf 文件，先等它下载完成\n")
+            .append("2. 点右上角「…」→「用其他应用打开」；或长按文件 →「分享」→ 展开更多应用\n")
+            .append("3. 在应用列表里选「单词酷」（首次可能藏在「更多」里）\n")
+            .append("4. 会自动跳到本应用的导入预览，确认划组和音标后点「导入 N 个」\n\n")
+            .append("【列表里找不到「单词酷」】\n")
+            .append("· 微信各版本给出的文件类型不一样，不一定会列出所有能打开的应用\n")
+            .append("· 先在微信里把文件「保存到手机」，再回本应用点「选择文档并导入」，从 下载 / Weixin / Documents 里选\n")
+            .append("· 或干脆复制词表内容，用本页「粘贴导入」\n\n")
+            .append("【收不到的情况】\n")
+            .append("· 扫描图片版 PDF 没有文字层\n")
+            .append("· 旧版 .doc / .xls，请另存为 .docx / .xlsx\n")
+            .append("· 发的是图片、语音或链接，不是词表文件\n")
+            .append("· 文件已被微信自动清理，重新下载一次\n\n")
+            .append("本应用不读微信私有目录、不联网、不申请任何权限；只有你主动选它，系统才会把这一个文件的临时读取权交给它。")
+            .toString()
+        AlertDialog.Builder(a)
+            .setTitle("从微信 / QQ 导入")
+            .setMessage(msg)
+            .setPositiveButton("知道了", null)
+            .setNeutralButton("选择文档并导入") { _, _ -> a.pickDocument() }
+            .show()
     }
 
     /** 每行一个组，点击即可重命名；不用 ListView，避免和外层 ScrollView 抢滚动 */

@@ -36,6 +36,7 @@ class MainActivity : Activity() {
     private var ukAvailable = false
     private var usAvailable = false
     private var pendingExport = ""
+    private var lastIncomingKey: String? = null
 
     companion object {
         private const val REQ_PICK = 1001
@@ -78,6 +79,15 @@ class MainActivity : Activity() {
 
         initTts()
         switchTo(0)
+        // v8：冷启动时若是从微信「用其他应用打开 / 分享」进来的，直接进导入预览
+        if (savedInstanceState == null) handleIncomingIntent(intent)
+    }
+
+    /** v8：App 已在运行（singleTask）时，微信再发一个文件会走这里 */
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleIncomingIntent(intent)
     }
 
     override fun onResume() {
@@ -89,6 +99,54 @@ class MainActivity : Activity() {
     override fun onDestroy() {
         tts?.shutdown()
         super.onDestroy()
+    }
+
+    /**
+     * v8：接住「微信 / QQ / 企业微信 / 文件管理器」发来的文件。
+     *
+     * 微信点文件 →「用其他应用打开」发 ACTION_VIEW（data 里是 content:// Uri）；
+     * 长按文件 →「分享 / 发送到其他应用」发 ACTION_SEND（Uri 在 EXTRA_STREAM）；
+     * 多选发 ACTION_SEND_MULTIPLE；有的版本还会把 Uri 放在 clipData。
+     * 三种一起接，再统一走原来的导入预览流程。纯文本分享按「粘贴导入」处理。
+     *
+     * 不主动去读微信私有目录：Android 的沙箱不允许，也不需要任何权限。
+     */
+    private fun handleIncomingIntent(intent: Intent?) {
+        val i = intent ?: return
+        when (i.action) {
+            Intent.ACTION_VIEW, Intent.ACTION_SEND, Intent.ACTION_SEND_MULTIPLE -> Unit
+            else -> return // 正常点图标启动是 ACTION_MAIN，别误处理
+        }
+        val uris = mutableListOf<Uri>()
+        i.data?.let { uris.add(it) }
+        when (val extra = i.extras?.get(Intent.EXTRA_STREAM)) {
+            is Uri -> uris.add(extra)
+            is List<*> -> uris.addAll(extra.filterIsInstance<Uri>())
+        }
+        i.clipData?.let { cd ->
+            for (k in 0 until cd.itemCount) cd.getItemAt(k).uri?.let { uris.add(it) }
+        }
+        val distinct = uris.distinctBy { it.toString() }
+        val sharedText = if (i.action == Intent.ACTION_SEND) {
+            i.getStringExtra(Intent.EXTRA_TEXT)
+        } else null
+
+        // 同一个 intent 被重复投递（重建 / 系统重发）时只处理一次，避免弹两遍预览
+        val key = "${i.action}|${distinct.joinToString(",") { it.toString() }}|${sharedText ?: ""}"
+        if (key == lastIncomingKey) return
+        lastIncomingKey = key
+
+        switchTo(3)
+        if (distinct.isNotEmpty()) {
+            if (distinct.size == 1) importFromUri(distinct[0], "微信 / 其他应用")
+            else importFromUris(distinct, "微信 / 其他应用")
+            return
+        }
+        if (!sharedText.isNullOrBlank()) {
+            showImportPreview(DocxParser.parseText(sharedText), "微信分享的文本")
+            return
+        }
+        toast("没拿到文件：在微信里点文件 → 用其他应用打开 → 选「单词酷」；或先保存到手机再用「选择文档并导入」")
     }
 
     fun switchTo(index: Int) {
@@ -654,55 +712,134 @@ class MainActivity : Activity() {
             .show()
     }
 
-    private fun importFromUri(uri: Uri) {
-        try {
-            val name = displayName(uri) ?: "文档"
-            val bytes = contentResolver.openInputStream(uri)?.use { it.readBytes() }
-                ?: throw IllegalArgumentException("打不开这个文件")
+    private data class Incoming(val name: String, val items: List<Imported>, val restored: Int? = null)
 
-            val legacy = (name.endsWith(".doc", true) || name.endsWith(".xls", true)) &&
-                !DocxParser.isZip(bytes) && !DocxParser.isPdf(bytes)
-            if (legacy) {
-                toast("旧版 .doc / .xls 读不了，请另存为 .docx / .xlsx，或用「粘贴导入」")
+    /** 读一个外部 Uri 并解析成词条。content:// / file:// 一律走 ContentResolver，
+     *  不拼文件路径——微信给的是 FileProvider 的临时授权 Uri。 */
+    private fun readIncoming(uri: Uri): Incoming {
+        val name = displayName(uri) ?: guessName(uri)
+        val bytes = contentResolver.openInputStream(uri)?.use { it.readBytes() }
+            ?: throw IllegalArgumentException("打不开这个文件（可能已被微信清理，或没有读取授权）")
+
+        val legacy = (name.endsWith(".doc", true) || name.endsWith(".xls", true)) &&
+            !DocxParser.isZip(bytes) && !DocxParser.isPdf(bytes)
+        if (legacy) {
+            throw IllegalArgumentException("旧版 .doc / .xls 读不了，请另存为 .docx / .xlsx，或复制内容用「粘贴导入」")
+        }
+
+        val plainText = !DocxParser.isZip(bytes) && !DocxParser.isPdf(bytes)
+        // 微信「分享」里选到图片 / 音频时别把二进制当 UTF-8 文本，生成一堆垃圾词条
+        if (plainText && !looksLikeText(bytes)) {
+            throw IllegalArgumentException("这不是文字型词表（可能是图片、音频或加密文件）。请把文档保存到手机后用「选择文档并导入」，或复制内容用「粘贴导入」")
+        }
+        val text = String(bytes, Charsets.UTF_8).trimStart()
+        // 只有纯文本文件才按内容猜 JSON，避免 docx/xlsx/pdf 的二进制流被误判成备份
+        if (name.endsWith(".json", true) ||
+            (plainText && text.startsWith("{") && text.contains("\"words\""))
+        ) {
+            try {
+                return Incoming(name, emptyList(), db.importBackup(text))
+            } catch (e: Exception) {
+                // 不是本应用的备份，按普通文本继续处理
+            }
+        }
+        return Incoming(name, DocxParser.parseBytes(bytes, name))
+    }
+
+    /** 用替换字符 / 控制字符比例判断是不是文本，挡住图片被当词表 */
+    private fun looksLikeText(bytes: ByteArray): Boolean {
+        if (bytes.isEmpty()) return false
+        val s = String(bytes, Charsets.UTF_8)
+        if (s.isEmpty()) return false
+        val bad = s.count { c ->
+            c == '\uFFFD' || (c.code < 0x20 && c != '\n' && c != '\r' && c != '\t')
+        }
+        return bad.toDouble() / s.length < 0.05
+    }
+
+    /** 单文件：系统文件选择器的旧调用行为不变，只加带默认值的参数 */
+    private fun importFromUri(uri: Uri, source: String? = null) {
+        try {
+            val inc = readIncoming(uri)
+            if (inc.restored != null) {
+                toast("已从${source ?: "备份"}恢复 ${inc.restored} 个单词")
+                dataChanged()
                 return
             }
-
-            val text = String(bytes, Charsets.UTF_8).trimStart()
-            // 只有纯文本文件才按内容猜 JSON，避免 docx/xlsx/pdf 的二进制流被误判成备份
-            val plainText = !DocxParser.isZip(bytes) && !DocxParser.isPdf(bytes)
-            if (name.endsWith(".json", true) ||
-                (plainText && text.startsWith("{") && text.contains("\"words\""))
-            ) {
-                try {
-                    val n = db.importBackup(text)
-                    toast("已从备份恢复 $n 个单词")
-                    dataChanged()
-                    return
-                } catch (e: Exception) {
-                    // 不是本应用的备份，按普通文本继续处理
-                }
-            }
-
-            showImportPreview(DocxParser.parseBytes(bytes, name), name)
+            showImportPreview(inc.items, source ?: inc.name)
         } catch (e: Exception) {
-            AlertDialog.Builder(this)
-                .setTitle("读取失败")
-                .setMessage(
-                    "${e.message}\n\n建议：Word 另存为 .docx、Excel 另存为 .xlsx；" +
-                        "扫描版 PDF 请复制内容用「粘贴导入」。"
-                )
-                .setPositiveButton("知道了", null)
-                .show()
+            showImportError(e.message ?: "未知错误")
         }
     }
 
+    /** v8：微信多选分享时合并成一次预览，不弹一堆窗口 */
+    private fun importFromUris(uris: List<Uri>, source: String) {
+        val all = mutableListOf<Imported>()
+        val names = mutableListOf<String>()
+        val failures = mutableListOf<String>()
+        var restored = 0
+        for (u in uris) {
+            try {
+                val inc = readIncoming(u)
+                names.add(inc.name)
+                if (inc.restored != null) restored += inc.restored else all.addAll(inc.items)
+            } catch (e: Exception) {
+                failures.add("${displayName(u) ?: guessName(u)}：${e.message}")
+            }
+        }
+        if (restored > 0) toast("已从备份恢复 $restored 个单词")
+        if (failures.isNotEmpty()) showImportError(failures.joinToString("\n\n"))
+        if (all.isEmpty()) {
+            if (restored == 0 && failures.isEmpty()) toast("这些文件里没识别到单词")
+            dataChanged()
+            return
+        }
+        showImportPreview(all, "$source（${names.size} 个文件）")
+    }
+
+    private fun showImportError(msg: String) {
+        AlertDialog.Builder(this)
+            .setTitle("读取失败")
+            .setMessage(
+                "$msg\n\n建议：Word 另存为 .docx、Excel 另存为 .xlsx；" +
+                    "扫描版 PDF 请复制内容用「粘贴导入」。"
+            )
+            .setPositiveButton("知道了", null)
+            .show()
+    }
+
     private fun displayName(uri: Uri): String? {
-        val c = contentResolver.query(uri, null, null, null, null) ?: return null
-        return c.use { cur ->
-            if (cur.moveToFirst()) {
-                val i = cur.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-                if (i >= 0) cur.getString(i) else null
-            } else null
+        return try {
+            // 微信的 FileProvider 可能不响应 DISPLAY_NAME 查询，甚至直接抛异常
+            val c = contentResolver.query(uri, null, null, null, null) ?: return null
+            c.use { cur ->
+                if (cur.moveToFirst()) {
+                    val i = cur.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                    if (i >= 0) cur.getString(i) else null
+                } else null
+            }
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    /** 微信常不返回文件名，用 MIME 补一个带扩展名的名字（解析主要靠魔数，名字只用于提示） */
+    private fun guessName(uri: Uri): String {
+        val seg = uri.lastPathSegment
+        if (!seg.isNullOrBlank() && seg.contains('.')) return seg
+        val mime = try {
+            contentResolver.getType(uri)
+        } catch (e: Exception) {
+            null
+        }
+        return when (mime) {
+            "application/pdf" -> "微信文档.pdf"
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document" -> "微信文档.docx"
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" -> "微信文档.xlsx"
+            "application/json" -> "微信文档.json"
+            "text/csv" -> "微信文档.csv"
+            "text/plain" -> "微信文档.txt"
+            else -> "微信文档"
         }
     }
 

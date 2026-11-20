@@ -106,4 +106,4 @@ git push -u origin main
 
 ## 6. 一句话边界
 
-仓库里**没有预编译 APK**，也**没有 gradlew**（CI 会自动 `gradle wrapper` 生成）；`UPLOAD.md` 只负责把源码推上去，出包交给 Actions。Android Studio 本地打开不依赖 gradlew。英音数据上游是 GPL-3.0，公开分发请保留 `LICENSES/`。
+源码仓库里**不放预编译 APK**，也**没有 gradlew**（CI 会自动 `gradle wrapper` 生成）；`UPLOAD.md` 只负责把源码推上去，出包交给 Actions。CI 编译成功后还会自动发布 / 更新 Release（默认 tag `v1.1.0`，可在 Actions 页手动填别的 tag），现成安装包在 <https://github.com/dotfaker-sys/WordCool/releases>。Android Studio 本地打开不依赖 gradlew。英音数据上游是 GPL-3.0，公开分发请保留 `LICENSES/`。

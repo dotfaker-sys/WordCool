@@ -29,7 +29,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:lineSpacingExtra="4dp"
-                android:text="支持 .docx（段落 / 两列表格）、.xlsx（两列）、文字型 .pdf、.txt / .csv。Unit 1 / Day 2 / 第 3 单元 等标题行会自动划组；写 UK /…/ US /…/ 会自动拆成英 / 美两套音标。旧版 .doc / .xls 请另存为新格式，扫描版 PDF 请用「粘贴导入」。"
+                android:text="支持 .docx（段落 / 两列表格）、.xlsx（两列）、文字型 .pdf、.txt / .csv。Unit 1 / Day 2 / 第 3 单元 等标题行会自动划组；写 UK /…/ US /…/ 会自动拆成英 / 美两套音标。旧版 .doc / .xls 请另存为新格式，扫描版 PDF 请用「粘贴导入」。\n\n也可以直接从微信把文件发进来，见下方「⑦ 从微信 / QQ 导入」。"
                 android:textSize="12sp"
                 android:textColor="@color/text_sub" />
 
@@ -533,6 +533,54 @@
                 android:background="@drawable/bg_btn_ghost"
                 android:gravity="center"
                 android:text="给现有词库补一次音标"
+                android:textSize="12sp"
+                android:textColor="@color/primary" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="vertical"
+            android:background="@drawable/bg_card"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="⑦ 从微信 / QQ 导入"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="@color/text" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:lineSpacingExtra="4dp"
+                android:text="不用先把文件存到手机：在微信里点开别人发的词表 → 右上角「…」→「用其他应用打开」（或长按文件 →「发送给朋友 / 分享」→ 更多），在应用列表里选「单词酷」，文件会直接进导入预览，确认后入库。QQ、企业微信、文件管理器用同一套入口。\n\n也支持多选文件一次发进来（合并成一批预览），以及把一段词表文字直接分享进来。\n\n本应用不会去读微信的私人目录，也不申请任何权限：必须由你在微信里主动选择「单词酷」，系统才把这一个文件的临时读取权交给它。"
+                android:textSize="12sp"
+                android:textColor="@color/text_sub" />
+
+            <TextView
+                android:id="@+id/btnWechatHelp"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_btn_soft"
+                android:gravity="center"
+                android:text="看详细步骤 / 列表里找不到怎么办"
+                android:textSize="12sp"
+                android:textColor="@color/primary" />
+
+            <TextView
+                android:id="@+id/btnPickDoc2"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/bg_btn_ghost"
+                android:gravity="center"
+                android:text="还是用「选择文档并导入」"
                 android:textSize="12sp"
                 android:textColor="@color/primary" />
         </LinearLayout>

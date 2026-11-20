@@ -247,6 +247,74 @@ for ok, msg in checks:
         errors.append("v7 回归失败: " + msg)
 print(f"v7 行为回归: {sum(1 for ok, _ in checks if ok)}/{len(checks)} 项通过 · 补全 {n} 词")
 
+# ---- v8：微信 / QQ 外部 Intent 接收 ----
+manifest = (MAIN / "AndroidManifest.xml").read_text(encoding="utf-8")
+for act in ("android.intent.action.VIEW", "android.intent.action.SEND",
+            "android.intent.action.SEND_MULTIPLE"):
+    if act not in manifest:
+        errors.append(f"Manifest 缺少外部文件接收 action: {act}")
+if "<uses-permission" in manifest:
+    errors.append("v8 破坏了零权限：Manifest 出现了 uses-permission")
+if 'android:launchMode="singleTask"' not in manifest:
+    errors.append("Manifest 缺少 singleTask，微信唤起会堆多个 Activity 实例")
+if 'android:exported="true"' not in manifest:
+    errors.append("targetSdk 34 要求显式 exported=true")
+if "application/octet-stream" not in manifest:
+    errors.append("Manifest 未兜住微信常给的 application/octet-stream")
+
+main_kt = (MAIN / "java/com/wordcool/app/MainActivity.kt").read_text(encoding="utf-8")
+for token in ("handleIncomingIntent", "onNewIntent", "importFromUris", "readIncoming",
+              "looksLikeText", "guessName", "Intent.EXTRA_STREAM", "clipData"):
+    if token not in main_kt:
+        errors.append(f"MainActivity 缺少 v8 微信导入实现: {token}")
+
+def collect(action, data=None, stream=None, clip=None, text=None):
+    """等价复刻 handleIncomingIntent 的 Uri 收集与去重"""
+    uris = []
+    if data:
+        uris.append(data)
+    if isinstance(stream, str):
+        uris.append(stream)
+    elif isinstance(stream, list):
+        uris.extend(stream)
+    if clip:
+        uris.extend(clip)
+    return list(dict.fromkeys(uris)), (text if action == "SEND" else None)
+
+def py_looks_like_text(raw):
+    if not raw:
+        return False
+    s = raw.decode("utf-8", "replace")
+    if not s:
+        return False
+    bad = sum(1 for c in s if c == "\ufffd" or (ord(c) < 0x20 and c not in "\n\r\t"))
+    return bad / len(s) < 0.05
+
+v8 = [
+    (collect("VIEW", data="content://a.docx")[0] == ["content://a.docx"],
+     "ACTION_VIEW 应从 intent.data 取到 Uri"),
+    (collect("SEND", stream="content://b.docx")[0] == ["content://b.docx"],
+     "ACTION_SEND 应从 EXTRA_STREAM 取到 Uri"),
+    (collect("SEND_MULTIPLE", stream=["content://c1.docx", "content://c2.xlsx"])[0]
+     == ["content://c1.docx", "content://c2.xlsx"],
+     "ACTION_SEND_MULTIPLE 应收到多个 Uri"),
+    (collect("SEND", stream="content://d.docx",
+             clip=["content://d.docx", "content://e.pdf"])[0]
+     == ["content://d.docx", "content://e.pdf"],
+     "EXTRA_STREAM 与 clipData 重复时应去重"),
+    (collect("SEND", text="abandon 放弃\nbenefit 益处")[1] is not None,
+     "纯文本分享应转成粘贴导入"),
+    (py_looks_like_text("Unit 1\nabandon 放弃\n".encode("utf-8")),
+     "正常 UTF-8 词表应被当成文本"),
+    (not py_looks_like_text(b"\x89PNG\r\n\x1a\n\xff\xfe\x00\x01binary"),
+     "图片二进制不应被当成 UTF-8 词表"),
+]
+for ok, msg in v8:
+    if not ok:
+        errors.append("v8 回归失败: " + msg)
+print(f"v8 微信导入回归: {sum(1 for ok, _ in v8 if ok)}/{len(v8)} 项通过 · "
+      f"零权限 / 三组过滤器校验完成")
+
 print(f"XML {len(xmls)} · Kotlin {len(kts)} · 布局 {len(layouts)} · id {len(ids)} · drawable {len(drawables)}")
 if errors:
     print("\n发现问题：")
@@ -255,6 +323,6 @@ if errors:
     print(f"\n共 {len(errors)} 项，静态自检未通过。")
     return_code = 1
 else:
-    print("静态自检全部通过。仍需用 Android Studio 真实编译并在真机上点按验证。")
+    print("静态自检全部通过。GitHub Actions 已真实编译出 APK；仍需真机点按验证（尤其微信分享入口）。")
     return_code = 0
 sys.exit(return_code)
