@@ -1,0 +1,15 @@
+# 统一换行：所有文本文件在仓库与工作区都用 LF。
+# 缺少这条时，Windows 上的 core.autocrlf=true 会把 ipa.tsv 的每行补一个 CR，
+# 导致文件字节数与 ipa_stats.json 的 tsv_bytes 不一致，tools/verify.py 直接失败。
+* text=auto eol=lf
+
+# 二进制资源不做换行转换
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.gif binary
+*.jar binary
+*.apk binary
+*.aab binary
+*.zip binary
