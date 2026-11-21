@@ -80,14 +80,14 @@ git push -u origin main
 
 ## 4. 推完检查这三件事
 
-> **工作流已按用户要求移除**：`.github/workflows/build-apk.yml` 已删除，push 到 `main` **不会再自动编译、也不会自动发新版 Release**。现有六条 Release 和 APK 都保留；最新 **v1.11.0** 是本地 `assembleRelease` 后手动上传的 Debug 签名包（内置离线语音，约 73 MB）。
+> **工作流已按用户要求移除**：`.github/workflows/build-apk.yml` 已删除，push 到 `main` **不会再自动编译、也不会自动发新版 Release**。现有七条 Release 和 APK 都保留；最新 **v1.11.1** 是本地 `assembleRelease` 后手动上传的 Debug 签名包（内置离线语音，约 69.5 MB）。
 
 1. **文件齐不齐**：仓库页应能看到
    - `app/src/main/assets/ipa.tsv` + `ipa_stats.json` ← 离线音标数据
    - `LICENSES/` ← MIT + GPL-3.0 全文与署名声明，**公开发布必须保留**
    - `tools/verify.py`、`tools/build_ipa.py`、`DESIGN.md`、`QUICKSTART.md`
 2. **源码树里不该有 `.github/workflows/`**：有 yml 就说明工作流又被加回来了，push 会重新触发自动编译
-3. **下载 APK**：<https://github.com/dotfaker-sys/WordCool/releases> → 最新一条 → Assets → `WordCool.apk` → 传手机安装
+3. **下载 APK**：<https://github.com/dotfaker-sys/WordCool/releases> → 最新一条 → Assets → 最新 APK → 传手机安装
 
 ---
 
@@ -106,4 +106,4 @@ git push -u origin main
 
 ## 6. 一句话边界
 
-源码仓库里**不放预编译 APK**；v10 起仓库自带 Gradle 8.2 Wrapper（`gradlew` / `gradlew.bat` / `gradle/wrapper/`），`UPLOAD.md` 只负责把源码推上去。**GitHub Actions 工作流已按用户要求删除，push 不再自动编译 / 自动发版**。现成安装包在 <https://github.com/dotfaker-sys/WordCool/releases>（现有 v1.0.0 / v1.1.0 / v1.2.0 / v1.10.0 / v1.10.1 / **v1.11.0** 六条，最新一条带 `WordCool.apk`）；v1.11.0 内置 sherpa-onnx + Piper Amy 离线美音，安装后不依赖系统语音包。以后要出新包请用 Android Studio 或命令行 `./gradlew assembleRelease` 本地编译后手动上传 Release，或把工作流加回来。英音数据上游是 GPL-3.0，公开分发请保留 `LICENSES/`；`kaoyan.tsv` 是用户提供的词表，公开分发前请确认版权。
+源码仓库里**不放预编译 APK**；v10 起仓库自带 Gradle 8.2 Wrapper（`gradlew` / `gradlew.bat` / `gradle/wrapper/`），`UPLOAD.md` 只负责把源码推上去。**GitHub Actions 工作流已按用户要求删除，push 不再自动编译 / 自动发版**。现成安装包在 <https://github.com/dotfaker-sys/WordCool/releases>（现有 v1.0.0 / v1.1.0 / v1.2.0 / v1.10.0 / v1.10.1 / v1.11.0 / **v1.11.1** 七条，最新一条带 `WordCool-v1.11.1.apk`）；v1.11.1 内置 sherpa-onnx + Piper Amy 离线美音，安装后不依赖系统语音包。以后要出新包请用 Android Studio 或命令行 `./gradlew assembleRelease` 本地编译后手动上传 Release，或把工作流加回来。英音数据上游是 GPL-3.0，公开分发请保留 `LICENSES/`；`kaoyan.tsv` 是用户提供的词表，公开分发前请确认版权。
