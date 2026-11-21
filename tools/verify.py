@@ -160,7 +160,7 @@ else:
         errors.append(f"ipa_stats.json 解析失败: {e}")
 
 for f in ("MIT.txt", "GPL-3.0-only.txt", "THIRD_PARTY_NOTICES.md",
-          "Apache-2.0.txt", "SHERPA_ONNX_AND_PIPER_NOTICE.md"):
+          "Apache-2.0.txt", "CC-BY-SA-4.0.txt", "SHERPA_ONNX_AND_PIPER_NOTICE.md"):
     if not (ROOT / "LICENSES" / f).is_file():
         errors.append(f"缺少许可证文件 LICENSES/{f}")
 

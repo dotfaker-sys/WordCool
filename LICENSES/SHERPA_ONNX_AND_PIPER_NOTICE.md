@@ -21,7 +21,7 @@ v1.11 起 APK 内置一份离线英语语音（美音），不再依赖手机系
 - 模型：`vits-piper-en_US-amy-low-int8`
 - 下载来源：<https://github.com/k2-fsa/sherpa-onnx/releases/tag/tts-models>
 - 上游数据集：<https://github.com/MycroftAI/mimic3-voices>
-- 上游数据集许可：**CC-BY-SA-4.0**（见上游仓库 LICENSE）
+- 上游数据集许可：**CC-BY-SA-4.0**，全文见 `LICENSES/CC-BY-SA-4.0.txt`
 - 说明：模型卡写明 `License: See URL`，本项目按上游数据集许可保留署名与相同方式共享要求；公开分发前请再次核对模型与数据集的许可。
 
 ## 3. 发音词典
