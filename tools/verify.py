@@ -361,8 +361,8 @@ if "UpdateChecker.autoCheck(this)" not in main_kt or "isIncomingIntent" not in m
     errors.append("MainActivity 未接上启动时静默检查 / 未避开微信分享入口")
 
 build_gradle = (ROOT / "app/build.gradle").read_text(encoding="utf-8")
-if "versionCode 13" not in build_gradle or "versionName '1.11.0'" not in build_gradle:
-    errors.append("app/build.gradle 版本号未升到 v1.11.0 / versionCode 13")
+if "versionCode 14" not in build_gradle or "versionName '1.11.1'" not in build_gradle:
+    errors.append("app/build.gradle 版本号未升到 v1.11.1 / versionCode 14")
 # v9.1：工作流已按用户要求移除，自检不再读那个文件；同时防止有人误把它加回来
 wf_dir = ROOT / ".github/workflows"
 active_wf = (list(wf_dir.glob("*.yml")) + list(wf_dir.glob("*.yaml"))) if wf_dir.is_dir() else []
@@ -678,7 +678,7 @@ if errors:
     print(f"\n共 {len(errors)} 项，静态自检未通过。")
     return_code = 1
 else:
-    print("静态自检全部通过。v1.11.0 已在 Android 37 模拟器（API 37）上真编译并验证内置 sherpa-onnx + Piper 语音初始化与播放（16kHz/12800 samples）；"
+    print("静态自检全部通过。v1.11.1 已在 Android 37 模拟器（API 37）上真编译并验证内置 sherpa-onnx + Piper 语音初始化与播放（16kHz/12800 samples）；"
           "微信分享入口、真实扬声器与各厂商 ROM 仍需真机验证。")
     return_code = 0
 sys.exit(return_code)

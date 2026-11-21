@@ -13,6 +13,9 @@ local.properties
 *.ap_
 *.aab
 
+# 本地整理好的发布包与校验文件
+release/
+
 # IDE 与系统文件
 *.iml
 .idea/

@@ -4,7 +4,9 @@
 
 > 仓库里是源码工程，不放已签名的 APK。最省事是直接从 [Releases](https://github.com/dotfaker-sys/WordCool/releases) 下载现成的 `WordCool.apk`；想自己编译见下面两条路径。**GitHub Actions 工作流已移除，push 不再自动出包**。完整命令见 [`README.md`](README.md) 一、和 [`UPLOAD.md`](UPLOAD.md)。
 
-**v1.11 · 内置离线语音（当前源码 v1.11.0，已发 Release v1.11.0）**：APK 自带 sherpa-onnx + Piper Amy 美音模型，安装后不需要系统语音包、不需要联网就能读；系统 TTS 只作兜底。安装包约 73 MB，在 [Releases](https://github.com/dotfaker-sys/WordCool/releases) 的 **v1.11.0 → Assets → WordCool.apk**。
+**v1.11.1 · 交互修整（当前源码 v1.11.1 / versionCode 14；安装包本地已生成，待上传 Release）**：词库右侧滚动条可上下拖动快速跳转；学习时单词 / 小测 / 拼写卡在「今日计划」上方，空闲时计划卡仍最上面。
+>
+> **v1.11 · 内置离线语音（v1.11.0，已发 Release v1.11.0）**：APK 自带 sherpa-onnx + Piper Amy 美音模型，安装后不需要系统语音包、不需要联网就能读；系统 TTS 只作兜底。安装包约 73 MB，在 [Releases](https://github.com/dotfaker-sys/WordCool/releases) 的 **v1.11.0 → Assets → WordCool.apk**。
 >
 > **v1.10.1 · 语音包安装入口修复（v1.10.1）**：系统语音包不能由 App 直接下载；「安装 / 检查英语语音包」现在会给出系统设置 / Google Play 两个入口，兼容 AOSP / 三星，装好后回来自动重新检测。安装包在 [Releases](https://github.com/dotfaker-sys/WordCool/releases) 的 **v1.10.1 → Assets → WordCool.apk**。
 >

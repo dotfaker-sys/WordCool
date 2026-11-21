@@ -1,6 +1,6 @@
 # 单词酷 · 设计系统与架构规范 v1.11
 
-> 版本沿革：v2 页面重设计 → v3 加功能 → v4 修 15 项缺陷 → v5 英音 / 美音双发音与双音标 → v6 内置离线开源音标词典 → v7 对照同行产品与开源数据源做实证调研 → v8 接入微信 / QQ 文件分享并做成 CI 真编译 + 自动发版 → v9 应用内检查更新（首次、也是唯一一次新增 `INTERNET` 权限）→ **v9.1 按用户要求移除 GitHub Actions 工作流** → **v10 拼写测试（v1.3）** → **v1.4 内置考研词库（versionCode 5）** → **v1.5 独立设置页（versionCode 6）** → **v1.6 多选范围与顺序 / 打乱（versionCode 7）** → **v1.7 词库折叠头与行内发音（versionCode 8）** → **v1.8 Unit → Day 分组折叠（versionCode 9）** → **v1.9 词库只读 / 英音单列 / 编辑移到导入（versionCode 10）** → **v1.10 词库组别多选（versionCode 11）** → **v1.11 内置离线语音（versionCode 13）**。
+> 版本沿革：v2 页面重设计 → v3 加功能 → v4 修 15 项缺陷 → v5 英音 / 美音双发音与双音标 → v6 内置离线开源音标词典 → v7 对照同行产品与开源数据源做实证调研 → v8 接入微信 / QQ 文件分享并做成 CI 真编译 + 自动发版 → v9 应用内检查更新（首次、也是唯一一次新增 `INTERNET` 权限）→ **v9.1 按用户要求移除 GitHub Actions 工作流** → **v10 拼写测试（v1.3）** → **v1.4 内置考研词库（versionCode 5）** → **v1.5 独立设置页（versionCode 6）** → **v1.6 多选范围与顺序 / 打乱（versionCode 7）** → **v1.7 词库折叠头与行内发音（versionCode 8）** → **v1.8 Unit → Day 分组折叠（versionCode 9）** → **v1.9 词库只读 / 英音单列 / 编辑移到导入（versionCode 10）** → **v1.10 词库组别多选（versionCode 11）** → **v1.11 内置离线语音（versionCode 13）** → **v1.11.1 滚动条可拖动 / 学习卡置顶（versionCode 14）**。
 >
 > **v9.1 一句话**：`.github/workflows/build-apk.yml` 已删除，push 到 `main` 不再自动编译、也不再自动发新版 Release。已发布的三条 Release 与 APK 全部保留，应用内「检查更新」仍能读到现有的 latest（v1.2.0）；只是以后不会自动冒出新版本。源码、数据、文档、自检脚本一行没删，只少了这一个自动化文件。
 >
