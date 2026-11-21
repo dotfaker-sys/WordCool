@@ -17,6 +17,7 @@ class LibraryView(private val a: MainActivity, private val root: View) {
 
     private val list = root.findViewById<ListView>(R.id.listWords)
     private val tvEmpty = root.findViewById<TextView>(R.id.tvEmpty)
+    private val fastBar = root.findViewById<FastScrollBar>(R.id.fastScrollBar)
 
     // 这些控件在 ListView 的 header 里；滚动列表时会跟着滚出屏幕（折叠效果）
     private lateinit var etSearch: EditText
@@ -193,6 +194,7 @@ class LibraryView(private val a: MainActivity, private val root: View) {
             }
         }
         list.adapter = adapter
+        fastBar.attach(list)
     }
 
     fun refresh() {
@@ -254,14 +256,9 @@ class LibraryView(private val a: MainActivity, private val root: View) {
 
         rows = out
         adapter.notifyDataSetChanged()
-        // FastScroller 只在创建时计算一次滑块长度；数据量 / 折叠状态变化后重建一次，
-        // 否则刚进页面时滑块会按空列表算成很长的一条。
-        list.post {
-            if (list.isFastScrollEnabled) {
-                list.isFastScrollEnabled = false
-                list.isFastScrollEnabled = true
-            }
-        }
+        // 行数 / 折叠状态变化后重算自定义滚动条的滑块长度与位置
+        fastBar.refresh()
+        fastBar.post { fastBar.refresh() }
         if (keepScroll) list.setSelectionFromTop(first, top)
     }
 

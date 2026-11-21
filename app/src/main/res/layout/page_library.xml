@@ -12,10 +12,6 @@
         android:layout_height="match_parent"
         android:divider="@android:color/transparent"
         android:dividerHeight="10dp"
-        android:fastScrollAlwaysVisible="true"
-        android:fastScrollEnabled="true"
-        android:fastScrollStyle="@style/AppFastScroll"
-        android:scrollbarStyle="outsideOverlay"
         android:scrollbars="none" />
 
     <TextView
@@ -30,5 +26,12 @@
         android:textColor="@color/text_sub"
         android:textSize="14sp"
         android:visibility="gone" />
+
+    <!-- 词库右侧可拖动的快速滚动条：按住灰色滑块上下拖，按比例跳到列表任意位置 -->
+    <com.wordcool.app.FastScrollBar
+        android:id="@+id/fastScrollBar"
+        android:layout_width="24dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="right|top" />
 
 </FrameLayout>
