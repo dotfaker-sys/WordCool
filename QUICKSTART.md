@@ -4,13 +4,13 @@
 
 > 仓库里是源码工程，不放已签名的 APK。最省事是直接从 [Releases](https://github.com/dotfaker-sys/WordCool/releases) 下载现成的 `WordCool.apk`；想自己编译见下面两条路径。**GitHub Actions 工作流已移除，push 不再自动出包**。完整命令见 [`README.md`](README.md) 一、和 [`UPLOAD.md`](UPLOAD.md)。
 
-**v1.10 · 词库多选组别（当前源码 v1.10，尚未发 Release）**：词库页「组别」也支持多选，列表和「解锁新词」共用范围；学习页的范围多选不变。现成安装包仍是 [Releases](https://github.com/dotfaker-sys/WordCool/releases) 的 v1.2.0，v1.10 需自行编译。
+**v1.10 · 词库多选组别（当前源码 v1.10，已发 Release v1.10.0）**：词库页「组别」也支持多选，列表和「解锁新词」共用范围；学习页的范围多选不变。安装包在 [Releases](https://github.com/dotfaker-sys/WordCool/releases) 的 **v1.10.0 → Assets → WordCool.apk**，Debug 签名，可直接安装。
 >
-> **v1.9 · 词库列表重排**：词库列表不再显示「未解锁 / 待解锁」，音标只显示英音，长单词完整换行；词库页只读，编辑 / 删除统一到导入页「编辑单词」搜索后操作。现成安装包仍是 [Releases](https://github.com/dotfaker-sys/WordCool/releases) 的 v1.2.0，v1.9 需自行编译。
+> **v1.9 · 词库列表重排**：词库列表不再显示「未解锁 / 待解锁」，音标只显示英音，长单词完整换行；词库页只读，编辑 / 删除统一到导入页「编辑单词」搜索后操作。当前最新 Release 是 v1.10.0。
 >
-> **v1.8 · 词库折叠 + Unit/Day 分组**：词库页往下滑时，搜索、筛选、组别和进度会随列表一起滚出屏幕；单词按 Unit → Day 二级标题分组，点标题可折叠，搜索时自动展开；每个单词行右侧有「发音」按钮，点一下直接读；学习页「开始学习」移到左边主按钮位置。现成安装包仍是 [Releases](https://github.com/dotfaker-sys/WordCool/releases) 的 v1.2.0，v1.8 需自行编译。
+> **v1.8 · 词库折叠 + Unit/Day 分组**：词库页往下滑时，搜索、筛选、组别和进度会随列表一起滚出屏幕；单词按 Unit → Day 二级标题分组，点标题可折叠，搜索时自动展开；每个单词行右侧有「发音」按钮，点一下直接读；学习页「开始学习」移到左边主按钮位置。当前最新 Release 是 v1.10.0。
 >
-> **v1.6 · 学习范围与顺序**：学习页顶部有「范围」和「顺序」两个按钮。「范围」可同时勾选多个 Unit / Day，解锁、复习、小测、拼写共用；「顺序」可在「按顺序」和「打乱」之间切换，下一轮开始学习 / 拼写时生效，两个选择都会记住。现成安装包仍是 [Releases](https://github.com/dotfaker-sys/WordCool/releases) 的 v1.2.0，v1.6 需自行编译。
+> **v1.6 · 学习范围与顺序**：学习页顶部有「范围」和「顺序」两个按钮。「范围」可同时勾选多个 Unit / Day，解锁、复习、小测、拼写共用；「顺序」可在「按顺序」和「打乱」之间切换，下一轮开始学习 / 拼写时生效，两个选择都会记住。当前最新 Release 是 v1.10.0。
 >
 > **v1.5 · 独立设置页**：底部第 5 个 tab 是「设置」，每天解锁数、备份导出、重置/清空、发音、音标、版本更新都集中在这里；导入页只留导入、粘贴、划组、内置词库和微信导入，统计页只留统计。
 >
@@ -46,7 +46,7 @@
 ## 拿到 APK 的最快路径
 
 ### 直接下载（推荐）
-打开 <https://github.com/dotfaker-sys/WordCool/releases> → 最新一条 → Assets → **WordCool.apk** → 传到手机安装。这是移除工作流前真编译出来的包，已签名，可直接使用。
+打开 <https://github.com/dotfaker-sys/WordCool/releases> → 最新一条 **v1.10.0** → Assets → **WordCool.apk** → 传到手机安装。这是本地 `assembleDebug` 产出的 Debug 签名包，可直接使用；旧版 v1.0.0 / v1.1.0 / v1.2.0 也都保留。
 
 ### 有电脑：Android Studio（约 5 分钟）
 1. 安装 [Android Studio](https://developer.android.com/studio)
