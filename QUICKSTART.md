@@ -4,7 +4,9 @@
 
 > 仓库里是源码工程，不放已签名的 APK。最省事是直接从 [Releases](https://github.com/dotfaker-sys/WordCool/releases) 下载现成的 `WordCool.apk`；想自己编译见下面两条路径。**GitHub Actions 工作流已移除，push 不再自动出包**。完整命令见 [`README.md`](README.md) 一、和 [`UPLOAD.md`](UPLOAD.md)。
 
-**v1.10 · 词库多选组别（当前源码 v1.10，已发 Release v1.10.0）**：词库页「组别」也支持多选，列表和「解锁新词」共用范围；学习页的范围多选不变。安装包在 [Releases](https://github.com/dotfaker-sys/WordCool/releases) 的 **v1.10.0 → Assets → WordCool.apk**，Debug 签名，可直接安装。
+**v1.10.1 · 语音包安装入口修复（当前源码 v1.10.1，已发 Release v1.10.1）**：系统语音包不能由 App 直接下载；「安装 / 检查英语语音包」现在会给出系统设置 / Google Play 两个入口，兼容 AOSP / 三星，装好后回来自动重新检测。安装包在 [Releases](https://github.com/dotfaker-sys/WordCool/releases) 的 **v1.10.1 → Assets → WordCool.apk**。
+>
+> **v1.10 · 词库多选组别（Release v1.10.0）**：词库页「组别」也支持多选，列表和「解锁新词」共用范围；学习页的范围多选不变。安装包在 [Releases](https://github.com/dotfaker-sys/WordCool/releases) 的 **v1.10.0 → Assets → WordCool.apk**，Debug 签名，可直接安装。
 >
 > **v1.9 · 词库列表重排**：词库列表不再显示「未解锁 / 待解锁」，音标只显示英音，长单词完整换行；词库页只读，编辑 / 删除统一到导入页「编辑单词」搜索后操作。当前最新 Release 是 v1.10.0。
 >

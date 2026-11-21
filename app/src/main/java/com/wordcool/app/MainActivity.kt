@@ -455,16 +455,58 @@ class MainActivity : Activity() {
         }
     }
 
-    /** 跳到系统 TTS 数据安装页；回来后 onResume 会重新探测 */
+    /** 系统 TTS 语音包不是 App 能直接下载的：给出可执行的安装路径，
+     *  并兼容 AOSP / 三星 / 原生设置等不同入口。 */
     fun openTtsSettings() {
-        try {
-            startActivity(Intent(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA))
-        } catch (e: Exception) {
+        AlertDialog.Builder(this)
+            .setTitle("安装英语语音包")
+            .setMessage(
+                "语音包由系统 TTS 引擎提供，不在 App 安装包里。\n\n" +
+                    "1. 打开系统「文字转语音」设置\n" +
+                    "2. 选择引擎：Google 文字转语音 / 手机自带引擎\n" +
+                    "3. 安装「英语（美国）」或「英语（英国）」语音数据\n\n" +
+                    "如果系统里没有安装入口，可在 Google Play 搜索「Speech Services by Google」更新或安装 Google 文字转语音。\n\n" +
+                    "装好后回到本页，状态会自动重新检测；也可以点「试听一句英文」确认。"
+            )
+            .setNegativeButton("关闭", null)
+            .setNeutralButton("Google Play") { _, _ -> openTtsStore() }
+            .setPositiveButton("系统设置") { _, _ -> openSystemTtsSettings() }
+            .show()
+    }
+
+    private fun openSystemTtsSettings() {
+        val candidates = listOf(
+            Intent(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA),
+            Intent("com.android.settings.TTS_SETTINGS"),
+            Intent("com.samsung.android.settings.TTS_SETTINGS"),
+            Intent(android.provider.Settings.ACTION_SETTINGS)
+        )
+        for (intent in candidates) {
             try {
-                startActivity(Intent("com.android.settings.TTS_SETTINGS"))
-            } catch (e2: Exception) {
-                toast("请到系统设置 → 语言和输入 → 文字转语音，安装英语语音数据")
+                startActivity(intent)
+                return
+            } catch (ignored: Exception) {
             }
+        }
+        toast("找不到系统 TTS 设置：请手动打开 设置 → 语言和输入 → 文字转语音")
+    }
+
+    private fun openTtsStore() {
+        val pkg = "com.google.android.tts"
+        try {
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$pkg")))
+            return
+        } catch (ignored: Exception) {
+        }
+        try {
+            startActivity(
+                Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse("https://play.google.com/store/apps/details?id=$pkg")
+                )
+            )
+        } catch (e: Exception) {
+            toast("打不开应用商店：${e.message}")
         }
     }
 
