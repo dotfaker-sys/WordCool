@@ -8,6 +8,14 @@
          仍然没有存储、定位、通讯录、后台自启等任何其他权限。 -->
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- 手机、平板、折叠屏、横竖屏都走同一套 dp/sp 布局；这里显式声明，避免旧 ROM 的兼容模式缩放 -->
+    <supports-screens
+        android:anyDensity="true"
+        android:largeScreens="true"
+        android:normalScreens="true"
+        android:smallScreens="true"
+        android:xlargeScreens="true" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -20,6 +28,7 @@
             android:name=".MainActivity"
             android:exported="true"
             android:launchMode="singleTask"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

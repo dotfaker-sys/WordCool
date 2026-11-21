@@ -12,7 +12,11 @@
         android:layout_height="match_parent"
         android:divider="@android:color/transparent"
         android:dividerHeight="10dp"
-        android:scrollbarStyle="outsideOverlay" />
+        android:fastScrollAlwaysVisible="true"
+        android:fastScrollEnabled="true"
+        android:fastScrollStyle="@style/AppFastScroll"
+        android:scrollbarStyle="outsideOverlay"
+        android:scrollbars="none" />
 
     <TextView
         android:id="@+id/tvEmpty"

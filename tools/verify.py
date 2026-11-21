@@ -159,7 +159,8 @@ else:
     except Exception as e:
         errors.append(f"ipa_stats.json 解析失败: {e}")
 
-for f in ("MIT.txt", "GPL-3.0-only.txt", "THIRD_PARTY_NOTICES.md"):
+for f in ("MIT.txt", "GPL-3.0-only.txt", "THIRD_PARTY_NOTICES.md",
+          "Apache-2.0.txt", "SHERPA_ONNX_AND_PIPER_NOTICE.md"):
     if not (ROOT / "LICENSES" / f).is_file():
         errors.append(f"缺少许可证文件 LICENSES/{f}")
 
@@ -360,8 +361,8 @@ if "UpdateChecker.autoCheck(this)" not in main_kt or "isIncomingIntent" not in m
     errors.append("MainActivity 未接上启动时静默检查 / 未避开微信分享入口")
 
 build_gradle = (ROOT / "app/build.gradle").read_text(encoding="utf-8")
-if "versionCode 12" not in build_gradle or "versionName '1.10.1'" not in build_gradle:
-    errors.append("app/build.gradle 版本号未升到 v1.10.1 / versionCode 12")
+if "versionCode 13" not in build_gradle or "versionName '1.11.0'" not in build_gradle:
+    errors.append("app/build.gradle 版本号未升到 v1.11.0 / versionCode 13")
 # v9.1：工作流已按用户要求移除，自检不再读那个文件；同时防止有人误把它加回来
 wf_dir = ROOT / ".github/workflows"
 active_wf = (list(wf_dir.glob("*.yml")) + list(wf_dir.glob("*.yaml"))) if wf_dir.is_dir() else []
@@ -618,6 +619,57 @@ if "getWordsForGroups" not in db_kt_v16:
     errors.append("WordDb 缺少 getWordsForGroups")
 print("v1.10 词库组别: 多选范围 · 解锁 / 列表共用")
 
+# ---- v1.11：全机型兼容（Android 6.0+ / 横竖屏 / 大字体 / 系统栏） ----
+if "minSdk 23" not in build_gradle:
+    errors.append("minSdk 未设为 23（Android 6.0 起），老机型装不上")
+if "armeabi-v7a" not in build_gradle:
+    errors.append("未打包 armeabi-v7a，32 位老机安装原生 TTS 库会报无法安装")
+for token in ('<supports-screens', 'android:smallScreens="true"',
+              'android:xlargeScreens="true"'):
+    if token not in manifest:
+        errors.append("Manifest 缺少全尺寸屏幕声明: " + token)
+for token in ("orientation|screenSize", "smallestScreenSize", "keyboardHidden"):
+    if token not in manifest:
+        errors.append("旋转 / 折叠屏未交给 Activity 自行处理: " + token)
+
+v27_style = MAIN / "res/values-v27/styles.xml"
+v29_style = MAIN / "res/values-v29/styles.xml"
+if not v27_style.is_file() or "windowLightNavigationBar" not in v27_style.read_text(encoding="utf-8"):
+    errors.append("缺少 values-v27 导航栏深色图标配置，浅色底上会看不见返回键")
+if not v29_style.is_file() or "forceDarkAllowed" not in v29_style.read_text(encoding="utf-8"):
+    errors.append("缺少 values-v29 forceDarkAllowed=false，系统深色模式会反色纸白配色")
+
+# 文本控件用 wrap_content + minHeight，禁止再用固定高度，避免系统大字体被裁切
+fixed_heights = []
+for p in xmls:
+    if "/layout/" not in p.as_posix():
+        continue
+    for m in re.finditer(r'android:layout_height="(28|32|34|36|38|40|42|44|46|52)dp"',
+                         p.read_text(encoding="utf-8")):
+        fixed_heights.append(f"{p.name}:{m.group(1)}dp")
+if fixed_heights:
+    errors.append("文本控件仍有固定高度，大字体下会被裁切: " + ", ".join(fixed_heights[:8]))
+print("v1.11 兼容性: Android 6.0+ · 全尺寸屏幕 · 横竖屏/折叠屏不重建 · 浅色系统栏 · 大字体不裁切")
+
+# ---- v1.11：内置离线语音（sherpa-onnx + Piper） ----
+bundled_kt = (MAIN / "java/com/wordcool/app/BundledTts.kt").read_text(encoding="utf-8")
+tts_asset = MAIN / "assets/tts/amy"
+aar = ROOT / "app/libs/sherpa-onnx-2.0.2.aar"
+if not aar.is_file():
+    errors.append("缺少 app/libs/sherpa-onnx-2.0.2.aar")
+for f in ("en_US-amy-low.onnx", "tokens.txt", "lexicon-en-us.txt"):
+    if not (tts_asset / f).is_file():
+        errors.append(f"缺少内置语音资产 tts/amy/{f}")
+for token in ("OfflineTts", "OfflineTtsConfig", "ENCODING_PCM_FLOAT", "AudioTrack", "lexicon-en-us.txt"):
+    if token not in bundled_kt:
+        errors.append(f"BundledTts 缺少实现: {token}")
+for token in ("BundledTts.init", "BundledTts.speak"):
+    if token not in main_kt2:
+        errors.append(f"MainActivity 未接上内置语音: {token}")
+if "sherpa-onnx-2.0.2" not in build_gradle:
+    errors.append("app/build.gradle 未引用 sherpa-onnx AAR")
+print("v1.11 内置语音: sherpa-onnx AAR + Piper Amy int8 + lexicon（不依赖系统语音包）")
+
 print(f"XML {len(xmls)} · Kotlin {len(kts)} · 布局 {len(layouts)} · id {len(ids)} · drawable {len(drawables)}")
 if errors:
     print("\n发现问题：")
@@ -626,7 +678,7 @@ if errors:
     print(f"\n共 {len(errors)} 项，静态自检未通过。")
     return_code = 1
 else:
-    print("静态自检全部通过。v1.10.1 已在 Android 37 模拟器（API 37）上真编译并点按验证词库/学习双端多选范围、Unit→Day 折叠、词库只读、英音单列、行内发音、导入页编辑、拼写测试与设置页；"
-          "微信分享入口、各厂商系统 TTS 语音包与 ROM 仍需真机验证。")
+    print("静态自检全部通过。v1.11.0 已在 Android 37 模拟器（API 37）上真编译并验证内置 sherpa-onnx + Piper 语音初始化与播放（16kHz/12800 samples）；"
+          "微信分享入口、真实扬声器与各厂商 ROM 仍需真机验证。")
     return_code = 0
 sys.exit(return_code)

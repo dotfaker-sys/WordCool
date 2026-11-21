@@ -36,7 +36,8 @@
             <TextView
                 android:id="@+id/btnPickDoc"
                 android:layout_width="match_parent"
-                android:layout_height="44dp"
+                android:layout_height="wrap_content"
+                android:minHeight="44dp"
                 android:layout_marginTop="14dp"
                 android:background="@drawable/bg_btn_primary"
                 android:gravity="center"
@@ -96,7 +97,8 @@
             <TextView
                 android:id="@+id/btnPasteImport"
                 android:layout_width="match_parent"
-                android:layout_height="42dp"
+                android:layout_height="wrap_content"
+                android:minHeight="42dp"
                 android:layout_marginTop="12dp"
                 android:background="@drawable/bg_btn_soft"
                 android:gravity="center"
@@ -156,7 +158,8 @@
                 <EditText
                     android:id="@+id/etGroupPrefix"
                     android:layout_width="0dp"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="40dp"
                     android:layout_weight="1.2"
                     android:layout_marginRight="6dp"
                     android:background="@drawable/bg_input"
@@ -170,7 +173,8 @@
                 <EditText
                     android:id="@+id/etGroupSize"
                     android:layout_width="0dp"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="40dp"
                     android:layout_weight="0.7"
                     android:layout_marginRight="6dp"
                     android:background="@drawable/bg_input"
@@ -185,7 +189,8 @@
                 <TextView
                     android:id="@+id/btnAutoGroup"
                     android:layout_width="wrap_content"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="40dp"
                     android:background="@drawable/bg_btn_primary"
                     android:gravity="center"
                     android:paddingLeft="14dp"
@@ -233,7 +238,8 @@
             <TextView
                 android:id="@+id/btnLoadKaoyan"
                 android:layout_width="match_parent"
-                android:layout_height="42dp"
+                android:layout_height="wrap_content"
+                android:minHeight="42dp"
                 android:layout_marginTop="12dp"
                 android:background="@drawable/bg_btn_primary"
                 android:gravity="center"
@@ -244,7 +250,8 @@
             <TextView
                 android:id="@+id/btnLoadDemo"
                 android:layout_width="match_parent"
-                android:layout_height="42dp"
+                android:layout_height="wrap_content"
+                android:minHeight="42dp"
                 android:layout_marginTop="8dp"
                 android:background="@drawable/bg_btn_ghost"
                 android:gravity="center"
@@ -281,7 +288,8 @@
             <TextView
                 android:id="@+id/btnEditWord"
                 android:layout_width="match_parent"
-                android:layout_height="42dp"
+                android:layout_height="wrap_content"
+                android:minHeight="42dp"
                 android:layout_marginTop="12dp"
                 android:background="@drawable/bg_btn_primary"
                 android:gravity="center"
@@ -318,7 +326,8 @@
             <TextView
                 android:id="@+id/btnWechatHelp"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
+                android:layout_height="wrap_content"
+                android:minHeight="40dp"
                 android:layout_marginTop="12dp"
                 android:background="@drawable/bg_btn_soft"
                 android:gravity="center"
@@ -329,7 +338,8 @@
             <TextView
                 android:id="@+id/btnPickDoc2"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
+                android:layout_height="wrap_content"
+                android:minHeight="40dp"
                 android:layout_marginTop="10dp"
                 android:background="@drawable/bg_btn_ghost"
                 android:gravity="center"

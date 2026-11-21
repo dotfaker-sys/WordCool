@@ -1,15 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- 编辑式排版：纸感底色、浅色状态栏、不叠加默认控件着色 -->
-    <style name="AppTheme" parent="@android:style/Theme.Material.Light.NoActionBar">
+    <!-- 编辑式排版：纸感底色、浅色状态栏、不叠加默认控件着色。
+         AppThemeBase 只放各系统版本通用的项；AppTheme 按 API 版本覆盖系统栏颜色。 -->
+    <style name="AppThemeBase" parent="@android:style/Theme.Material.Light.NoActionBar">
         <item name="android:colorPrimary">@color/primary</item>
         <item name="android:colorPrimaryDark">@color/primary_dark</item>
         <item name="android:colorAccent">@color/accent</item>
         <item name="android:windowBackground">@color/bg</item>
-        <item name="android:statusBarColor">@color/bg</item>
-        <item name="android:windowLightStatusBar">true</item>
         <item name="android:textColorPrimary">@color/text</item>
         <item name="android:textColorSecondary">@color/text_sub</item>
         <item name="android:textColorHint">@color/text_sub</item>
+    </style>
+
+    <!-- 默认（API 23–26）：状态栏浅纸底 + 深色图标；导航栏深墨底 + 白色图标 -->
+    <style name="AppTheme" parent="AppThemeBase">
+        <item name="android:statusBarColor">@color/bg</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:navigationBarColor">@color/text</item>
+    </style>
+
+    <!-- 词库列表的快速滚动条：细滑块 + 淡轨道，拖一下就能跳很远 -->
+    <style name="AppFastScroll" parent="@android:style/Widget.Material.FastScroll">
+        <item name="android:fastScrollThumbDrawable">@drawable/fast_scroll_thumb</item>
+        <item name="android:fastScrollTrackDrawable">@drawable/fast_scroll_track</item>
+        <item name="android:fastScrollPreviewBackgroundLeft">@android:color/transparent</item>
+        <item name="android:fastScrollPreviewBackgroundRight">@android:color/transparent</item>
+        <item name="android:fastScrollOverlayPosition">aboveThumb</item>
+        <item name="android:fastScrollTextColor">@color/text</item>
     </style>
 </resources>

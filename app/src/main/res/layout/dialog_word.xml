@@ -32,7 +32,8 @@
         <EditText
             android:id="@+id/etWord"
             android:layout_width="match_parent"
-            android:layout_height="42dp"
+            android:layout_height="wrap_content"
+            android:minHeight="42dp"
             android:layout_marginTop="4dp"
             android:background="@drawable/bg_input"
             android:hint="例如 abandon"
@@ -52,7 +53,8 @@
         <EditText
             android:id="@+id/etPhonetic"
             android:layout_width="match_parent"
-            android:layout_height="42dp"
+            android:layout_height="wrap_content"
+            android:minHeight="42dp"
             android:layout_marginTop="4dp"
             android:background="@drawable/bg_input"
             android:hint="/əˈbændən/"
@@ -84,7 +86,8 @@
                 <EditText
                     android:id="@+id/etPhoneticUk"
                     android:layout_width="match_parent"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="40dp"
                     android:layout_marginTop="4dp"
                     android:background="@drawable/bg_input"
                     android:hint="/ˈɑːftə/"
@@ -111,7 +114,8 @@
                 <EditText
                     android:id="@+id/etPhoneticUs"
                     android:layout_width="match_parent"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="40dp"
                     android:layout_marginTop="4dp"
                     android:background="@drawable/bg_input"
                     android:hint="/ˈæftər/"
@@ -131,7 +135,8 @@
             <TextView
                 android:id="@+id/btnDialogSpeakUk"
                 android:layout_width="0dp"
-                android:layout_height="38dp"
+                android:layout_height="wrap_content"
+                android:minHeight="38dp"
                 android:layout_weight="1"
                 android:layout_marginRight="6dp"
                 android:background="@drawable/bg_btn_soft"
@@ -143,7 +148,8 @@
             <TextView
                 android:id="@+id/btnDialogSpeakUs"
                 android:layout_width="0dp"
-                android:layout_height="38dp"
+                android:layout_height="wrap_content"
+                android:minHeight="38dp"
                 android:layout_weight="1"
                 android:layout_marginLeft="6dp"
                 android:background="@drawable/bg_btn_soft"
@@ -156,7 +162,8 @@
         <TextView
             android:id="@+id/btnDialogIpa"
             android:layout_width="match_parent"
-            android:layout_height="38dp"
+            android:layout_height="wrap_content"
+            android:minHeight="38dp"
             android:layout_marginTop="10dp"
             android:background="@drawable/bg_btn_ghost"
             android:gravity="center"
@@ -184,7 +191,8 @@
         <EditText
             android:id="@+id/etMeaning"
             android:layout_width="match_parent"
-            android:layout_height="42dp"
+            android:layout_height="wrap_content"
+            android:minHeight="42dp"
             android:layout_marginTop="4dp"
             android:background="@drawable/bg_input"
             android:hint="放弃；抛弃"
@@ -246,7 +254,8 @@
         <EditText
             android:id="@+id/etGroup"
             android:layout_width="match_parent"
-            android:layout_height="42dp"
+            android:layout_height="wrap_content"
+            android:minHeight="42dp"
             android:layout_marginTop="4dp"
             android:background="@drawable/bg_input"
             android:hint="例如 Unit 1 / Day 2 / Unit 1 Day 1"
@@ -264,7 +273,8 @@
             <TextView
                 android:id="@+id/btnDialogSpeak"
                 android:layout_width="0dp"
-                android:layout_height="38dp"
+                android:layout_height="wrap_content"
+                android:minHeight="38dp"
                 android:layout_weight="1"
                 android:layout_marginRight="4dp"
                 android:background="@drawable/bg_btn_ghost"
@@ -276,7 +286,8 @@
             <TextView
                 android:id="@+id/btnDialogMastered"
                 android:layout_width="0dp"
-                android:layout_height="38dp"
+                android:layout_height="wrap_content"
+                android:minHeight="38dp"
                 android:layout_weight="1"
                 android:layout_marginLeft="4dp"
                 android:layout_marginRight="4dp"
@@ -289,7 +300,8 @@
             <TextView
                 android:id="@+id/btnDialogReset"
                 android:layout_width="0dp"
-                android:layout_height="38dp"
+                android:layout_height="wrap_content"
+                android:minHeight="38dp"
                 android:layout_weight="1"
                 android:layout_marginLeft="4dp"
                 android:background="@drawable/bg_btn_ghost"

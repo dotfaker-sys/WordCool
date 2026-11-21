@@ -4,7 +4,9 @@
 
 > 仓库里是源码工程，不放已签名的 APK。最省事是直接从 [Releases](https://github.com/dotfaker-sys/WordCool/releases) 下载现成的 `WordCool.apk`；想自己编译见下面两条路径。**GitHub Actions 工作流已移除，push 不再自动出包**。完整命令见 [`README.md`](README.md) 一、和 [`UPLOAD.md`](UPLOAD.md)。
 
-**v1.10.1 · 语音包安装入口修复（当前源码 v1.10.1，已发 Release v1.10.1）**：系统语音包不能由 App 直接下载；「安装 / 检查英语语音包」现在会给出系统设置 / Google Play 两个入口，兼容 AOSP / 三星，装好后回来自动重新检测。安装包在 [Releases](https://github.com/dotfaker-sys/WordCool/releases) 的 **v1.10.1 → Assets → WordCool.apk**。
+**v1.11 · 内置离线语音（当前源码 v1.11.0，已发 Release v1.11.0）**：APK 自带 sherpa-onnx + Piper Amy 美音模型，安装后不需要系统语音包、不需要联网就能读；系统 TTS 只作兜底。安装包约 73 MB，在 [Releases](https://github.com/dotfaker-sys/WordCool/releases) 的 **v1.11.0 → Assets → WordCool.apk**。
+>
+> **v1.10.1 · 语音包安装入口修复（v1.10.1）**：系统语音包不能由 App 直接下载；「安装 / 检查英语语音包」现在会给出系统设置 / Google Play 两个入口，兼容 AOSP / 三星，装好后回来自动重新检测。安装包在 [Releases](https://github.com/dotfaker-sys/WordCool/releases) 的 **v1.10.1 → Assets → WordCool.apk**。
 >
 > **v1.10 · 词库多选组别（Release v1.10.0）**：词库页「组别」也支持多选，列表和「解锁新词」共用范围；学习页的范围多选不变。安装包在 [Releases](https://github.com/dotfaker-sys/WordCool/releases) 的 **v1.10.0 → Assets → WordCool.apk**，Debug 签名，可直接安装。
 >
@@ -48,7 +50,7 @@
 ## 拿到 APK 的最快路径
 
 ### 直接下载（推荐）
-打开 <https://github.com/dotfaker-sys/WordCool/releases> → 最新一条 **v1.10.0** → Assets → **WordCool.apk** → 传到手机安装。这是本地 `assembleDebug` 产出的 Debug 签名包，可直接使用；旧版 v1.0.0 / v1.1.0 / v1.2.0 也都保留。
+打开 <https://github.com/dotfaker-sys/WordCool/releases> → 最新一条 **v1.11.0** → Assets → **WordCool.apk** → 传到手机安装。v1.11.0 内置离线语音（约 73 MB），Debug 签名，可直接使用；旧版 v1.0.0 / v1.1.0 / v1.2.0 / v1.10.x 也都保留。
 
 ### 有电脑：Android Studio（约 5 分钟）
 1. 安装 [Android Studio](https://developer.android.com/studio)
@@ -98,7 +100,7 @@ apple
 
 ## 小提醒
 
-- 支持 Android 8.0 及以上；**词库、导入、音标、发音、备份全程离线**，词库只存手机本地；v1.2 起唯一新增的 `INTERNET` 权限只给「检查更新」用，不点就不联网
+- 支持 Android 6.0 及以上；**词库、导入、音标、发音、备份全程离线**，词库只存手机本地；v1.2 起唯一新增的 `INTERNET` 权限只给「检查更新」用，不点就不联网
 - 旧版 `.doc` / `.xls` 请另存为 `.docx` / `.xlsx`；**扫描图片版 PDF 导不出**，请复制内容用「粘贴导入」；PDF 用 CID 字体时中文释义可能乱码，优先用 Word / Excel
 - 发音用手机自带的文字转语音引擎，首次启动可能要等几秒；导入页「试听一句英文」可当场确认
 - 换手机：导入页「导出词库备份」，新手机用「选择文档并导入」选这个 JSON 恢复（含学习进度与组别）

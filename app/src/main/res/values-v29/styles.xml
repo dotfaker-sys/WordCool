@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- API 29+ 的强制深色会让固定的纸白配色被系统反色，这里显式关闭。
+         系统栏配色沿用 v27 的浅底深图标。 -->
+    <style name="AppTheme" parent="AppThemeBase">
+        <item name="android:statusBarColor">@color/bg</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:navigationBarColor">@color/bg</item>
+        <item name="android:windowLightNavigationBar">true</item>
+        <item name="android:forceDarkAllowed">false</item>
+    </style>
+</resources>

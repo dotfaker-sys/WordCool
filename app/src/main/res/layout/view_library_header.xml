@@ -13,7 +13,8 @@
         <EditText
             android:id="@+id/etSearch"
             android:layout_width="0dp"
-            android:layout_height="44dp"
+            android:layout_height="wrap_content"
+            android:minHeight="44dp"
             android:layout_weight="1"
             android:background="@drawable/bg_input"
             android:hint="搜单词或释义"
@@ -27,7 +28,8 @@
         <TextView
             android:id="@+id/btnAdd"
             android:layout_width="wrap_content"
-            android:layout_height="44dp"
+            android:layout_height="wrap_content"
+            android:minHeight="44dp"
             android:layout_marginLeft="8dp"
             android:background="@drawable/bg_btn_primary"
             android:gravity="center"
@@ -48,7 +50,8 @@
         <TextView
             android:id="@+id/chipAll"
             android:layout_width="0dp"
-            android:layout_height="32dp"
+            android:layout_height="wrap_content"
+            android:minHeight="32dp"
             android:layout_weight="1"
             android:layout_marginRight="5dp"
             android:gravity="center"
@@ -60,7 +63,8 @@
         <TextView
             android:id="@+id/chipLocked"
             android:layout_width="0dp"
-            android:layout_height="32dp"
+            android:layout_height="wrap_content"
+            android:minHeight="32dp"
             android:layout_weight="1"
             android:layout_marginRight="5dp"
             android:gravity="center"
@@ -72,7 +76,8 @@
         <TextView
             android:id="@+id/chipLearning"
             android:layout_width="0dp"
-            android:layout_height="32dp"
+            android:layout_height="wrap_content"
+            android:minHeight="32dp"
             android:layout_weight="1"
             android:layout_marginRight="5dp"
             android:gravity="center"
@@ -84,7 +89,8 @@
         <TextView
             android:id="@+id/chipMastered"
             android:layout_width="0dp"
-            android:layout_height="32dp"
+            android:layout_height="wrap_content"
+            android:minHeight="32dp"
             android:layout_weight="1"
             android:gravity="center"
             android:background="@drawable/bg_chip"
@@ -96,7 +102,8 @@
     <TextView
         android:id="@+id/btnGroupFilter"
         android:layout_width="match_parent"
-        android:layout_height="34dp"
+        android:layout_height="wrap_content"
+        android:minHeight="34dp"
         android:layout_marginTop="10dp"
         android:background="@drawable/bg_btn_ghost"
         android:gravity="center_vertical"
@@ -125,7 +132,8 @@
         <TextView
             android:id="@+id/btnUnlock"
             android:layout_width="wrap_content"
-            android:layout_height="34dp"
+            android:layout_height="wrap_content"
+            android:minHeight="34dp"
             android:background="@drawable/bg_btn_soft"
             android:gravity="center"
             android:paddingLeft="12dp"

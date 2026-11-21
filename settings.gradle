@@ -10,6 +10,8 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        // 本地 sherpa-onnx AAR（内置离线 TTS 引擎）
+        flatDir { dirs "${rootDir}/app/libs" }
     }
 }
 rootProject.name = "WordCool"

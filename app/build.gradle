@@ -9,18 +9,26 @@ android {
 
     defaultConfig {
         applicationId 'com.wordcool.app'
-        minSdk 26
+        // Android 6.0（API 23）起步：覆盖仍在使用的全部主流机型。
+        // 代码只用到 API 23 以前就有的能力（SAF / PdfRenderer / TTS voices / StandardCharsets），
+        // 状态栏深色图标从 API 23 开始支持；更低版本已无安全更新，不再兼容。
+        minSdk 23
         targetSdk 34
-        versionCode 12
-        versionName '1.10.1'
+        versionCode 13
+        versionName '1.11.0'
     }
 
     buildTypes {
         debug {
             minifyEnabled false
+            // 模拟器多为 x86_64；真机主流是 arm64，同时保留 32 位 ARM 方便老机测试。
+            ndk { abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86_64' }
         }
         release {
             minifyEnabled false
+            // 64 位主流机 + 仍在使用的 32 位 ARM 老机；x86 只用于模拟器，不放进正式包。
+            // 少一个 ABI 就会让对应架构的手机直接报「解析包错误 / 无法安装」。
+            ndk { abiFilters 'arm64-v8a', 'armeabi-v7a' }
             // 直接使用 debug 签名，产出的 release 包也能立刻安装
             signingConfig signingConfigs.debug
         }
@@ -35,6 +43,7 @@ android {
     }
 }
 
-// 不需要任何第三方库：SQLite / XML 解析 / TTS / SAF 全部是系统自带能力
 dependencies {
+    // 内置离线 TTS：sherpa-onnx（Apache-2.0）+ Piper 模型（本地 assets）
+    implementation(name: 'sherpa-onnx-2.0.2', ext: 'aar')
 }

@@ -64,3 +64,7 @@ en_UK.txt  221394caef0cf723b4f2df81a98ac33191293257b88aed5b1fb89466d3a0dc77
 - 当前仅用于用户本地学习；**公开分发 APK 或仓库前，请先确认词表来源与版权授权**。
 - 文件首尾的 `#` 注释说明了来源与这一限制；`tools/verify.py` 只校验行数、组数、列格式与唯一性，不校验版权。
 - 如果不想随包分发这份词表，删除 `app/src/main/assets/kaoyan.tsv` 并移除导入页的「载入考研词库」入口即可，其余功能不受影响。
+
+## 7. 内置语音引擎（v1.11 起）
+
+`app/libs/sherpa-onnx-2.0.2.aar` 与 `app/src/main/assets/tts/amy/` 是内置离线语音（sherpa-onnx + Piper Amy int8）。sherpa-onnx 使用 **Apache-2.0**（全文见 `LICENSES/Apache-2.0.txt`）；Piper 模型的上游数据集许可见 `LICENSES/SHERPA_ONNX_AND_PIPER_NOTICE.md`。公开分发时请一并保留这两份声明。

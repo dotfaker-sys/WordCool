@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 快速滚动条的轨道：比滑块更淡，只做位置参考 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#66D8D3C9" />
+    <corners android:radius="2dp" />
+    <size
+        android:width="2dp"
+        android:height="48dp" />
+</shape>

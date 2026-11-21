@@ -54,7 +54,8 @@
                 <TextView
                     android:id="@+id/btnPickGroup"
                     android:layout_width="0dp"
-                    android:layout_height="38dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="38dp"
                     android:layout_weight="1"
                     android:layout_marginRight="6dp"
                     android:background="@drawable/bg_btn_ghost"
@@ -68,7 +69,8 @@
                 <TextView
                     android:id="@+id/btnStudyOrder"
                     android:layout_width="0dp"
-                    android:layout_height="38dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="38dp"
                     android:layout_weight="1"
                     android:layout_marginLeft="6dp"
                     android:background="@drawable/bg_btn_ghost"
@@ -87,7 +89,8 @@
                 <TextView
                     android:id="@+id/btnStart"
                     android:layout_width="0dp"
-                    android:layout_height="42dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="42dp"
                     android:layout_weight="1"
                     android:layout_marginRight="6dp"
                     android:background="@drawable/bg_btn_primary"
@@ -99,7 +102,8 @@
                 <TextView
                     android:id="@+id/btnUnlockNew"
                     android:layout_width="0dp"
-                    android:layout_height="42dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="42dp"
                     android:layout_weight="1"
                     android:layout_marginLeft="6dp"
                     android:background="@drawable/bg_btn_soft"
@@ -112,7 +116,8 @@
             <TextView
                 android:id="@+id/btnSpellStart"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
+                android:layout_height="wrap_content"
+                android:minHeight="40dp"
                 android:layout_marginTop="8dp"
                 android:background="@drawable/bg_btn_ghost"
                 android:gravity="center"
@@ -171,7 +176,8 @@
                 <TextView
                     android:id="@+id/btnSpeakUk"
                     android:layout_width="0dp"
-                    android:layout_height="36dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="36dp"
                     android:layout_weight="1"
                     android:layout_marginRight="6dp"
                     android:background="@drawable/bg_btn_ghost"
@@ -183,7 +189,8 @@
                 <TextView
                     android:id="@+id/btnSpeak"
                     android:layout_width="0dp"
-                    android:layout_height="36dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="36dp"
                     android:layout_weight="1"
                     android:layout_marginLeft="6dp"
                     android:background="@drawable/bg_btn_soft"
@@ -237,7 +244,8 @@
             <TextView
                 android:id="@+id/btnReveal"
                 android:layout_width="match_parent"
-                android:layout_height="44dp"
+                android:layout_height="wrap_content"
+                android:minHeight="44dp"
                 android:layout_marginTop="16dp"
                 android:background="@drawable/bg_btn_primary"
                 android:gravity="center"
@@ -256,7 +264,8 @@
                 <TextView
                     android:id="@+id/gradeBad"
                     android:layout_width="0dp"
-                    android:layout_height="42dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="42dp"
                     android:layout_weight="1"
                     android:layout_marginRight="4dp"
                     android:background="@drawable/bg_btn_ghost"
@@ -268,7 +277,8 @@
                 <TextView
                     android:id="@+id/gradeFuzzy"
                     android:layout_width="0dp"
-                    android:layout_height="42dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="42dp"
                     android:layout_weight="1"
                     android:layout_marginLeft="4dp"
                     android:layout_marginRight="4dp"
@@ -281,7 +291,8 @@
                 <TextView
                     android:id="@+id/gradeGood"
                     android:layout_width="0dp"
-                    android:layout_height="42dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="42dp"
                     android:layout_weight="1"
                     android:layout_marginLeft="4dp"
                     android:background="@drawable/bg_btn_primary"
@@ -305,7 +316,8 @@
             <TextView
                 android:id="@+id/btnStudyNext"
                 android:layout_width="match_parent"
-                android:layout_height="44dp"
+                android:layout_height="wrap_content"
+                android:minHeight="44dp"
                 android:layout_marginTop="10dp"
                 android:background="@drawable/bg_btn_primary"
                 android:gravity="center"
@@ -355,7 +367,8 @@
                 <TextView
                     android:id="@+id/opt0"
                     android:layout_width="match_parent"
-                    android:layout_height="44dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="44dp"
                     android:background="@drawable/bg_btn_ghost"
                     android:gravity="center_vertical"
                     android:paddingLeft="14dp"
@@ -367,7 +380,8 @@
                 <TextView
                     android:id="@+id/opt1"
                     android:layout_width="match_parent"
-                    android:layout_height="44dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="44dp"
                     android:layout_marginTop="8dp"
                     android:background="@drawable/bg_btn_ghost"
                     android:gravity="center_vertical"
@@ -380,7 +394,8 @@
                 <TextView
                     android:id="@+id/opt2"
                     android:layout_width="match_parent"
-                    android:layout_height="44dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="44dp"
                     android:layout_marginTop="8dp"
                     android:background="@drawable/bg_btn_ghost"
                     android:gravity="center_vertical"
@@ -393,7 +408,8 @@
                 <TextView
                     android:id="@+id/opt3"
                     android:layout_width="match_parent"
-                    android:layout_height="44dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="44dp"
                     android:layout_marginTop="8dp"
                     android:background="@drawable/bg_btn_ghost"
                     android:gravity="center_vertical"
@@ -417,7 +433,8 @@
             <TextView
                 android:id="@+id/btnQuizNext"
                 android:layout_width="match_parent"
-                android:layout_height="44dp"
+                android:layout_height="wrap_content"
+                android:minHeight="44dp"
                 android:layout_marginTop="10dp"
                 android:background="@drawable/bg_btn_primary"
                 android:gravity="center"
@@ -481,7 +498,8 @@
             <EditText
                 android:id="@+id/etSpell"
                 android:layout_width="match_parent"
-                android:layout_height="52dp"
+                android:layout_height="wrap_content"
+                android:minHeight="52dp"
                 android:layout_marginTop="14dp"
                 android:background="@drawable/bg_input"
                 android:fontFamily="serif"
@@ -505,7 +523,8 @@
                 <TextView
                     android:id="@+id/btnSpellSpeak"
                     android:layout_width="0dp"
-                    android:layout_height="38dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="38dp"
                     android:layout_weight="1"
                     android:layout_marginRight="6dp"
                     android:background="@drawable/bg_btn_ghost"
@@ -517,7 +536,8 @@
                 <TextView
                     android:id="@+id/btnSpellHint"
                     android:layout_width="0dp"
-                    android:layout_height="38dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="38dp"
                     android:layout_weight="1"
                     android:layout_marginLeft="6dp"
                     android:background="@drawable/bg_btn_soft"
@@ -530,7 +550,8 @@
             <TextView
                 android:id="@+id/btnSpellCheck"
                 android:layout_width="match_parent"
-                android:layout_height="44dp"
+                android:layout_height="wrap_content"
+                android:minHeight="44dp"
                 android:layout_marginTop="12dp"
                 android:background="@drawable/bg_btn_primary"
                 android:gravity="center"
@@ -541,7 +562,8 @@
             <TextView
                 android:id="@+id/btnSpellGiveUp"
                 android:layout_width="match_parent"
-                android:layout_height="38dp"
+                android:layout_height="wrap_content"
+                android:minHeight="38dp"
                 android:layout_marginTop="8dp"
                 android:background="@drawable/bg_btn_ghost"
                 android:gravity="center"
@@ -564,7 +586,8 @@
             <TextView
                 android:id="@+id/btnSpellNext"
                 android:layout_width="match_parent"
-                android:layout_height="44dp"
+                android:layout_height="wrap_content"
+                android:minHeight="44dp"
                 android:layout_marginTop="10dp"
                 android:background="@drawable/bg_btn_primary"
                 android:gravity="center"
@@ -608,7 +631,8 @@
             <TextView
                 android:id="@+id/btnMore"
                 android:layout_width="match_parent"
-                android:layout_height="42dp"
+                android:layout_height="wrap_content"
+                android:minHeight="42dp"
                 android:layout_marginTop="16dp"
                 android:background="@drawable/bg_btn_ghost"
                 android:gravity="center"

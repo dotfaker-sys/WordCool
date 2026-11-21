@@ -45,10 +45,12 @@ class MainActivity : Activity() {
     private var usAvailable = false
     private var pendingExport = ""
     private var lastIncomingKey: String? = null
+    private var bundledAccentNotified = false
 
     companion object {
         private const val REQ_PICK = 1001
         private const val REQ_EXPORT = 1002
+        private const val STATE_TAB = "state_tab"
         const val ACCENT_US = 0
         const val ACCENT_UK = 1
         private val LOC_US = Locale.US
@@ -89,7 +91,9 @@ class MainActivity : Activity() {
         tabs.forEachIndexed { i, t -> t.setOnClickListener { switchTo(i) } }
 
         initTts()
-        switchTo(0)
+        BundledTts.init(this)
+        // 旋转屏幕由 configChanges 自行处理；这里的恢复主要针对进程被系统回收后重建
+        switchTo((savedInstanceState?.getInt(STATE_TAB, 0) ?: 0).coerceIn(0, pages.lastIndex))
         if (savedInstanceState != null) return
         if (isIncomingIntent(intent)) {
             // v8：从微信「用其他应用打开 / 分享」进来，直接进导入预览
@@ -116,6 +120,11 @@ class MainActivity : Activity() {
         super.onResume()
         if (ttsReady) refreshVoiceAvailability()
         if (::library.isInitialized) refreshCurrent()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putInt(STATE_TAB, current)
+        super.onSaveInstanceState(outState)
     }
 
     override fun onDestroy() {
@@ -332,8 +341,20 @@ class MainActivity : Activity() {
     /** v5：指定口音朗读。缺该口音语音包时自动回退到另一种，两个都没有则引导安装 */
     fun speak(text: String, accent: Int) {
         if (text.isBlank()) return
+        if (!mediaVolumeOk()) return
+        // 优先用随包内置的离线引擎；没装系统语音包的手机也能直接读
+        if (BundledTts.speak(text, db.speechRate)) {
+            if (accent == ACCENT_UK && !bundledAccentNotified) {
+                bundledAccentNotified = true
+                toast("当前内置语音为美音，英音按钮也会用美音朗读")
+            }
+            return
+        }
         if (!ttsReady || tts == null) {
-            toast("语音引擎还在准备，稍等一下再点")
+            toast(
+                if (BundledTts.isInitializing()) "内置语音正在加载，稍等几秒再点"
+                else "语音引擎还在准备，稍等一下再点"
+            )
             return
         }
         val ok = if (accent == ACCENT_UK) ukAvailable else usAvailable
@@ -351,20 +372,22 @@ class MainActivity : Activity() {
         toast("还没装英语语音包：系统设置 → 语言和输入 → 文字转语音 → 安装英语（美国 / 英国）语音数据")
     }
 
-    /** 真正下发 TTS；音量 0 / 系统拒绝时给出可执行提示，而不是点了没反应 */
-    private fun speakNow(text: String) {
-        val am = getSystemService(AUDIO_SERVICE) as? AudioManager
-        if (am != null) {
-            val vol = am.getStreamVolume(AudioManager.STREAM_MUSIC)
-            val max = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC).coerceAtLeast(1)
-            if (vol == 0) {
-                toast("媒体音量为 0：先按音量键调高媒体音量，再点发音")
-                return
-            }
-            if (vol * 100 / max < 30) {
-                toast("媒体音量偏低（$vol/$max），按音量键调高后再听")
-            }
+    private fun mediaVolumeOk(): Boolean {
+        val am = getSystemService(AUDIO_SERVICE) as? AudioManager ?: return true
+        val vol = am.getStreamVolume(AudioManager.STREAM_MUSIC)
+        val max = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC).coerceAtLeast(1)
+        if (vol == 0) {
+            toast("媒体音量为 0：先按音量键调高媒体音量，再点发音")
+            return false
         }
+        if (vol * 100 / max < 30) {
+            toast("媒体音量偏低（$vol/$max），按音量键调高后再听")
+        }
+        return true
+    }
+
+    /** 系统 TTS 兜底；内置引擎不可用时才会走到这里 */
+    private fun speakNow(text: String) {
         val engine = tts ?: return
         engine.setSpeechRate(db.speechRate)
         val params = Bundle().apply {
@@ -382,10 +405,12 @@ class MainActivity : Activity() {
 
     /** 给导入页「发音」设置区显示当前引擎状态 */
     fun ttsStatusText(): String {
-        if (!ttsReady) return "语音引擎还在准备…"
-        val uk = if (ukAvailable) "英音可用" else "英音未安装"
-        val us = if (usAvailable) "美音可用" else "美音未安装"
-        return "$uk · $us · 默认${accentName(db.accent)} · 语速${speechRateLabel()}"
+        val system = if (!ttsReady) "系统 TTS 未就绪" else {
+            val uk = if (ukAvailable) "英音可用" else "英音未安装"
+            val us = if (usAvailable) "美音可用" else "美音未安装"
+            "$uk · $us"
+        }
+        return "${BundledTts.statusText()} · $system · 默认${accentName(db.accent)} · 语速${speechRateLabel()}"
     }
 
     fun speechRateLabel(): String = when (db.speechRate) {

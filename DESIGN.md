@@ -1,6 +1,6 @@
-# 单词酷 · 设计系统与架构规范 v1.10
+# 单词酷 · 设计系统与架构规范 v1.11
 
-> 版本沿革：v2 页面重设计 → v3 加功能 → v4 修 15 项缺陷 → v5 英音 / 美音双发音与双音标 → v6 内置离线开源音标词典 → v7 对照同行产品与开源数据源做实证调研 → v8 接入微信 / QQ 文件分享并做成 CI 真编译 + 自动发版 → v9 应用内检查更新（首次、也是唯一一次新增 `INTERNET` 权限）→ **v9.1 按用户要求移除 GitHub Actions 工作流** → **v10 拼写测试（v1.3）** → **v1.4 内置考研词库（versionCode 5）** → **v1.5 独立设置页（versionCode 6）** → **v1.6 多选范围与顺序 / 打乱（versionCode 7）** → **v1.7 词库折叠头与行内发音（versionCode 8）** → **v1.8 Unit → Day 分组折叠（versionCode 9）** → **v1.9 词库只读 / 英音单列 / 编辑移到导入（versionCode 10）** → **v1.10 词库组别多选（versionCode 11）**。
+> 版本沿革：v2 页面重设计 → v3 加功能 → v4 修 15 项缺陷 → v5 英音 / 美音双发音与双音标 → v6 内置离线开源音标词典 → v7 对照同行产品与开源数据源做实证调研 → v8 接入微信 / QQ 文件分享并做成 CI 真编译 + 自动发版 → v9 应用内检查更新（首次、也是唯一一次新增 `INTERNET` 权限）→ **v9.1 按用户要求移除 GitHub Actions 工作流** → **v10 拼写测试（v1.3）** → **v1.4 内置考研词库（versionCode 5）** → **v1.5 独立设置页（versionCode 6）** → **v1.6 多选范围与顺序 / 打乱（versionCode 7）** → **v1.7 词库折叠头与行内发音（versionCode 8）** → **v1.8 Unit → Day 分组折叠（versionCode 9）** → **v1.9 词库只读 / 英音单列 / 编辑移到导入（versionCode 10）** → **v1.10 词库组别多选（versionCode 11）** → **v1.11 内置离线语音（versionCode 13）**。
 >
 > **v9.1 一句话**：`.github/workflows/build-apk.yml` 已删除，push 到 `main` 不再自动编译、也不再自动发新版 Release。已发布的三条 Release 与 APK 全部保留，应用内「检查更新」仍能读到现有的 latest（v1.2.0）；只是以后不会自动冒出新版本。源码、数据、文档、自检脚本一行没删，只少了这一个自动化文件。
 >
@@ -19,6 +19,8 @@
 > **v1.9 一句话**：词库列表做减法：去掉每行的「未解锁 / 待解锁」，只显示英音，长单词完整换行；词库页改为只读，编辑与删除统一走导入页的「编辑单词」搜索框，避免在列表里误点误改。
 >
 > **v1.10 一句话**：词库页的组别筛选从单选升级为多选，复用学习页的「清空 / 全选 / 勾选」弹窗；列表查询与「解锁新词」共用同一组组名，按钮显示「组别：2 个组」。
+>
+> **v1.11 一句话**：把系统 TTS 从「唯一发音来源」降为兜底，APK 内置 sherpa-onnx + Piper Amy int8 美音模型；安装后不装语音包、不联网也能直接读。代价是 APK 从约 2.5MB 增到约 73MB，正式包 arm64 + armeabi-v7a。
 >
 > **v9 一句话**：应用内检查更新放在「统计 → 版本与更新」，点按钮才向 GitHub 发一次只读 GET 比对公开 Release 版本号；发现新版弹窗、点「去下载」才用浏览器打开下载页，绝不自动下载或安装。**这是全应用唯一联网点，也是唯一新增权限**：词库、导入、离线音标词典、双发音、复习、备份全部仍离线可用。用户明确确认「允许加 INTERNET 权限」后才做，见第 11 节。
 >
@@ -132,7 +134,7 @@
 5. **`MainActivity.kt` 与四个 View 的构造、调用契约**：`showWordDialog` / `showImportPreview` / `pickDocument` / `exportBackup` / `switchTo` / `dataChanged` / `speak` 等；四个 View 仍以 `(MainActivity, View)` 构造。
 6. **v2 的全部 `R.id` 与布局文件名**：8 个布局、90 个旧 id 一个不改名、不删除（v3 新增 10 个、v4 新增 `dialog_input.xml`、v5 新增 9 个、v6 新增 8 个、v8 新增 2 个、v9 新增 3 个、v10 新增 13 个、v1.4 新增 1 个、v1.5 新增 1 个、v1.6 新增 1 个、v1.7 新增 1 个并新增 `view_library_header.xml`，v1.8 新增 6 个并新增 `item_library_unit.xml` / `item_library_day.xml`，v1.9 删 1 个 `tvState`、加 4 个编辑入口 id 并新增 `dialog_pick_word.xml`，现共 14 布局 / 148 个 id）。
 7. **`Ui.kt` 的函数签名**：`Pal` 字段名、`dp` / `rounded` / `toast` / `show` / `stateName` / `stateColor` 全部保持；仅替换色值与圆角收敛系数。
-8. **Gradle 与清单**：`applicationId`、minSdk 26 / targetSdk 34、**零第三方依赖（Gradle dependencies 仍为空）**。**v1.0/v1.1 为零权限；v1.2 起按用户明确确认新增唯一一个 `<uses-permission android:name="android.permission.INTERNET" />`**，只给「检查更新」用，仍无存储 / 定位 / 通讯录等任何其他权限，`tools/verify.py` 用白名单强制只允许这一个。v8 前 `AndroidManifest.xml` 一直没有改过；v8 起**只增不改**：加 `launchMode="singleTask"` 与 3 组接收文件的 `intent-filter`，原 MAIN / LAUNCHER 过滤器与 `exported="true"` 不变。Kotlin 源文件 8 → 9（v6 `IpaDictionary.kt`）→ 10（v9 `UpdateChecker.kt`）→ **11（v1.5 `SettingsView.kt`）**；v6 另新增 `assets/ipa.tsv`、`LICENSES/`、`tools/`，均为数据与脚本，不是代码依赖。
+8. **Gradle 与清单**：`applicationId`、minSdk 23 / targetSdk 34、**v1.11 起依赖本地 `app/libs/sherpa-onnx-2.0.2.aar`（Apache-2.0），不再是空 dependencies；除此之外不引 AndroidX / 网络库**。**v1.0/v1.1 为零权限；v1.2 起按用户明确确认新增唯一一个 `<uses-permission android:name="android.permission.INTERNET" />`**，只给「检查更新」用，仍无存储 / 定位 / 通讯录等任何其他权限，`tools/verify.py` 用白名单强制只允许这一个。v8 前 `AndroidManifest.xml` 一直没有改过；v8 起**只增不改**：加 `launchMode="singleTask"` 与 3 组接收文件的 `intent-filter`，原 MAIN / LAUNCHER 过滤器与 `exported="true"` 不变。Kotlin 源文件 8 → 9（v6 `IpaDictionary.kt`）→ 10（v9 `UpdateChecker.kt`）→ 11（v1.5 `SettingsView.kt`）→ **12（v1.11 `BundledTts.kt`）**；v6 另新增 `assets/ipa.tsv`、`LICENSES/`、`tools/`，均为数据与脚本，不是代码依赖。
 9. **编译与安装方式**：v9.1 移除工作流后剩下 Android Studio / 命令行两条路径，外加直接下载已有 Release（见 `README.md`）。
 
 本次实际改动范围：`res/values`（色板、主题）、`res/drawable`（卡片 / 按钮 / 输入 / 进度 / 行 / 页眉）、`res/mipmap-*`（启动图标）、`Ui.kt`（数值与圆角实现）、以及布局里的纯视觉属性（字体族、字号、背景引用、去掉 emoji 的文案）。
@@ -708,9 +710,58 @@ Android 沙箱下，微信收到的文件在 `com.tencent.mm` 私有目录里，
 
 ---
 
-## 20. 验收与诚实边界
+## 20. v1.11：内置离线语音
 
-- 已做：`python3 tools/verify.py` 一键静态自检通过（30 个 XML 合法性与重复属性、148 个 id / 资源引用一致性、11 个 Kotlin 精细括号扫描、emoji 残留、`ipa.tsv` 三列格式与排序、许可证文件齐全、上游 SHA-256 与 `ipa_stats.json` 行数一致性、**Manifest 三组接收过滤器与「仅 INTERNET 一个权限」白名单校验**、v10 拼写判分等价回归、v1.4 考研词库 711 词 / 23 组 / 无重复词校验、v1.5 设置页 5 tab / 设置项搬离导入与统计页校验、v1.6 多组 SQL IN / 多选范围 / 顺序切换校验、v1.7 折叠头 / 行内发音 / 主按钮顺序校验、v1.8 Unit/Day 分组折叠校验、v1.9 词库只读 / 英音单列 / 完整词形 / 编辑入口校验、**v1.10 词库组别多选 / 列表与解锁共用范围校验**）
+### 20.1 为什么换引擎
+
+系统 TTS 语音包属于 Google / 手机厂商，不能合法打进第三方 APK；`ACTION_INSTALL_TTS_DATA` 在多数新系统上也不提供真正的下载入口。要做到「安装完直接能读」，只能内置开源引擎 + 模型。
+
+- 引擎：**sherpa-onnx 2.0.2 AAR**（Apache-2.0）
+- 模型：**Piper `vits-piper-en_US-amy-low-int8`**，16 kHz，单说话人，约 18.6 MB
+- 发音词典：`lexicon-en-us.txt`（约 6.3 MB，来自 sherpa-onnx tts-models release）
+- 不再需要模型包里的 `espeak-ng-data`（已删除，省约 11 MB）
+- 全部在 CPU 推理，不联网、不申请新权限
+
+### 20.2 实现
+
+- `app/libs/sherpa-onnx-2.0.2.aar` 通过 `flatDir` 依赖引入
+- `app/src/main/assets/tts/amy/` 放 `en_US-amy-low.onnx`、`tokens.txt`、`lexicon-en-us.txt`
+- 新增 `BundledTts.kt`（第 12 个 Kotlin 文件）：
+  - `init()` 在后台线程创建 `OfflineTts(assetManager, config)`
+  - `speak()` 在单线程 executor 里 `generate()`，再用 `AudioTrack`（`ENCODING_PCM_FLOAT`、16 kHz、单声道、媒体流）播放
+  - 状态：加载中 / 已就绪 / 失败 + 错误原因
+- `MainActivity.speak()` 顺序：
+  1. 检查媒体音量（0 / <30% 给提示）
+  2. `BundledTts.speak()` 成功就直接返回
+  3. 内置未就绪时才走原系统 TTS 兜底
+- 内置只有美音：UK 按钮也会用 Amy，并在首次切换时提示；系统 TTS 仍保留给内置失败 / 不支持的设备
+
+### 20.3 体积与 ABI
+
+- 正式包：`arm64-v8a` + `armeabi-v7a`，约 **73 MB**（含 18.6 MB 模型、6.3 MB 词典、约 31 MB arm64 + 22 MB armeabi 原生库）
+- 调试包：额外带 `x86_64`（模拟器），约 **111 MB**
+- `app/build.gradle` 的 `ndk.abiFilters` 与 `packaging.jniLibs.excludes` 共同决定打包 ABI；AAR 自带四个 ABI，不能只靠 AAR 默认
+- 首次启动后台加载模型约 1–3 秒；加载完成前点发音会走系统 TTS 兜底
+
+### 20.4 许可
+
+- sherpa-onnx：Apache-2.0，全文见 `LICENSES/Apache-2.0.txt`
+- Piper 模型：`MODEL_CARD` 注明数据集来自 MycroftAI/mimic3-voices，上游许可 **CC-BY-SA-4.0**；声明见 `LICENSES/SHERPA_ONNX_AND_PIPER_NOTICE.md`
+- `lexicon-en-us.txt` 来源与生成方式见同一声明
+
+### 20.5 诚实边界
+
+1. 只内置美音 Amy；UK 按钮不是英音，只是同一美音，第一次会提示。
+2. 模型是 low/int8，音质不如 Google 系统语音包，偶尔会有机器味；胜在安装即用、离线、可控。
+3. 正式包不支持 x86 / x86_64 真机（只支持 arm64 / armeabi-v7a）；模拟器用 debug 包。
+4. APK 73 MB 是明确的体积代价，无法同时做到「2.5 MB」和「自带语音」。
+5. 仍未做真机扬声器试听；模拟器只验证了模型加载与 AudioTrack 生成（16 kHz / 12800 samples），实际音质需真机确认。
+
+---
+
+## 21. 验收与诚实边界
+
+- 已做：`python3 tools/verify.py` 一键静态自检通过（34 个 XML 合法性与重复属性、148 个 id / 资源引用一致性、12 个 Kotlin 精细括号扫描、emoji 残留、`ipa.tsv` 三列格式与排序、许可证文件齐全、上游 SHA-256 与 `ipa_stats.json` 行数一致性、**Manifest 三组接收过滤器与「仅 INTERNET 一个权限」白名单校验**、v10 拼写判分等价回归、v1.4 考研词库 711 词 / 23 组 / 无重复词校验、v1.5 设置页 5 tab / 设置项搬离导入与统计页校验、v1.6 多组 SQL IN / 多选范围 / 顺序切换校验、v1.7 折叠头 / 行内发音 / 主按钮顺序校验、v1.8 Unit/Day 分组折叠校验、v1.9 词库只读 / 英音单列 / 完整词形 / 编辑入口校验、v1.10 词库组别多选 / 列表与解锁共用范围校验、**v1.11 sherpa-onnx AAR / Piper 模型 / BundledTts / AudioTrack 校验**）
 - 已做（v10）：本机 Android 37 模拟器（API 37、1080×2400、Play Store 镜像）用 `assembleDebug` 真编译、`adb install` 安装并点按验证：加载示例词库 → 解锁 → 拼写测试 → 输入正确 / 错误答案 / 提示 / 看答案 → 完成页「拼对 1 / 10」→ 再来一轮（9 个错词）；同时确认拼写卡在认词 / 小测 / 完成态会正确隐藏
 - 已做（v1.4）：同一模拟器上清空词库 → 导入页「载入考研词库」→ 确认 → 预览显示「711 个单词 / 23 组 / 自动补 706 个音标 / 未命中 5 个」→ 导入成功 → 词库顶栏「已解锁 0 / 711」、划组列表显示 23 组（Unit 2 Day 3 为 34 个）；随后把 `Pre-` 修正为 `prefix`，最终资产为 711 词 / 23 组 / 10 条拼写备注。修正后重装并再次导入：预览为 707 个音标、未命中 4 个，词库 0 / 711
 - 已做（v1.5）：同一模拟器安装 v1.5，确认底部 5 个 tab（词库 / 学习 / 统计 / 导入 / 设置）都能切换；设置页渲染出学习、数据管理、发音、音标、版本与更新、关于六张卡；导入页精简为 5 张卡（文档 / 粘贴 / 划组 / 内置词库 / 微信），统计页底部不再有重置与版本卡。设置项复用旧监听逻辑，未改数据库与偏好键
@@ -719,6 +770,7 @@ Android 沙箱下，微信收到的文件在 `com.tencent.mm` 私有目录里，
 - 已做（v1.8）：同一模拟器安装 v1.8 → 词库页显示 Unit / Day 二级标题（如 Unit 5 Day 3）→ 点标题折叠后单词行消失、箭头变为 `▸` → 搜索框输入文字后强制展开；顶部 header 仍随列表滚动折叠
 - 已做（v1.9）：同一模拟器安装 v1.9 → 词库行不再出现「未解锁」chip 与「待解锁」→ 音标只显示英音 → `education` / `conductor` 等长词完整显示 → 导入页出现「⑤ 编辑单词」，点开是搜索框 + 词表；词库页点击 / 长按不再打开编辑
 - 已做（v1.10）：同一模拟器安装 v1.10 → 词库页「组别」→「清空」→ 勾选 Unit 1 Day 1 + Unit 1 Day 2 → 确定，按钮显示「组别：2 个组」，当前显示 78 词；「解锁新词」也按这 2 个组执行
+- 已做（v1.11）：Android 37 x86_64 模拟器安装 debug 包（含 x86_64），logcat 显示 `WordCoolTts: ready: sampleRate=16000`；点词库行「发音」后 `AudioTrack` 生成 `samples=12800 rate=16000`，确认不经过系统 TTS。正式 release 包为 arm64 + armeabi-v7a，约 73 MB；模拟器无音频输出，实际音质需真机听
 - 已做：解析算法等价模拟与 **v7 的 8 项行为回归**（逐字段只补空、文档自带双音标不覆盖、别名补缺列、多读音保留、词组与自造词留空），断言全部通过；v8 另加了外部 Intent 的等价模拟（三种 action、Uri 去重、多文件合并、二进制拦截）；**v9 加了 9 项检查更新回归**（版本三段比较含 1.10>1.9、预发布后缀、assets 挑 APK 直链、无 assets 降级、权限白名单）
 - 已做：用真实公开高频词表 `google-10000-english-no-swears`（9,894 词）跑离线查表，得到 94.9% / 77.6% / 5.1% 三组覆盖率数字，非估算
 - 曾做（**该工作流现已按用户要求移除**）：GitHub Actions（ubuntu-22.04 + JDK 17 + SDK 34 + Gradle 8.2）真实编译通过，`assembleDebug` 产出 `WordCool.apk`，并自动发布 Release；此前两轮 CI 失败（setup-android action、SDK 34 不存在的 TTS 常量）都已按日志定位并修掉

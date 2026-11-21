@@ -254,6 +254,14 @@ class LibraryView(private val a: MainActivity, private val root: View) {
 
         rows = out
         adapter.notifyDataSetChanged()
+        // FastScroller 只在创建时计算一次滑块长度；数据量 / 折叠状态变化后重建一次，
+        // 否则刚进页面时滑块会按空列表算成很长的一条。
+        list.post {
+            if (list.isFastScrollEnabled) {
+                list.isFastScrollEnabled = false
+                list.isFastScrollEnabled = true
+            }
+        }
         if (keepScroll) list.setSelectionFromTop(first, top)
     }
 

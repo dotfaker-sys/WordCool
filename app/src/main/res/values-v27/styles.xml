@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- API 27+ 才支持导航栏深色图标，这里把导航栏也换成纸白底，和整页配色一致 -->
+    <style name="AppTheme" parent="AppThemeBase">
+        <item name="android:statusBarColor">@color/bg</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:navigationBarColor">@color/bg</item>
+        <item name="android:windowLightNavigationBar">true</item>
+    </style>
+</resources>

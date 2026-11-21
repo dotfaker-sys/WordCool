@@ -14,6 +14,10 @@
 *.webp binary
 *.gif binary
 *.jar binary
+*.aar binary
 *.apk binary
 *.aab binary
 *.zip binary
+*.onnx binary
+*.so binary
+*.bin binary
