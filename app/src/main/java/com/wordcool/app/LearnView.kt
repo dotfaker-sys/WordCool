@@ -2,6 +2,7 @@ package com.wordcool.app
 
 import android.graphics.Color
 import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.ProgressBar
@@ -20,6 +21,7 @@ class LearnView(private val a: MainActivity, private val root: View) {
         private val LETTERS = listOf("A", "B", "C", "D")
     }
 
+    private val planCard = root.findViewById<View>(R.id.planCard)
     private val tvTodayTitle = root.findViewById<TextView>(R.id.tvTodayTitle)
     private val tvTodayInfo = root.findViewById<TextView>(R.id.tvTodayInfo)
     private val todayBar = root.findViewById<ProgressBar>(R.id.todayBar)
@@ -179,6 +181,15 @@ class LearnView(private val a: MainActivity, private val root: View) {
                 checkSpelling()
                 true
             } else false
+        }
+
+        // 学习内容卡（单词 / 小测 / 拼写）放到「今日计划」上面；
+        // 空闲时这些卡都是 gone，计划卡仍然自然排在最上面。
+        val column = planCard.parent as? ViewGroup
+        if (column != null) {
+            column.removeView(planCard)
+            val emptyIndex = column.indexOfChild(learnEmpty)
+            column.addView(planCard, if (emptyIndex >= 0) emptyIndex else column.childCount)
         }
     }
 
