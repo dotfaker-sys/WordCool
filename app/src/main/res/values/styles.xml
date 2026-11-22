@@ -18,4 +18,14 @@
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:navigationBarColor">@color/text</item>
     </style>
+
+    <!-- 设置页 / 导入页的深色弹窗（只用于简单的标题+正文+按钮） -->
+    <style name="ObsidianDialog" parent="@android:style/Theme.Material.Dialog.Alert">
+        <item name="android:colorAccent">@color/obs_accent</item>
+        <item name="android:colorBackground">@color/obs_surface</item>
+        <item name="android:windowBackground">@color/obs_surface</item>
+        <item name="android:textColorPrimary">@color/obs_text</item>
+        <item name="android:textColorSecondary">@color/obs_sub</item>
+        <item name="android:textColorHint">@color/obs_sub</item>
+    </style>
 </resources>

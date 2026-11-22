@@ -46,7 +46,7 @@ class ImportView(private val a: MainActivity, private val root: View) {
                 a.toast("每组个数请填 1~200")
                 return@setOnClickListener
             }
-            AlertDialog.Builder(a)
+            AlertDialog.Builder(a, R.style.ObsidianDialog)
                 .setTitle("自动划组")
                 .setMessage("把全部单词按顺序每 $size 个一组，组名为「$prefix 1」「$prefix 2」…\n会覆盖现有组名，学习进度不受影响。")
                 .setNegativeButton("取消", null)
@@ -58,7 +58,7 @@ class ImportView(private val a: MainActivity, private val root: View) {
         }
 
         root.findViewById<TextView>(R.id.btnLoadDemo).setOnClickListener {
-            AlertDialog.Builder(a)
+            AlertDialog.Builder(a, R.style.ObsidianDialog)
                 .setTitle("载入示例词库？")
                 .setMessage("加入 12 个带音标、释义、例句、记忆提示和组别的示例词（Unit 1 / Day 1 / Day 2 / Unit 2）。已存在的词不会重复。")
                 .setNegativeButton("取消", null)
@@ -70,7 +70,7 @@ class ImportView(private val a: MainActivity, private val root: View) {
         }
 
         root.findViewById<TextView>(R.id.btnLoadKaoyan).setOnClickListener {
-            AlertDialog.Builder(a)
+            AlertDialog.Builder(a, R.style.ObsidianDialog)
                 .setTitle("载入考研词库？")
                 .setMessage(
                     "加入 711 个考研词，按 Unit 1 Day 1 … Unit 5 Day 3 分成 23 组。\n\n" +
@@ -109,7 +109,7 @@ class ImportView(private val a: MainActivity, private val root: View) {
             .append("· 文件已被微信自动清理，重新下载一次\n\n")
             .append("本应用不读微信私有目录、不联网、不申请任何权限；只有你主动选它，系统才会把这一个文件的临时读取权交给它。")
             .toString()
-        AlertDialog.Builder(a)
+        AlertDialog.Builder(a, R.style.ObsidianDialog)
             .setTitle("从微信 / QQ 导入")
             .setMessage(msg)
             .setPositiveButton("知道了", null)
@@ -131,8 +131,8 @@ class ImportView(private val a: MainActivity, private val root: View) {
                 text = "${a.db.groupLabel(g.name)} · ${g.total} 词 · " +
                     "已解锁 ${g.unlocked} · 已掌握 ${g.mastered}"
                 textSize = 12f
-                setTextColor(Pal.text)
-                background = a.rounded(Pal.card, 3f, Pal.line)
+                setTextColor(Obs.text)
+                background = a.rounded(Obs.surface, 3f, Obs.line)
                 gravity = Gravity.CENTER_VERTICAL
                 layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,

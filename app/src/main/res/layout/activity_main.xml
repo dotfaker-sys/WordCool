@@ -6,6 +6,7 @@
     android:background="@color/bg">
 
     <LinearLayout
+        android:id="@+id/headerBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -23,6 +24,7 @@
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/headerTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="单词酷"
@@ -31,6 +33,7 @@
                 android:textColor="@color/text" />
 
             <TextView
+                android:id="@+id/headerSubtitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"

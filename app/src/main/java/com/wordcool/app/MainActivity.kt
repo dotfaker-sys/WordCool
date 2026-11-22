@@ -3,9 +3,11 @@ package com.wordcool.app
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
+import android.graphics.drawable.Drawable
 import android.media.AudioAttributes
 import android.media.AudioManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.OpenableColumns
 import android.speech.tts.TextToSpeech
@@ -18,6 +20,7 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.FrameLayout
+import android.widget.LinearLayout
 import android.widget.ListView
 import android.widget.TextView
 import java.text.SimpleDateFormat
@@ -30,6 +33,12 @@ class MainActivity : Activity() {
 
     private lateinit var content: FrameLayout
     private lateinit var badge: TextView
+    private lateinit var headerBar: LinearLayout
+    private lateinit var headerTitle: TextView
+    private lateinit var headerSubtitle: TextView
+    private lateinit var tabBar: LinearLayout
+    private var paperHeaderBg: Drawable? = null
+    private var paperTabBg: Drawable? = null
     private val tabs = mutableListOf<TextView>()
     private val pages = mutableListOf<View>()
     private lateinit var library: LibraryView
@@ -50,6 +59,7 @@ class MainActivity : Activity() {
     companion object {
         private const val REQ_PICK = 1001
         private const val REQ_EXPORT = 1002
+        private const val REQ_VAULT = 1003
         private const val STATE_TAB = "state_tab"
         const val ACCENT_US = 0
         const val ACCENT_UK = 1
@@ -64,6 +74,12 @@ class MainActivity : Activity() {
 
         content = findViewById(R.id.content)
         badge = findViewById(R.id.headerBadge)
+        headerBar = findViewById(R.id.headerBar)
+        headerTitle = findViewById(R.id.headerTitle)
+        headerSubtitle = findViewById(R.id.headerSubtitle)
+        tabBar = findViewById(R.id.tabBar)
+        paperHeaderBg = headerBar.background
+        paperTabBg = tabBar.background
 
         val inflater = LayoutInflater.from(this)
         val p0 = inflater.inflate(R.layout.page_library, content, false)
@@ -119,7 +135,13 @@ class MainActivity : Activity() {
     override fun onResume() {
         super.onResume()
         if (ttsReady) refreshVoiceAvailability()
-        if (::library.isInitialized) refreshCurrent()
+        if (::library.isInitialized) {
+            refreshCurrent()
+            // Obsidian 文件夹是主数据：先写本机改动，再把外部编辑读回来
+            if (VaultStore.enabled(this)) {
+                VaultSync.sync(this, db) { runOnUiThread { refreshCurrent() } }
+            }
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -182,20 +204,65 @@ class MainActivity : Activity() {
 
     fun switchTo(index: Int) {
         current = index
+        val dark = index == 3 || index == 4
         pages.forEachIndexed { i, v -> v.visibility = if (i == index) View.VISIBLE else View.GONE }
+        applyChrome(dark)
         tabs.forEachIndexed { i, t ->
             val on = i == index
-            t.setTextColor(if (on) Pal.primary else Pal.textSub)
-            t.background = if (on) rounded(Pal.softBlue, 10f) else null
+            t.setTextColor(
+                if (on) (if (dark) Obs.accent else Pal.primary)
+                else (if (dark) Obs.sub else Pal.textSub)
+            )
+            t.background = if (on) {
+                rounded(if (dark) Obs.accentSoft else Pal.softBlue, 10f)
+            } else null
         }
         refreshCurrent()
     }
 
+    /** 设置页 / 导入页使用 Obsidian 深色，顶部栏、状态栏和底部 tab 一起切；其余页面保持纸白 */
+    private fun applyChrome(dark: Boolean) {
+        if (dark) {
+            headerBar.setBackgroundColor(Obs.bg)
+            tabBar.setBackgroundColor(Obs.bg)
+            headerTitle.setTextColor(Obs.text)
+            headerSubtitle.setTextColor(Obs.sub)
+        } else {
+            headerBar.background = paperHeaderBg
+            tabBar.background = paperTabBg
+            headerTitle.setTextColor(Pal.text)
+            headerSubtitle.setTextColor(Pal.textSub)
+        }
+
+        window.statusBarColor = if (dark) Obs.bg else getColor(R.color.bg)
+        window.navigationBarColor = if (dark) {
+            Obs.bg
+        } else if (Build.VERSION.SDK_INT >= 27) {
+            getColor(R.color.bg)
+        } else {
+            getColor(R.color.text)
+        }
+
+        var flags = window.decorView.systemUiVisibility
+        val lightStatus = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+        flags = if (dark) flags and lightStatus.inv() else flags or lightStatus
+        if (Build.VERSION.SDK_INT >= 26) {
+            val lightNav = View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+            flags = if (dark) flags and lightNav.inv() else flags or lightNav
+        }
+        window.decorView.systemUiVisibility = flags
+    }
+
     private fun refreshCurrent() {
         val s = db.stats()
+        val dark = current == 3 || current == 4
         badge.text = "已解锁 ${s.unlocked} / ${s.total}"
-        badge.setTextColor(Pal.primary)
-        badge.background = rounded(Pal.softBlue, 18f)
+        badge.setTextColor(if (dark) Obs.accent else Pal.primary)
+        badge.background = if (dark) {
+            rounded(Obs.accentSoft, 18f, Obs.line)
+        } else {
+            rounded(Pal.softBlue, 18f)
+        }
         when (current) {
             0 -> library.refresh()
             1 -> learn.refresh()
@@ -205,8 +272,11 @@ class MainActivity : Activity() {
         }
     }
 
-    /** 任何数据改动后统一刷新顶栏和当前页 */
-    fun dataChanged() = refreshCurrent()
+    /** 任何数据改动后统一刷新顶栏和当前页，并把差异写进 Obsidian 文件夹 */
+    fun dataChanged() {
+        refreshCurrent()
+        VaultSync.flush(this, db)
+    }
 
     private fun initTts() {
         try {
@@ -757,6 +827,21 @@ class MainActivity : Activity() {
         }
     }
 
+    fun pickVaultFolder() {
+        val i = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).apply {
+            addFlags(
+                Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                    Intent.FLAG_GRANT_WRITE_URI_PERMISSION or
+                    Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION
+            )
+        }
+        try {
+            startActivityForResult(i, REQ_VAULT)
+        } catch (e: Exception) {
+            toast("打不开文件夹选择器：${e.message}")
+        }
+    }
+
     fun exportBackup() {
         pendingExport = db.exportJson()
         val name = "单词酷备份_" +
@@ -1099,6 +1184,53 @@ class MainActivity : Activity() {
         val uri = result.data ?: return
         when (requestCode) {
             REQ_PICK -> importFromUri(uri)
+            REQ_VAULT -> {
+                if (!VaultStore.setTree(this, uri)) {
+                    toast("没有拿到文件夹的读写权限，无法作为 Obsidian 词库")
+                    return
+                }
+                val files = VaultStore.list(this)
+                if (files == null) {
+                    VaultStore.clear(this)
+                    toast("这个文件夹无法创建 WordCool/，换一个文件夹试试")
+                    settingsPage.refresh()
+                    return
+                }
+                val done: (String) -> Unit = { msg ->
+                    runOnUiThread {
+                        toast(msg)
+                        settingsPage.refresh()
+                        dataChanged()
+                    }
+                }
+                if (files.isEmpty()) {
+                    VaultSync.exportAll(this, db) {
+                        done("已连接 Obsidian 文件夹：${VaultStore.displayName(this)} / WordCool")
+                    }
+                } else {
+                    AlertDialog.Builder(this, R.style.ObsidianDialog)
+                        .setTitle("文件夹里已有 ${files.size} 个 Markdown")
+                        .setMessage(
+                            "要把本机 ${db.stats().total} 个词写进去，还是用文件夹里的词覆盖本机？\n\n" +
+                                "从文件夹导入前，会先把本机词库备份到应用私有目录。"
+                        )
+                        .setPositiveButton("以本机为准") { _, _ ->
+                            VaultSync.exportAll(this, db) {
+                                done("已把本机词库写入 Obsidian 文件夹")
+                            }
+                        }
+                        .setNegativeButton("从文件夹导入") { _, _ ->
+                            VaultSync.importAll(this, db) {
+                                done("已从 Obsidian 文件夹导入")
+                            }
+                        }
+                        .setNeutralButton("取消") { _, _ ->
+                            VaultStore.clear(this)
+                            settingsPage.refresh()
+                        }
+                        .show()
+                }
+            }
             REQ_EXPORT -> {
                 try {
                     contentResolver.openOutputStream(uri)?.use {

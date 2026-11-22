@@ -290,6 +290,45 @@ class WordDb(ctx: Context) : SQLiteOpenHelper(ctx.applicationContext, "wordcool.
         return c.use { if (it.moveToFirst()) it.readWord() else null }
     }
 
+    /** 按单词（大小写不敏感）查找，Obsidian 同步用 */
+    fun getWordByWord(word: String): Word? {
+        val c = readableDatabase.query(
+            "words", null, "word=?", arrayOf(word.trim()), null, null, null
+        )
+        return c.use { if (it.moveToFirst()) it.readWord() else null }
+    }
+
+    /** 用 Obsidian 文件内容覆盖本机行（含学习进度），不存在则新建 */
+    fun upsertFromVault(w: Word): Long {
+        val existing = getWordByWord(w.word)
+        val cv = ContentValues().apply {
+            put("word", w.word.trim())
+            put("phonetic", w.phonetic.trim())
+            put("meaning", w.meaning.trim())
+            put("example", w.example.trim())
+            put("note", w.note.trim())
+            put("group_name", w.groupName.trim())
+            put("phonetic_uk", w.phoneticUk.trim())
+            put("phonetic_us", w.phoneticUs.trim())
+            put("state", w.state)
+            put("streak", w.streak)
+            put("right_count", w.right)
+            put("wrong_count", w.wrong)
+            put("next_review", w.nextReview)
+            put("learned_day", w.learnedDay)
+            put("created_at", if (w.createdAt > 0) w.createdAt else System.currentTimeMillis())
+        }
+        return if (existing != null) {
+            writableDatabase.update("words", cv, "id=?", arrayOf(existing.id.toString()))
+            existing.id
+        } else {
+            val id = writableDatabase.insertWithOnConflict(
+                "words", null, cv, SQLiteDatabase.CONFLICT_IGNORE
+            )
+            if (id > 0) id else getWordByWord(w.word)?.id ?: 0
+        }
+    }
+
     fun insertWord(w: Word): Long {
         val cv = ContentValues().apply {
             put("word", w.word.trim())
@@ -322,7 +361,9 @@ class WordDb(ctx: Context) : SQLiteOpenHelper(ctx.applicationContext, "wordcool.
     }
 
     fun deleteWord(id: Long) {
+        val w = getWord(id)
         writableDatabase.delete("words", "id=?", arrayOf(id.toString()))
+        if (w != null) VaultSync.deleteWord(appCtx, w.word)
     }
 
     fun setState(id: Long, state: Int) {
@@ -670,6 +711,7 @@ class WordDb(ctx: Context) : SQLiteOpenHelper(ctx.applicationContext, "wordcool.
         val db = writableDatabase
         db.execSQL("DELETE FROM words")
         db.execSQL("DELETE FROM checkin")
+        VaultSync.clearAll(appCtx)
     }
 
     fun resetProgress() {

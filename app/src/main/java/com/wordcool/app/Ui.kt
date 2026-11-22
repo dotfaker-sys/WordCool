@@ -28,6 +28,20 @@ object Pal {
     val line: Int = Color.parseColor("#D8D3C9")
 }
 
+/** Obsidian 深色页专用色板（只给设置页 / 导入页用） */
+object Obs {
+    val bg: Int = Color.parseColor("#1E1E1E")
+    val surface: Int = Color.parseColor("#262626")
+    val surfaceAlt: Int = Color.parseColor("#2D2D2D")
+    val text: Int = Color.parseColor("#DADADA")
+    val sub: Int = Color.parseColor("#9A9A9A")
+    val line: Int = Color.parseColor("#3A3A3A")
+    val accent: Int = Color.parseColor("#7F6DF2")
+    val accentSoft: Int = Color.parseColor("#2F2A45")
+    val danger: Int = Color.parseColor("#E06C75")
+    val white: Int = Color.parseColor("#FFFFFF")
+}
+
 fun Context.dp(value: Int): Int = (value * resources.displayMetrics.density + 0.5f).toInt()
 
 /**

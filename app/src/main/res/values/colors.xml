@@ -19,4 +19,15 @@
     <color name="soft_grey">#EFECE6</color>
     <color name="track">#DDD8CF</color>
     <color name="ic_bg">#16181D</color>
+
+    <!-- Obsidian 风深色（只用于设置页 / 导入页） -->
+    <color name="obs_bg">#1E1E1E</color>
+    <color name="obs_surface">#262626</color>
+    <color name="obs_surface_alt">#2D2D2D</color>
+    <color name="obs_text">#DADADA</color>
+    <color name="obs_sub">#9A9A9A</color>
+    <color name="obs_line">#3A3A3A</color>
+    <color name="obs_accent">#7F6DF2</color>
+    <color name="obs_accent_soft">#2F2A45</color>
+    <color name="obs_danger">#E06C75</color>
 </resources>

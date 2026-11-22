@@ -134,6 +134,8 @@ class LearnView(private val a: MainActivity, private val root: View) {
                 a.toast("又解锁了 $n 个新词")
             }
             startOrNext()
+            // 解锁后即使直接进入卡片，也要刷新顶栏并写进 Obsidian
+            a.dataChanged()
         }
         btnSpeakUk.setOnClickListener {
             val w = current?.word.orEmpty()
