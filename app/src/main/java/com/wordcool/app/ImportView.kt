@@ -23,9 +23,6 @@ class ImportView(private val a: MainActivity, private val root: View) {
         root.findViewById<TextView>(R.id.btnPickDoc).setOnClickListener {
             a.pickDocument()
         }
-        root.findViewById<TextView>(R.id.btnPickDoc2).setOnClickListener {
-            a.pickDocument()
-        }
         root.findViewById<TextView>(R.id.btnWechatHelp).setOnClickListener {
             showWechatHelp()
         }
@@ -104,7 +101,7 @@ class ImportView(private val a: MainActivity, private val root: View) {
             .append("【列表里找不到「单词酷」】\n")
             .append("· 微信各版本给出的文件类型不一样，不一定会列出所有能打开的应用\n")
             .append("· 先在微信里把文件「保存到手机」，再回本应用点「选择文档并导入」，从 下载 / Weixin / Documents 里选\n")
-            .append("· 或干脆复制词表内容，用本页「粘贴导入」\n\n")
+            .append("· 或干脆复制词表内容，用本页「粘贴文本导入」\n\n")
             .append("【收不到的情况】\n")
             .append("· 扫描图片版 PDF 没有文字层\n")
             .append("· 旧版 .doc / .xls，请另存为 .docx / .xlsx\n")
@@ -138,9 +135,11 @@ class ImportView(private val a: MainActivity, private val root: View) {
                 background = a.rounded(Pal.card, 3f, Pal.line)
                 gravity = Gravity.CENTER_VERTICAL
                 layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT, a.dp(40)
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
                 ).apply { topMargin = a.dp(6) }
-                setPadding(a.dp(10), 0, a.dp(10), 0)
+                minimumHeight = a.dp(40)
+                setPadding(a.dp(10), a.dp(8), a.dp(10), a.dp(8))
                 setOnClickListener {
                     a.showGroupNameInput(
                         "重命名组",

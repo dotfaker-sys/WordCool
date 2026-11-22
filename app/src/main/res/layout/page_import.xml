@@ -9,6 +9,7 @@
         android:orientation="vertical"
         android:padding="14dp">
 
+        <!-- 导入：文件 / 微信 / 粘贴，全部使用设置页式行布局 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -19,94 +20,197 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="① 导入文档（Word / Excel / PDF）"
+                android:text="导入"
+                android:textColor="@color/text"
                 android:textSize="15sp"
-                android:textStyle="bold"
-                android:textColor="@color/text" />
+                android:textStyle="bold" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:lineSpacingExtra="4dp"
-                android:text="支持 .docx（段落 / 两列表格）、.xlsx（两列）、文字型 .pdf、.txt / .csv。Unit 1 / Day 2 / 第 3 单元 等标题行会自动划组；写 UK /…/ US /…/ 会自动拆成英 / 美两套音标。旧版 .doc / .xls 请另存为新格式，扫描版 PDF 请用「粘贴导入」。\n\n也可以直接从微信把文件发进来，见下方「⑥ 从微信 / QQ 导入」。"
-                android:textSize="12sp"
-                android:textColor="@color/text_sub" />
+                android:layout_marginTop="4dp"
+                android:text="把词表弄进来：文件、微信分享或直接粘贴。"
+                android:textColor="@color/text_sub"
+                android:textSize="11sp" />
 
-            <TextView
-                android:id="@+id/btnPickDoc"
+            <!-- 从文件导入 -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="44dp"
                 android:layout_marginTop="14dp"
-                android:background="@drawable/bg_btn_primary"
-                android:gravity="center"
-                android:text="选择文档并导入"
-                android:textSize="14sp"
-                android:textColor="@color/white" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="从文件导入"
+                        android:textColor="@color/text"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:lineSpacingExtra="2dp"
+                        android:text=".docx / .xlsx / 文字型 .pdf / .txt / .csv；Unit / Day 标题自动划组，UK / US 音标自动拆分。旧版 .doc / .xls 请另存。"
+                        android:textColor="@color/text_sub"
+                        android:textSize="11sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/btnPickDoc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="12dp"
+                    android:background="@drawable/bg_btn_primary"
+                    android:gravity="center"
+                    android:minHeight="32dp"
+                    android:paddingLeft="14dp"
+                    android:paddingRight="14dp"
+                    android:text="选择"
+                    android:textColor="@color/white"
+                    android:textSize="12sp" />
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/tvImportStatus"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="8dp"
                 android:text="还没导入过文档"
-                android:textSize="12sp"
-                android:textColor="@color/primary" />
-        </LinearLayout>
+                android:textColor="@color/primary"
+                android:textSize="11sp" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:orientation="vertical"
-            android:background="@drawable/bg_card"
-            android:padding="16dp">
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="12dp"
+                android:background="@color/line" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="② 粘贴导入"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                android:textColor="@color/text" />
-
-            <TextView
+            <!-- 从微信 / QQ 导入 -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:lineSpacingExtra="4dp"
-                android:text="在 Word 里全选复制，粘贴到这里。每行一个词，例如：\nabandon  /əˈbændən/  放弃\nbenefit - 益处\n或用 Tab / 冒号 / 分号分隔。"
-                android:textSize="12sp"
-                android:textColor="@color/text_sub" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="从微信 / QQ 导入"
+                        android:textColor="@color/text"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:lineSpacingExtra="2dp"
+                        android:text="微信里点文件 → 右上角「…」→「用其他应用打开」→ 选「单词酷」；不读微信私人目录，也不申请存储权限。"
+                        android:textColor="@color/text_sub"
+                        android:textSize="11sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/btnWechatHelp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="12dp"
+                    android:background="@drawable/bg_btn_ghost"
+                    android:gravity="center"
+                    android:minHeight="32dp"
+                    android:paddingLeft="14dp"
+                    android:paddingRight="14dp"
+                    android:text="步骤"
+                    android:textColor="@color/primary"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="12dp"
+                android:background="@color/line" />
+
+            <!-- 粘贴导入 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="粘贴文本导入"
+                        android:textColor="@color/text"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:lineSpacingExtra="2dp"
+                        android:text="每行一个词，支持 Tab / 冒号 / 分号分隔；例：abandon /əˈbændən/ 放弃。粘贴到下方输入框。"
+                        android:textColor="@color/text_sub"
+                        android:textSize="11sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/btnPasteImport"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="12dp"
+                    android:background="@drawable/bg_btn_ghost"
+                    android:gravity="center"
+                    android:minHeight="32dp"
+                    android:paddingLeft="14dp"
+                    android:paddingRight="14dp"
+                    android:text="导入"
+                    android:textColor="@color/primary"
+                    android:textSize="12sp" />
+            </LinearLayout>
 
             <EditText
                 android:id="@+id/etPaste"
                 android:layout_width="match_parent"
                 android:layout_height="120dp"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="10dp"
                 android:background="@drawable/bg_input"
                 android:gravity="top"
                 android:hint="把单词表粘贴到这里…"
                 android:inputType="textMultiLine"
                 android:padding="10dp"
-                android:textSize="13sp"
                 android:textColor="@color/text"
-                android:textColorHint="@color/text_sub" />
-
-            <TextView
-                android:id="@+id/btnPasteImport"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="42dp"
-                android:layout_marginTop="12dp"
-                android:background="@drawable/bg_btn_soft"
-                android:gravity="center"
-                android:text="解析并导入"
-                android:textSize="14sp"
-                android:textColor="@color/primary" />
+                android:textColorHint="@color/text_sub"
+                android:textSize="13sp" />
         </LinearLayout>
 
+        <!-- 整理：划组 / 编辑 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -118,19 +222,18 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="③ 划组管理"
+                android:text="整理词库"
+                android:textColor="@color/text"
                 android:textSize="15sp"
-                android:textStyle="bold"
-                android:textColor="@color/text" />
+                android:textStyle="bold" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:lineSpacingExtra="4dp"
-                android:text="点任一组可以改名；也可以按顺序自动划成 Unit 1 / Unit 2 或 Day 1 / Day 2。词库页和学习页都能按组筛选。"
-                android:textSize="12sp"
-                android:textColor="@color/text_sub" />
+                android:layout_marginTop="4dp"
+                android:text="划组、改名、编辑或删除单词；词库页只读。"
+                android:textColor="@color/text_sub"
+                android:textSize="11sp" />
 
             <TextView
                 android:id="@+id/tvGroupSummary"
@@ -138,8 +241,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:text="还没有分组"
-                android:textSize="12sp"
-                android:textColor="@color/primary" />
+                android:textColor="@color/primary"
+                android:textSize="11sp" />
 
             <LinearLayout
                 android:id="@+id/groupBox"
@@ -148,68 +251,152 @@
                 android:layout_marginTop="8dp"
                 android:orientation="vertical" />
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="12dp"
+                android:background="@color/line" />
+
+            <!-- 自动划组 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
-                <EditText
-                    android:id="@+id/etGroupPrefix"
+                <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:minHeight="40dp"
-                    android:layout_weight="1.2"
-                    android:layout_marginRight="6dp"
-                    android:background="@drawable/bg_input"
-                    android:hint="组名前缀"
-                    android:inputType="text"
-                    android:maxLines="1"
-                    android:text="Unit"
-                    android:textSize="13sp"
-                    android:textColor="@color/text" />
+                    android:layout_weight="1"
+                    android:orientation="vertical">
 
-                <EditText
-                    android:id="@+id/etGroupSize"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:minHeight="40dp"
-                    android:layout_weight="0.7"
-                    android:layout_marginRight="6dp"
-                    android:background="@drawable/bg_input"
-                    android:gravity="center"
-                    android:hint="每组个数"
-                    android:inputType="number"
-                    android:maxLines="1"
-                    android:text="20"
-                    android:textSize="13sp"
-                    android:textColor="@color/text" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="按顺序自动划组"
+                        android:textColor="@color/text"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:lineSpacingExtra="2dp"
+                        android:text="每 N 个一组，组名 = 前缀 + 序号；例如前缀「Unit 1 Day」可得到 Unit 1 Day 1。会覆盖现有组名。"
+                        android:textColor="@color/text_sub"
+                        android:textSize="11sp" />
+                </LinearLayout>
 
                 <TextView
                     android:id="@+id/btnAutoGroup"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:minHeight="40dp"
+                    android:layout_marginLeft="12dp"
                     android:background="@drawable/bg_btn_primary"
                     android:gravity="center"
+                    android:minHeight="32dp"
                     android:paddingLeft="14dp"
                     android:paddingRight="14dp"
-                    android:text="自动划组"
-                    android:textSize="13sp"
-                    android:textColor="@color/white" />
+                    android:text="划组"
+                    android:textColor="@color/white"
+                    android:textSize="12sp" />
             </LinearLayout>
 
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="按词库顺序每 N 个一组，组名 = 前缀 + 序号（前缀填「Unit 1 Day」可得到 Unit 1 Day 1）。会覆盖现有组名。"
-                android:textSize="11sp"
-                android:lineSpacingExtra="3dp"
-                android:textColor="@color/text_sub" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/etGroupPrefix"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="6dp"
+                    android:layout_weight="1.2"
+                    android:background="@drawable/bg_input"
+                    android:hint="组名前缀"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:minHeight="40dp"
+                    android:text="Unit"
+                    android:textColor="@color/text"
+                    android:textSize="13sp" />
+
+                <EditText
+                    android:id="@+id/etGroupSize"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.7"
+                    android:background="@drawable/bg_input"
+                    android:gravity="center"
+                    android:hint="每组个数"
+                    android:inputType="number"
+                    android:maxLines="1"
+                    android:minHeight="40dp"
+                    android:text="20"
+                    android:textColor="@color/text"
+                    android:textSize="13sp" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="12dp"
+                android:background="@color/line" />
+
+            <!-- 编辑单词 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="编辑 / 删除单词"
+                        android:textColor="@color/text"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:lineSpacingExtra="2dp"
+                        android:text="改释义、音标、例句、组别，或删除单词；搜索后编辑。"
+                        android:textColor="@color/text_sub"
+                        android:textSize="11sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/btnEditWord"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="12dp"
+                    android:background="@drawable/bg_btn_ghost"
+                    android:gravity="center"
+                    android:minHeight="32dp"
+                    android:paddingLeft="14dp"
+                    android:paddingRight="14dp"
+                    android:text="编辑"
+                    android:textColor="@color/primary"
+                    android:textSize="12sp" />
+            </LinearLayout>
         </LinearLayout>
 
+        <!-- 内置词库 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -221,131 +408,116 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="④ 内置词库"
+                android:text="内置词库"
+                android:textColor="@color/text"
                 android:textSize="15sp"
-                android:textStyle="bold"
-                android:textColor="@color/text" />
+                android:textStyle="bold" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:lineSpacingExtra="4dp"
-                android:text="不想自己找文件时，可以直接载入内置词表。考研词库按 Unit 1 Day 1 … Unit 5 Day 3 分成 23 组，先进入导入预览，确认后才写入。"
-                android:textSize="12sp"
-                android:textColor="@color/text_sub" />
+                android:layout_marginTop="4dp"
+                android:text="不想自己找文件时直接载入；先进入导入预览，确认后才写入。"
+                android:textColor="@color/text_sub"
+                android:textSize="11sp" />
 
-            <TextView
-                android:id="@+id/btnLoadKaoyan"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="42dp"
+                android:layout_marginTop="14dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="考研词库"
+                        android:textColor="@color/text"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:lineSpacingExtra="2dp"
+                        android:text="711 词 · Unit 1–5 · 23 组；自动补音标并列出未命中词。"
+                        android:textColor="@color/text_sub"
+                        android:textSize="11sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/btnLoadKaoyan"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="12dp"
+                    android:background="@drawable/bg_btn_primary"
+                    android:gravity="center"
+                    android:minHeight="32dp"
+                    android:paddingLeft="14dp"
+                    android:paddingRight="14dp"
+                    android:text="载入"
+                    android:textColor="@color/white"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
                 android:layout_marginTop="12dp"
-                android:background="@drawable/bg_btn_primary"
-                android:gravity="center"
-                android:text="载入考研词库（Unit 1–5 · 711 词）"
-                android:textSize="13sp"
-                android:textColor="@color/white" />
+                android:layout_marginBottom="12dp"
+                android:background="@color/line" />
 
-            <TextView
-                android:id="@+id/btnLoadDemo"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="42dp"
-                android:layout_marginTop="8dp"
-                android:background="@drawable/bg_btn_ghost"
-                android:gravity="center"
-                android:text="载入 12 个示例词"
-                android:textSize="12sp"
-                android:textColor="@color/primary" />
-        </LinearLayout>
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:orientation="vertical"
-            android:background="@drawable/bg_card"
-            android:padding="16dp">
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="⑤ 编辑单词"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                android:textColor="@color/text" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="示例词库"
+                        android:textColor="@color/text"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:lineSpacingExtra="4dp"
-                android:text="词库页只读，不再直接点开编辑。要改释义、音标、例句、组别，或删除单词，都在这里搜索后编辑。"
-                android:textSize="12sp"
-                android:textColor="@color/text_sub" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:lineSpacingExtra="2dp"
+                        android:text="12 个带音标、释义、例句和组别的示例词；已存在的词不会重复。"
+                        android:textColor="@color/text_sub"
+                        android:textSize="11sp" />
+                </LinearLayout>
 
-            <TextView
-                android:id="@+id/btnEditWord"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="42dp"
-                android:layout_marginTop="12dp"
-                android:background="@drawable/bg_btn_primary"
-                android:gravity="center"
-                android:text="搜索 / 编辑单词"
-                android:textSize="13sp"
-                android:textColor="@color/white" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:orientation="vertical"
-            android:background="@drawable/bg_card"
-            android:padding="16dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="⑥ 从微信 / QQ 导入"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                android:textColor="@color/text" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:lineSpacingExtra="4dp"
-                android:text="不用先把文件存到手机：在微信里点开别人发的词表 → 右上角「…」→「用其他应用打开」（或长按文件 →「发送给朋友 / 分享」→ 更多），在应用列表里选「单词酷」，文件会直接进导入预览，确认后入库。QQ、企业微信、文件管理器用同一套入口。\n\n也支持多选文件一次发进来（合并成一批预览），以及把一段词表文字直接分享进来。\n\n本应用不会去读微信的私人目录，也不申请任何权限：必须由你在微信里主动选择「单词酷」，系统才把这一个文件的临时读取权交给它。"
-                android:textSize="12sp"
-                android:textColor="@color/text_sub" />
-
-            <TextView
-                android:id="@+id/btnWechatHelp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="40dp"
-                android:layout_marginTop="12dp"
-                android:background="@drawable/bg_btn_soft"
-                android:gravity="center"
-                android:text="看详细步骤 / 列表里找不到怎么办"
-                android:textSize="12sp"
-                android:textColor="@color/primary" />
-
-            <TextView
-                android:id="@+id/btnPickDoc2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="40dp"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/bg_btn_ghost"
-                android:gravity="center"
-                android:text="还是用「选择文档并导入」"
-                android:textSize="12sp"
-                android:textColor="@color/primary" />
+                <TextView
+                    android:id="@+id/btnLoadDemo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="12dp"
+                    android:background="@drawable/bg_btn_ghost"
+                    android:gravity="center"
+                    android:minHeight="32dp"
+                    android:paddingLeft="14dp"
+                    android:paddingRight="14dp"
+                    android:text="载入"
+                    android:textColor="@color/primary"
+                    android:textSize="12sp" />
+            </LinearLayout>
         </LinearLayout>
 
         <TextView
@@ -356,8 +528,8 @@
             android:gravity="center"
             android:lineSpacingExtra="3dp"
             android:text="发音、音标、每日新词数、备份、重置与版本更新已移到「设置」页。"
-            android:textSize="11sp"
-            android:textColor="@color/text_sub" />
+            android:textColor="@color/text_sub"
+            android:textSize="11sp" />
 
     </LinearLayout>
 </ScrollView>
