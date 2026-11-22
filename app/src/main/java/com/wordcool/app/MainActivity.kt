@@ -2,8 +2,8 @@ package com.wordcool.app
 
 import android.app.Activity
 import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
-import android.graphics.drawable.Drawable
 import android.media.AudioAttributes
 import android.media.AudioManager
 import android.net.Uri
@@ -20,7 +20,6 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.FrameLayout
-import android.widget.LinearLayout
 import android.widget.ListView
 import android.widget.TextView
 import java.text.SimpleDateFormat
@@ -33,12 +32,6 @@ class MainActivity : Activity() {
 
     private lateinit var content: FrameLayout
     private lateinit var badge: TextView
-    private lateinit var headerBar: LinearLayout
-    private lateinit var headerTitle: TextView
-    private lateinit var headerSubtitle: TextView
-    private lateinit var tabBar: LinearLayout
-    private var paperHeaderBg: Drawable? = null
-    private var paperTabBg: Drawable? = null
     private val tabs = mutableListOf<TextView>()
     private val pages = mutableListOf<View>()
     private lateinit var library: LibraryView
@@ -67,19 +60,20 @@ class MainActivity : Activity() {
         private val LOC_UK = Locale.UK
     }
 
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(ThemePrefs.wrap(newBase))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setTheme(R.style.AppTheme)
         setContentView(R.layout.activity_main)
+        Pal.init(this)
+        applySystemBars()
         db = WordDb(this)
 
         content = findViewById(R.id.content)
         badge = findViewById(R.id.headerBadge)
-        headerBar = findViewById(R.id.headerBar)
-        headerTitle = findViewById(R.id.headerTitle)
-        headerSubtitle = findViewById(R.id.headerSubtitle)
-        tabBar = findViewById(R.id.tabBar)
-        paperHeaderBg = headerBar.background
-        paperTabBg = tabBar.background
 
         val inflater = LayoutInflater.from(this)
         val p0 = inflater.inflate(R.layout.page_library, content, false)
@@ -204,40 +198,23 @@ class MainActivity : Activity() {
 
     fun switchTo(index: Int) {
         current = index
-        val dark = index == 3 || index == 4
         pages.forEachIndexed { i, v -> v.visibility = if (i == index) View.VISIBLE else View.GONE }
-        applyChrome(dark)
         tabs.forEachIndexed { i, t ->
             val on = i == index
-            t.setTextColor(
-                if (on) (if (dark) Obs.accent else Pal.primary)
-                else (if (dark) Obs.sub else Pal.textSub)
-            )
-            t.background = if (on) {
-                rounded(if (dark) Obs.accentSoft else Pal.softBlue, 10f)
-            } else null
+            t.setTextColor(if (on) Pal.primary else Pal.textSub)
+            t.background = if (on) rounded(Pal.softBlue, 10f) else null
         }
         refreshCurrent()
     }
 
-    /** 设置页 / 导入页使用 Obsidian 深色，顶部栏、状态栏和底部 tab 一起切；其余页面保持纸白 */
-    private fun applyChrome(dark: Boolean) {
-        if (dark) {
-            headerBar.setBackgroundColor(Obs.bg)
-            tabBar.setBackgroundColor(Obs.bg)
-            headerTitle.setTextColor(Obs.text)
-            headerSubtitle.setTextColor(Obs.sub)
-        } else {
-            headerBar.background = paperHeaderBg
-            tabBar.background = paperTabBg
-            headerTitle.setTextColor(Pal.text)
-            headerSubtitle.setTextColor(Pal.textSub)
-        }
+    /** 状态栏 / 导航栏跟着亮暗主题走，不再按页面单独切换 */
+    private fun applySystemBars() {
+        val dark = (resources.configuration.uiMode and
+            android.content.res.Configuration.UI_MODE_NIGHT_MASK) ==
+            android.content.res.Configuration.UI_MODE_NIGHT_YES
 
-        window.statusBarColor = if (dark) Obs.bg else getColor(R.color.bg)
-        window.navigationBarColor = if (dark) {
-            Obs.bg
-        } else if (Build.VERSION.SDK_INT >= 27) {
+        window.statusBarColor = getColor(R.color.bg)
+        window.navigationBarColor = if (dark || Build.VERSION.SDK_INT >= 27) {
             getColor(R.color.bg)
         } else {
             getColor(R.color.text)
@@ -255,14 +232,9 @@ class MainActivity : Activity() {
 
     private fun refreshCurrent() {
         val s = db.stats()
-        val dark = current == 3 || current == 4
         badge.text = "已解锁 ${s.unlocked} / ${s.total}"
-        badge.setTextColor(if (dark) Obs.accent else Pal.primary)
-        badge.background = if (dark) {
-            rounded(Obs.accentSoft, 18f, Obs.line)
-        } else {
-            rounded(Pal.softBlue, 18f)
-        }
+        badge.setTextColor(Pal.primary)
+        badge.background = rounded(Pal.softBlue, 18f)
         when (current) {
             0 -> library.refresh()
             1 -> learn.refresh()
@@ -1208,7 +1180,7 @@ class MainActivity : Activity() {
                         done("已连接 Obsidian 文件夹：${VaultStore.displayName(this)} / WordCool")
                     }
                 } else {
-                    AlertDialog.Builder(this, R.style.ObsidianDialog)
+                    AlertDialog.Builder(this)
                         .setTitle("文件夹里已有 ${files.size} 个 Markdown")
                         .setMessage(
                             "要把本机 ${db.stats().total} 个词写进去，还是用文件夹里的词覆盖本机？\n\n" +

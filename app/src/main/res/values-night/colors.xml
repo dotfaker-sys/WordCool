@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 暗色主题：所有布局 / drawable 共用同一套 @color 名称，切 uiMode 即整站换肤 -->
+    <color name="primary">#7F6DF2</color>
+    <color name="primary_dark">#6B5AE0</color>
+    <color name="accent">#DADADA</color>
+    <color name="bg">#1E1E1E</color>
+    <color name="card">#262626</color>
+    <color name="text">#DADADA</color>
+    <color name="text_sub">#9A9A9A</color>
+    <color name="line">#3A3A3A</color>
+    <color name="white">#FFFFFF</color>
+    <color name="locked">#5C6067</color>
+    <color name="learning">#7F6DF2</color>
+    <color name="mastered">#DADADA</color>
+    <color name="danger">#E06C75</color>
+    <color name="soft_blue">#2F2A45</color>
+    <color name="soft_grey">#2D2D2D</color>
+    <color name="track">#3A3A3A</color>
+    <color name="ic_bg">#1E1E1E</color>
+</resources>

@@ -94,6 +94,10 @@ class FastScrollBar @JvmOverloads constructor(
         super.onDraw(canvas)
         if (thumbHeight <= 0f) return
 
+        // 跟随亮/暗主题：轨道淡、滑块实
+        trackPaint.color = (Pal.line and 0x00FFFFFF) or 0x66000000
+        thumbPaint.color = (Pal.textSub and 0x00FFFFFF) or 0xB3000000.toInt()
+
         val cx = width / 2f
         canvas.drawRoundRect(
             cx - trackWidth / 2f, 0f, cx + trackWidth / 2f, height.toFloat(),

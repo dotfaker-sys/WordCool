@@ -1,7 +1,6 @@
 package com.wordcool.app
 
 import android.content.Context
-import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.view.View
 import android.widget.Toast
@@ -12,34 +11,28 @@ import android.widget.Toast
  * 因此各页面控制器无需改动一行调用代码。
  */
 object Pal {
-    val primary: Int = Color.parseColor("#C2402F")      // 朱红，唯一强调色
-    val accent: Int = Color.parseColor("#16181D")      // 墨黑，进度与强调
-    val text: Int = Color.parseColor("#16181D")
-    val textSub: Int = Color.parseColor("#6B6F76")    // 对纸底 ≈ 4.9:1
-    val white: Int = Color.parseColor("#FFFFFF")
-    val softBlue: Int = Color.parseColor("#EDE9E1")   // 选中态浅米（保留原名，避免动接口）
-    val softGrey: Int = Color.parseColor("#EFECE6")
-    val track: Int = Color.parseColor("#DDD8CF")
-    val locked: Int = Color.parseColor("#5C6067")     // 深石墨，保证白字 ≥ 4.5:1
-    val learning: Int = Color.parseColor("#C2402F")
-    val mastered: Int = Color.parseColor("#16181D")
-    val danger: Int = Color.parseColor("#B23A2E")
-    val card: Int = Color.parseColor("#FDFCF9")
-    val line: Int = Color.parseColor("#D8D3C9")
-}
+    private var res: android.content.res.Resources? = null
 
-/** Obsidian 深色页专用色板（只给设置页 / 导入页用） */
-object Obs {
-    val bg: Int = Color.parseColor("#1E1E1E")
-    val surface: Int = Color.parseColor("#262626")
-    val surfaceAlt: Int = Color.parseColor("#2D2D2D")
-    val text: Int = Color.parseColor("#DADADA")
-    val sub: Int = Color.parseColor("#9A9A9A")
-    val line: Int = Color.parseColor("#3A3A3A")
-    val accent: Int = Color.parseColor("#7F6DF2")
-    val accentSoft: Int = Color.parseColor("#2F2A45")
-    val danger: Int = Color.parseColor("#E06C75")
-    val white: Int = Color.parseColor("#FFFFFF")
+    fun init(context: Context) {
+        res = context.resources
+    }
+
+    private fun c(id: Int, fallback: Int): Int = res?.getColor(id) ?: fallback
+
+    val primary get() = c(R.color.primary, 0xFFC2402F.toInt())      // 朱红（亮）/ 紫（暗）
+    val accent get() = c(R.color.accent, 0xFF16181D.toInt())
+    val text get() = c(R.color.text, 0xFF16181D.toInt())
+    val textSub get() = c(R.color.text_sub, 0xFF6B6F76.toInt())
+    val white get() = c(R.color.white, 0xFFFFFFFF.toInt())
+    val softBlue get() = c(R.color.soft_blue, 0xFFEDE9E1.toInt())
+    val softGrey get() = c(R.color.soft_grey, 0xFFEFECE6.toInt())
+    val track get() = c(R.color.track, 0xFFDDD8CF.toInt())
+    val locked get() = c(R.color.locked, 0xFF5C6067.toInt())
+    val learning get() = c(R.color.learning, 0xFFC2402F.toInt())
+    val mastered get() = c(R.color.mastered, 0xFF16181D.toInt())
+    val danger get() = c(R.color.danger, 0xFFB23A2E.toInt())
+    val card get() = c(R.color.card, 0xFFFDFCF9.toInt())
+    val line get() = c(R.color.line, 0xFFD8D3C9.toInt())
 }
 
 fun Context.dp(value: Int): Int = (value * resources.displayMetrics.density + 0.5f).toInt()

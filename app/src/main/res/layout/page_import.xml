@@ -2,7 +2,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/obs_bg">
+    android:background="@color/bg">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -15,14 +15,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="@drawable/bg_obs_card"
+            android:background="@drawable/bg_card"
             android:padding="16dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="导入"
-                android:textColor="@color/obs_text"
+                android:textColor="@color/text"
                 android:textSize="15sp"
                 android:textStyle="bold" />
 
@@ -31,7 +31,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="把词表弄进来：文件、微信分享或直接粘贴。"
-                android:textColor="@color/obs_sub"
+                android:textColor="@color/text_sub"
                 android:textSize="11sp" />
 
             <!-- 从文件导入 -->
@@ -52,7 +52,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="从文件导入"
-                        android:textColor="@color/obs_text"
+                        android:textColor="@color/text"
                         android:textSize="14sp"
                         android:textStyle="bold" />
 
@@ -62,7 +62,7 @@
                         android:layout_marginTop="3dp"
                         android:lineSpacingExtra="2dp"
                         android:text=".docx / .xlsx / 文字型 .pdf / .txt / .csv；Unit / Day 标题自动划组，UK / US 音标自动拆分。旧版 .doc / .xls 请另存。"
-                        android:textColor="@color/obs_sub"
+                        android:textColor="@color/text_sub"
                         android:textSize="11sp" />
                 </LinearLayout>
 
@@ -71,7 +71,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="12dp"
-                    android:background="@drawable/bg_obs_btn_primary"
+                    android:background="@drawable/bg_btn_primary"
                     android:gravity="center"
                     android:minHeight="32dp"
                     android:paddingLeft="14dp"
@@ -87,7 +87,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:text="还没导入过文档"
-                android:textColor="@color/obs_accent"
+                android:textColor="@color/primary"
                 android:textSize="11sp" />
 
             <View
@@ -95,7 +95,7 @@
                 android:layout_height="1px"
                 android:layout_marginTop="12dp"
                 android:layout_marginBottom="12dp"
-                android:background="@color/obs_line" />
+                android:background="@color/line" />
 
             <!-- 从微信 / QQ 导入 -->
             <LinearLayout
@@ -114,7 +114,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="从微信 / QQ 导入"
-                        android:textColor="@color/obs_text"
+                        android:textColor="@color/text"
                         android:textSize="14sp"
                         android:textStyle="bold" />
 
@@ -124,7 +124,7 @@
                         android:layout_marginTop="3dp"
                         android:lineSpacingExtra="2dp"
                         android:text="微信里点文件 → 右上角「…」→「用其他应用打开」→ 选「单词酷」；不读微信私人目录，也不申请存储权限。"
-                        android:textColor="@color/obs_sub"
+                        android:textColor="@color/text_sub"
                         android:textSize="11sp" />
                 </LinearLayout>
 
@@ -133,13 +133,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="12dp"
-                    android:background="@drawable/bg_obs_btn_ghost"
+                    android:background="@drawable/bg_btn_ghost"
                     android:gravity="center"
                     android:minHeight="32dp"
                     android:paddingLeft="14dp"
                     android:paddingRight="14dp"
                     android:text="步骤"
-                    android:textColor="@color/obs_accent"
+                    android:textColor="@color/primary"
                     android:textSize="12sp" />
             </LinearLayout>
 
@@ -148,7 +148,7 @@
                 android:layout_height="1px"
                 android:layout_marginTop="12dp"
                 android:layout_marginBottom="12dp"
-                android:background="@color/obs_line" />
+                android:background="@color/line" />
 
             <!-- 粘贴导入 -->
             <LinearLayout
@@ -167,7 +167,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="粘贴文本导入"
-                        android:textColor="@color/obs_text"
+                        android:textColor="@color/text"
                         android:textSize="14sp"
                         android:textStyle="bold" />
 
@@ -177,7 +177,7 @@
                         android:layout_marginTop="3dp"
                         android:lineSpacingExtra="2dp"
                         android:text="每行一个词，支持 Tab / 冒号 / 分号分隔；例：abandon /əˈbændən/ 放弃。粘贴到下方输入框。"
-                        android:textColor="@color/obs_sub"
+                        android:textColor="@color/text_sub"
                         android:textSize="11sp" />
                 </LinearLayout>
 
@@ -186,13 +186,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="12dp"
-                    android:background="@drawable/bg_obs_btn_ghost"
+                    android:background="@drawable/bg_btn_ghost"
                     android:gravity="center"
                     android:minHeight="32dp"
                     android:paddingLeft="14dp"
                     android:paddingRight="14dp"
                     android:text="导入"
-                    android:textColor="@color/obs_accent"
+                    android:textColor="@color/primary"
                     android:textSize="12sp" />
             </LinearLayout>
 
@@ -201,13 +201,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="120dp"
                 android:layout_marginTop="10dp"
-                android:background="@drawable/bg_obs_input"
+                android:background="@drawable/bg_input"
                 android:gravity="top"
                 android:hint="把单词表粘贴到这里…"
                 android:inputType="textMultiLine"
                 android:padding="10dp"
-                android:textColor="@color/obs_text"
-                android:textColorHint="@color/obs_sub"
+                android:textColor="@color/text"
+                android:textColorHint="@color/text_sub"
                 android:textSize="13sp" />
         </LinearLayout>
 
@@ -217,14 +217,14 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:orientation="vertical"
-            android:background="@drawable/bg_obs_card"
+            android:background="@drawable/bg_card"
             android:padding="16dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="整理词库"
-                android:textColor="@color/obs_text"
+                android:textColor="@color/text"
                 android:textSize="15sp"
                 android:textStyle="bold" />
 
@@ -233,7 +233,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="划组、改名、编辑或删除单词；词库页只读。"
-                android:textColor="@color/obs_sub"
+                android:textColor="@color/text_sub"
                 android:textSize="11sp" />
 
             <TextView
@@ -242,7 +242,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:text="还没有分组"
-                android:textColor="@color/obs_accent"
+                android:textColor="@color/primary"
                 android:textSize="11sp" />
 
             <LinearLayout
@@ -257,7 +257,7 @@
                 android:layout_height="1px"
                 android:layout_marginTop="12dp"
                 android:layout_marginBottom="12dp"
-                android:background="@color/obs_line" />
+                android:background="@color/line" />
 
             <!-- 自动划组 -->
             <LinearLayout
@@ -276,7 +276,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="按顺序自动划组"
-                        android:textColor="@color/obs_text"
+                        android:textColor="@color/text"
                         android:textSize="14sp"
                         android:textStyle="bold" />
 
@@ -286,7 +286,7 @@
                         android:layout_marginTop="3dp"
                         android:lineSpacingExtra="2dp"
                         android:text="每 N 个一组，组名 = 前缀 + 序号；例如前缀「Unit 1 Day」可得到 Unit 1 Day 1。会覆盖现有组名。"
-                        android:textColor="@color/obs_sub"
+                        android:textColor="@color/text_sub"
                         android:textSize="11sp" />
                 </LinearLayout>
 
@@ -295,7 +295,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="12dp"
-                    android:background="@drawable/bg_obs_btn_primary"
+                    android:background="@drawable/bg_btn_primary"
                     android:gravity="center"
                     android:minHeight="32dp"
                     android:paddingLeft="14dp"
@@ -318,13 +318,13 @@
                     android:layout_height="wrap_content"
                     android:layout_marginRight="6dp"
                     android:layout_weight="1.2"
-                    android:background="@drawable/bg_obs_input"
+                    android:background="@drawable/bg_input"
                     android:hint="组名前缀"
                     android:inputType="text"
                     android:maxLines="1"
                     android:minHeight="40dp"
                     android:text="Unit"
-                    android:textColor="@color/obs_text"
+                    android:textColor="@color/text"
                     android:textSize="13sp" />
 
                 <EditText
@@ -332,14 +332,14 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.7"
-                    android:background="@drawable/bg_obs_input"
+                    android:background="@drawable/bg_input"
                     android:gravity="center"
                     android:hint="每组个数"
                     android:inputType="number"
                     android:maxLines="1"
                     android:minHeight="40dp"
                     android:text="20"
-                    android:textColor="@color/obs_text"
+                    android:textColor="@color/text"
                     android:textSize="13sp" />
             </LinearLayout>
 
@@ -348,7 +348,7 @@
                 android:layout_height="1px"
                 android:layout_marginTop="12dp"
                 android:layout_marginBottom="12dp"
-                android:background="@color/obs_line" />
+                android:background="@color/line" />
 
             <!-- 编辑单词 -->
             <LinearLayout
@@ -367,7 +367,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="编辑 / 删除单词"
-                        android:textColor="@color/obs_text"
+                        android:textColor="@color/text"
                         android:textSize="14sp"
                         android:textStyle="bold" />
 
@@ -377,7 +377,7 @@
                         android:layout_marginTop="3dp"
                         android:lineSpacingExtra="2dp"
                         android:text="改释义、音标、例句、组别，或删除单词；搜索后编辑。"
-                        android:textColor="@color/obs_sub"
+                        android:textColor="@color/text_sub"
                         android:textSize="11sp" />
                 </LinearLayout>
 
@@ -386,13 +386,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="12dp"
-                    android:background="@drawable/bg_obs_btn_ghost"
+                    android:background="@drawable/bg_btn_ghost"
                     android:gravity="center"
                     android:minHeight="32dp"
                     android:paddingLeft="14dp"
                     android:paddingRight="14dp"
                     android:text="编辑"
-                    android:textColor="@color/obs_accent"
+                    android:textColor="@color/primary"
                     android:textSize="12sp" />
             </LinearLayout>
         </LinearLayout>
@@ -403,14 +403,14 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:orientation="vertical"
-            android:background="@drawable/bg_obs_card"
+            android:background="@drawable/bg_card"
             android:padding="16dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="内置词库"
-                android:textColor="@color/obs_text"
+                android:textColor="@color/text"
                 android:textSize="15sp"
                 android:textStyle="bold" />
 
@@ -419,7 +419,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="不想自己找文件时直接载入；先进入导入预览，确认后才写入。"
-                android:textColor="@color/obs_sub"
+                android:textColor="@color/text_sub"
                 android:textSize="11sp" />
 
             <LinearLayout
@@ -439,7 +439,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="考研词库"
-                        android:textColor="@color/obs_text"
+                        android:textColor="@color/text"
                         android:textSize="14sp"
                         android:textStyle="bold" />
 
@@ -449,7 +449,7 @@
                         android:layout_marginTop="3dp"
                         android:lineSpacingExtra="2dp"
                         android:text="711 词 · Unit 1–5 · 23 组；自动补音标并列出未命中词。"
-                        android:textColor="@color/obs_sub"
+                        android:textColor="@color/text_sub"
                         android:textSize="11sp" />
                 </LinearLayout>
 
@@ -458,7 +458,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="12dp"
-                    android:background="@drawable/bg_obs_btn_primary"
+                    android:background="@drawable/bg_btn_primary"
                     android:gravity="center"
                     android:minHeight="32dp"
                     android:paddingLeft="14dp"
@@ -473,7 +473,7 @@
                 android:layout_height="1px"
                 android:layout_marginTop="12dp"
                 android:layout_marginBottom="12dp"
-                android:background="@color/obs_line" />
+                android:background="@color/line" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -491,7 +491,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="示例词库"
-                        android:textColor="@color/obs_text"
+                        android:textColor="@color/text"
                         android:textSize="14sp"
                         android:textStyle="bold" />
 
@@ -501,7 +501,7 @@
                         android:layout_marginTop="3dp"
                         android:lineSpacingExtra="2dp"
                         android:text="12 个带音标、释义、例句和组别的示例词；已存在的词不会重复。"
-                        android:textColor="@color/obs_sub"
+                        android:textColor="@color/text_sub"
                         android:textSize="11sp" />
                 </LinearLayout>
 
@@ -510,13 +510,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="12dp"
-                    android:background="@drawable/bg_obs_btn_ghost"
+                    android:background="@drawable/bg_btn_ghost"
                     android:gravity="center"
                     android:minHeight="32dp"
                     android:paddingLeft="14dp"
                     android:paddingRight="14dp"
                     android:text="载入"
-                    android:textColor="@color/obs_accent"
+                    android:textColor="@color/primary"
                     android:textSize="12sp" />
             </LinearLayout>
         </LinearLayout>
@@ -529,7 +529,7 @@
             android:gravity="center"
             android:lineSpacingExtra="3dp"
             android:text="发音、音标、每日新词数、备份、重置与版本更新已移到「设置」页。"
-            android:textColor="@color/obs_sub"
+            android:textColor="@color/text_sub"
             android:textSize="11sp" />
 
     </LinearLayout>

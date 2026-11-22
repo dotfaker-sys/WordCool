@@ -46,7 +46,7 @@ class ImportView(private val a: MainActivity, private val root: View) {
                 a.toast("每组个数请填 1~200")
                 return@setOnClickListener
             }
-            AlertDialog.Builder(a, R.style.ObsidianDialog)
+            AlertDialog.Builder(a)
                 .setTitle("自动划组")
                 .setMessage("把全部单词按顺序每 $size 个一组，组名为「$prefix 1」「$prefix 2」…\n会覆盖现有组名，学习进度不受影响。")
                 .setNegativeButton("取消", null)
@@ -58,7 +58,7 @@ class ImportView(private val a: MainActivity, private val root: View) {
         }
 
         root.findViewById<TextView>(R.id.btnLoadDemo).setOnClickListener {
-            AlertDialog.Builder(a, R.style.ObsidianDialog)
+            AlertDialog.Builder(a)
                 .setTitle("载入示例词库？")
                 .setMessage("加入 12 个带音标、释义、例句、记忆提示和组别的示例词（Unit 1 / Day 1 / Day 2 / Unit 2）。已存在的词不会重复。")
                 .setNegativeButton("取消", null)
@@ -70,7 +70,7 @@ class ImportView(private val a: MainActivity, private val root: View) {
         }
 
         root.findViewById<TextView>(R.id.btnLoadKaoyan).setOnClickListener {
-            AlertDialog.Builder(a, R.style.ObsidianDialog)
+            AlertDialog.Builder(a)
                 .setTitle("载入考研词库？")
                 .setMessage(
                     "加入 711 个考研词，按 Unit 1 Day 1 … Unit 5 Day 3 分成 23 组。\n\n" +
@@ -109,7 +109,7 @@ class ImportView(private val a: MainActivity, private val root: View) {
             .append("· 文件已被微信自动清理，重新下载一次\n\n")
             .append("本应用不读微信私有目录、不联网、不申请任何权限；只有你主动选它，系统才会把这一个文件的临时读取权交给它。")
             .toString()
-        AlertDialog.Builder(a, R.style.ObsidianDialog)
+        AlertDialog.Builder(a)
             .setTitle("从微信 / QQ 导入")
             .setMessage(msg)
             .setPositiveButton("知道了", null)
@@ -117,7 +117,35 @@ class ImportView(private val a: MainActivity, private val root: View) {
             .show()
     }
 
-    /** 每行一个组，点击即可重命名；不用 ListView，避免和外层 ScrollView 抢滚动 */
+    private val expandedUnits = mutableSetOf<String>()
+
+    private fun renameGroup(g: GroupInfo) {
+        a.showGroupNameInput(
+            "重命名组",
+            g.name,
+            "例如 Unit 1 / Day 2 / Unit 1 Day 1"
+        ) { newName ->
+            val changed = a.db.renameGroup(g.name, newName)
+            a.toast("已更新 $changed 个词为「${newName.ifBlank { "未分组" }}」")
+            a.dataChanged()
+        }
+    }
+
+    private fun unitOf(name: String): String {
+        val m = Regex("""\bunit\s*(\d+)""", RegexOption.IGNORE_CASE).find(name)
+        if (m != null) return "Unit ${m.groupValues[1]}"
+        if (Regex("""\bday\s*(\d+)""", RegexOption.IGNORE_CASE).containsMatchIn(name)) {
+            return "未分单元"
+        }
+        return if (name.isBlank()) "未分组" else name
+    }
+
+    private fun dayOf(name: String): String? {
+        val m = Regex("""\bday\s*(\d+)""", RegexOption.IGNORE_CASE).find(name)
+        return if (m != null) "Day ${m.groupValues[1]}" else null
+    }
+
+    /** 像 Obsidian 文件树：Unit 折叠 → Day 子行；点 Unit 展开，点 Day 改名 */
     private fun renderGroups() {
         val gs = a.db.groups()
         tvGroupSummary.text = if (gs.isEmpty()) {
@@ -126,33 +154,90 @@ class ImportView(private val a: MainActivity, private val root: View) {
             "共 ${gs.size} 组 · ${gs.sumOf { it.total }} 个单词"
         }
         groupBox.removeAllViews()
+
+        class UnitNode(val title: String) {
+            val groups = mutableListOf<Pair<String?, GroupInfo>>()
+        }
+
+        val units = LinkedHashMap<String, UnitNode>()
         gs.forEach { g ->
-            val row = TextView(a).apply {
-                text = "${a.db.groupLabel(g.name)} · ${g.total} 词 · " +
-                    "已解锁 ${g.unlocked} · 已掌握 ${g.mastered}"
-                textSize = 12f
-                setTextColor(Obs.text)
-                background = a.rounded(Obs.surface, 3f, Obs.line)
+            val title = unitOf(g.name)
+            val node = units.getOrPut(title) { UnitNode(title) }
+            node.groups.add(dayOf(g.name) to g)
+        }
+
+        units.values.forEach { unit ->
+            val total = unit.groups.sumOf { it.second.total }
+            val unlocked = unit.groups.sumOf { it.second.unlocked }
+            val expanded = unit.title in expandedUnits
+
+            val unitRow = LinearLayout(a).apply {
+                orientation = LinearLayout.HORIZONTAL
                 gravity = Gravity.CENTER_VERTICAL
+                setPadding(a.dp(6), a.dp(10), a.dp(6), a.dp(10))
                 layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
-                ).apply { topMargin = a.dp(6) }
-                minimumHeight = a.dp(40)
-                setPadding(a.dp(10), a.dp(8), a.dp(10), a.dp(8))
+                )
                 setOnClickListener {
-                    a.showGroupNameInput(
-                        "重命名组",
-                        g.name,
-                        "例如 Unit 1 / Day 2 / Unit 1 Day 1"
-                    ) { newName ->
-                        val changed = a.db.renameGroup(g.name, newName)
-                        a.toast("已更新 $changed 个词为「${newName.ifBlank { "未分组" }}」")
-                        a.dataChanged()
-                    }
+                    if (expanded) expandedUnits.remove(unit.title)
+                    else expandedUnits.add(unit.title)
+                    renderGroups()
                 }
             }
-            groupBox.addView(row)
+            unitRow.addView(TextView(a).apply {
+                text = if (expanded) "▾" else "▸"
+                textSize = 12f
+                setTextColor(Pal.textSub)
+                gravity = Gravity.CENTER
+                layoutParams = LinearLayout.LayoutParams(a.dp(22), a.dp(28))
+            })
+            unitRow.addView(TextView(a).apply {
+                text = unit.title
+                textSize = 13f
+                setTypeface(typeface, android.graphics.Typeface.BOLD)
+                setTextColor(Pal.text)
+                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+            })
+            unitRow.addView(TextView(a).apply {
+                text = "${unit.groups.size} 组 · $total 词 · 已解锁 $unlocked"
+                textSize = 11f
+                setTextColor(Pal.textSub)
+            })
+            groupBox.addView(unitRow)
+
+            if (!expanded) return@forEach
+
+            unit.groups.forEach { (day, g) ->
+                val row = LinearLayout(a).apply {
+                    orientation = LinearLayout.HORIZONTAL
+                    gravity = Gravity.CENTER_VERTICAL
+                    setPadding(a.dp(30), a.dp(8), a.dp(6), a.dp(8))
+                    layoutParams = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    )
+                    setOnClickListener { renameGroup(g) }
+                }
+                row.addView(TextView(a).apply {
+                    text = day ?: "全部"
+                    textSize = 12.5f
+                    setTextColor(Pal.text)
+                    layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+                })
+                row.addView(TextView(a).apply {
+                    text = "${g.total} 词 · 已解锁 ${g.unlocked} · 已掌握 ${g.mastered}"
+                    textSize = 10.5f
+                    setTextColor(Pal.textSub)
+                })
+                row.addView(TextView(a).apply {
+                    text = "改名"
+                    textSize = 10.5f
+                    setTextColor(Pal.primary)
+                    setPadding(a.dp(8), 0, 0, 0)
+                })
+                groupBox.addView(row)
+            }
         }
     }
 }

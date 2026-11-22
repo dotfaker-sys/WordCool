@@ -2,7 +2,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/obs_bg">
+    android:background="@color/bg">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -10,11 +10,81 @@
         android:orientation="vertical"
         android:padding="14dp">
 
+        <!-- 外观：亮色 / 暗色 / 跟随系统 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="@drawable/bg_obs_card"
+            android:background="@drawable/bg_card"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="外观"
+                android:textColor="@color/text"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="亮色 / 暗色 / 跟随系统；切换后立即生效，整个 App 一起换。"
+                android:textColor="@color/text_sub"
+                android:textSize="11sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/btnThemeSystem"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_btn_ghost"
+                    android:gravity="center"
+                    android:minHeight="36dp"
+                    android:text="跟随系统"
+                    android:textColor="@color/text_sub"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/btnThemeLight"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="6dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_btn_ghost"
+                    android:gravity="center"
+                    android:minHeight="36dp"
+                    android:text="亮色"
+                    android:textColor="@color/text_sub"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/btnThemeDark"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="6dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_btn_ghost"
+                    android:gravity="center"
+                    android:minHeight="36dp"
+                    android:text="暗色"
+                    android:textColor="@color/text_sub"
+                    android:textSize="12sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/bg_card"
             android:padding="16dp">
 
             <TextView
@@ -23,7 +93,7 @@
                 android:text="学习"
                 android:textSize="15sp"
                 android:textStyle="bold"
-                android:textColor="@color/obs_text" />
+                android:textColor="@color/text" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -38,20 +108,20 @@
                     android:layout_weight="1"
                     android:text="每天解锁新词数"
                     android:textSize="13sp"
-                    android:textColor="@color/obs_text" />
+                    android:textColor="@color/text" />
 
                 <EditText
                     android:id="@+id/etDaily"
                     android:layout_width="64dp"
                     android:layout_height="wrap_content"
                     android:minHeight="40dp"
-                    android:background="@drawable/bg_obs_input"
+                    android:background="@drawable/bg_input"
                     android:gravity="center"
                     android:inputType="number"
                     android:maxLines="1"
                     android:text="10"
                     android:textSize="14sp"
-                    android:textColor="@color/obs_text" />
+                    android:textColor="@color/text" />
 
                 <TextView
                     android:id="@+id/btnSaveDaily"
@@ -59,7 +129,7 @@
                     android:layout_height="wrap_content"
                     android:minHeight="40dp"
                     android:layout_marginLeft="8dp"
-                    android:background="@drawable/bg_obs_btn_primary"
+                    android:background="@drawable/bg_btn_primary"
                     android:gravity="center"
                     android:paddingLeft="14dp"
                     android:paddingRight="14dp"
@@ -75,7 +145,7 @@
                 android:lineSpacingExtra="3dp"
                 android:text="每天从「未解锁」里放出一批新词。学习中的词按 1/2/4/7/15/30 天回来复习，不受这个数字限制。"
                 android:textSize="11sp"
-                android:textColor="@color/obs_sub" />
+                android:textColor="@color/text_sub" />
         </LinearLayout>
 
         <LinearLayout
@@ -83,7 +153,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:orientation="vertical"
-            android:background="@drawable/bg_obs_card"
+            android:background="@drawable/bg_card"
             android:padding="16dp">
 
             <TextView
@@ -92,7 +162,7 @@
                 android:text="数据管理"
                 android:textSize="15sp"
                 android:textStyle="bold"
-                android:textColor="@color/obs_text" />
+                android:textColor="@color/text" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -100,7 +170,7 @@
                 android:layout_marginTop="4dp"
                 android:text="备份、重置或清空本机词库；所有操作只影响这台手机。"
                 android:textSize="11sp"
-                android:textColor="@color/obs_sub" />
+                android:textColor="@color/text_sub" />
 
             <!-- Obsidian 词库文件夹 -->
             <LinearLayout
@@ -120,7 +190,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Obsidian 词库文件夹"
-                        android:textColor="@color/obs_text"
+                        android:textColor="@color/text"
                         android:textSize="14sp"
                         android:textStyle="bold" />
 
@@ -130,7 +200,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="3dp"
                         android:text="当前：本机数据库"
-                        android:textColor="@color/obs_accent"
+                        android:textColor="@color/primary"
                         android:textSize="11sp" />
 
                     <TextView
@@ -139,7 +209,7 @@
                         android:layout_marginTop="3dp"
                         android:lineSpacingExtra="2dp"
                         android:text="每个单词一个 .md，放在所选文件夹的 WordCool/ 里；可用 Obsidian 直接打开、编辑，App 回到前台时自动同步。"
-                        android:textColor="@color/obs_sub"
+                        android:textColor="@color/text_sub"
                         android:textSize="11sp" />
                 </LinearLayout>
 
@@ -148,13 +218,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="12dp"
-                    android:background="@drawable/bg_obs_btn_ghost"
+                    android:background="@drawable/bg_btn_ghost"
                     android:gravity="center"
                     android:minHeight="32dp"
                     android:paddingLeft="14dp"
                     android:paddingRight="14dp"
                     android:text="选择"
-                    android:textColor="@color/obs_accent"
+                    android:textColor="@color/primary"
                     android:textSize="12sp" />
             </LinearLayout>
 
@@ -163,7 +233,7 @@
                 android:layout_height="1px"
                 android:layout_marginTop="12dp"
                 android:layout_marginBottom="12dp"
-                android:background="@color/obs_line" />
+                android:background="@color/line" />
 
             <!-- 导出：左侧标题 + 说明，右侧小按钮 -->
             <LinearLayout
@@ -182,7 +252,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="导出词库备份"
-                        android:textColor="@color/obs_text"
+                        android:textColor="@color/text"
                         android:textSize="14sp"
                         android:textStyle="bold" />
 
@@ -192,7 +262,7 @@
                         android:layout_marginTop="3dp"
                         android:lineSpacingExtra="2dp"
                         android:text="JSON 格式，含单词、释义、组别、学习进度与答题记录；可在「导入」页选择该文件恢复。"
-                        android:textColor="@color/obs_sub"
+                        android:textColor="@color/text_sub"
                         android:textSize="11sp" />
                 </LinearLayout>
 
@@ -201,13 +271,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="12dp"
-                    android:background="@drawable/bg_obs_btn_ghost"
+                    android:background="@drawable/bg_btn_ghost"
                     android:gravity="center"
                     android:minHeight="32dp"
                     android:paddingLeft="14dp"
                     android:paddingRight="14dp"
                     android:text="导出"
-                    android:textColor="@color/obs_accent"
+                    android:textColor="@color/primary"
                     android:textSize="12sp" />
             </LinearLayout>
 
@@ -216,7 +286,7 @@
                 android:layout_height="1px"
                 android:layout_marginTop="12dp"
                 android:layout_marginBottom="12dp"
-                android:background="@color/obs_line" />
+                android:background="@color/line" />
 
             <!-- 重置学习进度 -->
             <LinearLayout
@@ -235,7 +305,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="重置学习进度"
-                        android:textColor="@color/obs_text"
+                        android:textColor="@color/text"
                         android:textSize="14sp"
                         android:textStyle="bold" />
 
@@ -245,7 +315,7 @@
                         android:layout_marginTop="3dp"
                         android:lineSpacingExtra="2dp"
                         android:text="保留单词和分组，把学习状态、连对和答题记录清零。"
-                        android:textColor="@color/obs_sub"
+                        android:textColor="@color/text_sub"
                         android:textSize="11sp" />
                 </LinearLayout>
 
@@ -254,13 +324,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="12dp"
-                    android:background="@drawable/bg_obs_btn_ghost"
+                    android:background="@drawable/bg_btn_ghost"
                     android:gravity="center"
                     android:minHeight="32dp"
                     android:paddingLeft="14dp"
                     android:paddingRight="14dp"
                     android:text="重置"
-                    android:textColor="@color/obs_danger"
+                    android:textColor="@color/danger"
                     android:textSize="12sp" />
             </LinearLayout>
 
@@ -269,7 +339,7 @@
                 android:layout_height="1px"
                 android:layout_marginTop="12dp"
                 android:layout_marginBottom="12dp"
-                android:background="@color/obs_line" />
+                android:background="@color/line" />
 
             <!-- 清空整个词库 -->
             <LinearLayout
@@ -288,7 +358,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="清空整个词库"
-                        android:textColor="@color/obs_text"
+                        android:textColor="@color/text"
                         android:textSize="14sp"
                         android:textStyle="bold" />
 
@@ -298,7 +368,7 @@
                         android:layout_marginTop="3dp"
                         android:lineSpacingExtra="2dp"
                         android:text="删除全部单词与学习记录，无法撤销；建议先导出备份。"
-                        android:textColor="@color/obs_sub"
+                        android:textColor="@color/text_sub"
                         android:textSize="11sp" />
                 </LinearLayout>
 
@@ -307,13 +377,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="12dp"
-                    android:background="@drawable/bg_obs_btn_ghost"
+                    android:background="@drawable/bg_btn_ghost"
                     android:gravity="center"
                     android:minHeight="32dp"
                     android:paddingLeft="14dp"
                     android:paddingRight="14dp"
                     android:text="清空"
-                    android:textColor="@color/obs_danger"
+                    android:textColor="@color/danger"
                     android:textSize="12sp" />
             </LinearLayout>
         </LinearLayout>
@@ -323,7 +393,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:orientation="vertical"
-            android:background="@drawable/bg_obs_card"
+            android:background="@drawable/bg_card"
             android:padding="16dp">
 
             <TextView
@@ -332,7 +402,7 @@
                 android:text="发音"
                 android:textSize="15sp"
                 android:textStyle="bold"
-                android:textColor="@color/obs_text" />
+                android:textColor="@color/text" />
 
             <TextView
                 android:id="@+id/tvTtsStatus"
@@ -341,7 +411,7 @@
                 android:layout_marginTop="8dp"
                 android:text="语音引擎还在准备…"
                 android:textSize="12sp"
-                android:textColor="@color/obs_accent" />
+                android:textColor="@color/primary" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -356,11 +426,11 @@
                     android:minHeight="40dp"
                     android:layout_weight="1"
                     android:layout_marginRight="6dp"
-                    android:background="@drawable/bg_obs_btn_ghost"
+                    android:background="@drawable/bg_btn_ghost"
                     android:gravity="center"
                     android:text="默认：美音 US"
                     android:textSize="12sp"
-                    android:textColor="@color/obs_accent" />
+                    android:textColor="@color/primary" />
 
                 <TextView
                     android:id="@+id/btnAccentUk"
@@ -369,11 +439,11 @@
                     android:minHeight="40dp"
                     android:layout_weight="1"
                     android:layout_marginLeft="6dp"
-                    android:background="@drawable/bg_obs_btn_ghost"
+                    android:background="@drawable/bg_btn_ghost"
                     android:gravity="center"
                     android:text="默认：英音 UK"
                     android:textSize="12sp"
-                    android:textColor="@color/obs_accent" />
+                    android:textColor="@color/primary" />
             </LinearLayout>
 
             <TextView
@@ -382,7 +452,7 @@
                 android:layout_marginTop="14dp"
                 android:text="朗读语速"
                 android:textSize="12sp"
-                android:textColor="@color/obs_sub" />
+                android:textColor="@color/text_sub" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -397,11 +467,11 @@
                     android:minHeight="36dp"
                     android:layout_weight="1"
                     android:layout_marginRight="4dp"
-                    android:background="@drawable/bg_obs_btn_ghost"
+                    android:background="@drawable/bg_btn_ghost"
                     android:gravity="center"
                     android:text="慢 0.7×"
                     android:textSize="11sp"
-                    android:textColor="@color/obs_accent" />
+                    android:textColor="@color/primary" />
 
                 <TextView
                     android:id="@+id/btnRateNormal"
@@ -411,11 +481,11 @@
                     android:layout_weight="1"
                     android:layout_marginLeft="4dp"
                     android:layout_marginRight="4dp"
-                    android:background="@drawable/bg_obs_btn_ghost"
+                    android:background="@drawable/bg_btn_ghost"
                     android:gravity="center"
                     android:text="正常 1.0×"
                     android:textSize="11sp"
-                    android:textColor="@color/obs_accent" />
+                    android:textColor="@color/primary" />
 
                 <TextView
                     android:id="@+id/btnRateFast"
@@ -424,11 +494,11 @@
                     android:minHeight="36dp"
                     android:layout_weight="1"
                     android:layout_marginLeft="4dp"
-                    android:background="@drawable/bg_obs_btn_ghost"
+                    android:background="@drawable/bg_btn_ghost"
                     android:gravity="center"
                     android:text="快 1.3×"
                     android:textSize="11sp"
-                    android:textColor="@color/obs_accent" />
+                    android:textColor="@color/primary" />
             </LinearLayout>
 
             <TextView
@@ -437,11 +507,11 @@
                 android:layout_height="wrap_content"
                 android:minHeight="38dp"
                 android:layout_marginTop="10dp"
-                android:background="@drawable/bg_obs_btn_soft"
+                android:background="@drawable/bg_btn_soft"
                 android:gravity="center"
                 android:text="试听一句英文（确认到底出不出声）"
                 android:textSize="12sp"
-                android:textColor="@color/obs_accent" />
+                android:textColor="@color/primary" />
 
             <TextView
                 android:id="@+id/btnTtsSettings"
@@ -449,11 +519,11 @@
                 android:layout_height="wrap_content"
                 android:minHeight="40dp"
                 android:layout_marginTop="10dp"
-                android:background="@drawable/bg_obs_btn_ghost"
+                android:background="@drawable/bg_btn_ghost"
                 android:gravity="center"
                 android:text="安装 / 检查英语语音包"
                 android:textSize="12sp"
-                android:textColor="@color/obs_accent" />
+                android:textColor="@color/primary" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -462,7 +532,7 @@
                 android:lineSpacingExtra="3dp"
                 android:text="发音走系统 TTS 的本地离线语音包；没装对应口音时会自动回退到另一种并提示。音色由手机安装的语音包决定，应用不联网合成。"
                 android:textSize="11sp"
-                android:textColor="@color/obs_sub" />
+                android:textColor="@color/text_sub" />
         </LinearLayout>
 
         <LinearLayout
@@ -470,7 +540,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:orientation="vertical"
-            android:background="@drawable/bg_obs_card"
+            android:background="@drawable/bg_card"
             android:padding="16dp">
 
             <TextView
@@ -479,7 +549,7 @@
                 android:text="音标"
                 android:textSize="15sp"
                 android:textStyle="bold"
-                android:textColor="@color/obs_text" />
+                android:textColor="@color/text" />
 
             <TextView
                 android:id="@+id/tvIpaStatus"
@@ -488,7 +558,7 @@
                 android:layout_marginTop="8dp"
                 android:text="正在读取内置词典…"
                 android:textSize="12sp"
-                android:textColor="@color/obs_accent" />
+                android:textColor="@color/primary" />
 
             <TextView
                 android:id="@+id/btnAutoIpa"
@@ -496,11 +566,11 @@
                 android:layout_height="wrap_content"
                 android:minHeight="40dp"
                 android:layout_marginTop="12dp"
-                android:background="@drawable/bg_obs_btn_soft"
+                android:background="@drawable/bg_btn_soft"
                 android:gravity="center"
                 android:text="导入时自动补全音标：开"
                 android:textSize="12sp"
-                android:textColor="@color/obs_accent" />
+                android:textColor="@color/primary" />
 
             <TextView
                 android:id="@+id/btnFillIpa"
@@ -508,11 +578,11 @@
                 android:layout_height="wrap_content"
                 android:minHeight="40dp"
                 android:layout_marginTop="10dp"
-                android:background="@drawable/bg_obs_btn_ghost"
+                android:background="@drawable/bg_btn_ghost"
                 android:gravity="center"
                 android:text="给现有词库补一次音标"
                 android:textSize="12sp"
-                android:textColor="@color/obs_accent" />
+                android:textColor="@color/primary" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -521,7 +591,7 @@
                 android:lineSpacingExtra="3dp"
                 android:text="音标来自随包内置的离线开源词典，只补空字段，不覆盖手填内容；查不到的词留空，不编造。数据来源与许可见 LICENSES/THIRD_PARTY_NOTICES.md。"
                 android:textSize="11sp"
-                android:textColor="@color/obs_sub" />
+                android:textColor="@color/text_sub" />
         </LinearLayout>
 
         <LinearLayout
@@ -529,7 +599,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:orientation="vertical"
-            android:background="@drawable/bg_obs_card"
+            android:background="@drawable/bg_card"
             android:padding="16dp">
 
             <TextView
@@ -538,7 +608,7 @@
                 android:text="版本与更新"
                 android:textSize="15sp"
                 android:textStyle="bold"
-                android:textColor="@color/obs_text" />
+                android:textColor="@color/text" />
 
             <TextView
                 android:id="@+id/tvVersion"
@@ -548,7 +618,7 @@
                 android:text="当前版本"
                 android:fontFamily="serif"
                 android:textSize="18sp"
-                android:textColor="@color/obs_text" />
+                android:textColor="@color/text" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -557,7 +627,7 @@
                 android:lineSpacingExtra="4dp"
                 android:text="点「检查更新」会向 GitHub 读取一次公开的版本号，这是本应用唯一会联网的地方。不会上传词库、账号或设备信息，也不会自动下载、自动安装 APK。"
                 android:textSize="12sp"
-                android:textColor="@color/obs_sub" />
+                android:textColor="@color/text_sub" />
 
             <TextView
                 android:id="@+id/btnCheckUpdate"
@@ -565,7 +635,7 @@
                 android:layout_height="wrap_content"
                 android:minHeight="42dp"
                 android:layout_marginTop="14dp"
-                android:background="@drawable/bg_obs_btn_primary"
+                android:background="@drawable/bg_btn_primary"
                 android:gravity="center"
                 android:text="检查更新"
                 android:textSize="14sp"
@@ -577,11 +647,11 @@
                 android:layout_height="wrap_content"
                 android:minHeight="40dp"
                 android:layout_marginTop="10dp"
-                android:background="@drawable/bg_obs_btn_soft"
+                android:background="@drawable/bg_btn_soft"
                 android:gravity="center"
                 android:text="启动时自动检查：关"
                 android:textSize="12sp"
-                android:textColor="@color/obs_accent" />
+                android:textColor="@color/primary" />
         </LinearLayout>
 
         <LinearLayout
@@ -589,7 +659,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:orientation="vertical"
-            android:background="@drawable/bg_obs_card"
+            android:background="@drawable/bg_card"
             android:padding="16dp">
 
             <TextView
@@ -598,7 +668,7 @@
                 android:text="关于"
                 android:textSize="15sp"
                 android:textStyle="bold"
-                android:textColor="@color/obs_text" />
+                android:textColor="@color/text" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -607,7 +677,7 @@
                 android:lineSpacingExtra="4dp"
                 android:text="单词酷是一个离线优先的本地词库：词库、导入、音标、发音、复习与备份都在手机上完成，不上传账号或设备信息。唯一的联网点是「检查更新」，只在点按钮或打开自动检查时读取一次 GitHub 公开版本号。\n\n考研词库（711 词 / 23 组）来自用户提供的 Unit1–5 词表，仅保存在本机；公开分发前请确认词表版权。"
                 android:textSize="12sp"
-                android:textColor="@color/obs_sub" />
+                android:textColor="@color/text_sub" />
         </LinearLayout>
 
     </LinearLayout>

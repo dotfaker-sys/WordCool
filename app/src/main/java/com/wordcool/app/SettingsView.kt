@@ -15,6 +15,9 @@ class SettingsView(private val a: MainActivity, private val root: View) {
     private val btnAutoUpdate = root.findViewById<TextView>(R.id.btnAutoUpdate)
     private val tvVaultStatus = root.findViewById<TextView>(R.id.tvVaultStatus)
     private val btnVault = root.findViewById<TextView>(R.id.btnVault)
+    private val btnThemeSystem = root.findViewById<TextView>(R.id.btnThemeSystem)
+    private val btnThemeLight = root.findViewById<TextView>(R.id.btnThemeLight)
+    private val btnThemeDark = root.findViewById<TextView>(R.id.btnThemeDark)
 
     private val btnAccentUs = root.findViewById<TextView>(R.id.btnAccentUs)
     private val btnAccentUk = root.findViewById<TextView>(R.id.btnAccentUk)
@@ -36,10 +39,22 @@ class SettingsView(private val a: MainActivity, private val root: View) {
         }
 
         root.findViewById<TextView>(R.id.btnExport).setOnClickListener { a.exportBackup() }
+        listOf(
+            btnThemeSystem to ThemePrefs.SYSTEM,
+            btnThemeLight to ThemePrefs.LIGHT,
+            btnThemeDark to ThemePrefs.DARK
+        ).forEach { (button, mode) ->
+            button.setOnClickListener {
+                if (ThemePrefs.mode(a) != mode) {
+                    ThemePrefs.set(a, mode)
+                    a.recreate()
+                }
+            }
+        }
         btnVault.setOnClickListener { a.pickVaultFolder() }
 
         root.findViewById<TextView>(R.id.btnReset).setOnClickListener {
-            AlertDialog.Builder(a, R.style.ObsidianDialog)
+            AlertDialog.Builder(a)
                 .setTitle("重置学习进度？")
                 .setMessage("所有词回到「未解锁」，并清空连对、答题记录和打卡。单词与释义会保留。")
                 .setNegativeButton("取消", null)
@@ -51,7 +66,7 @@ class SettingsView(private val a: MainActivity, private val root: View) {
         }
 
         root.findViewById<TextView>(R.id.btnClear).setOnClickListener {
-            AlertDialog.Builder(a, R.style.ObsidianDialog)
+            AlertDialog.Builder(a)
                 .setTitle("清空整个词库？")
                 .setMessage("所有单词、释义、组别和学习记录都会被删除，无法撤销。建议先「导出词库备份」。")
                 .setNegativeButton("取消", null)
@@ -113,21 +128,28 @@ class SettingsView(private val a: MainActivity, private val root: View) {
 
         val accent = a.db.accent
         val usOn = accent == MainActivity.ACCENT_US
-        btnAccentUs.background = a.rounded(if (usOn) Obs.accent else Obs.surface, 3f, Obs.line)
-        btnAccentUs.setTextColor(if (usOn) Obs.white else Obs.accent)
-        btnAccentUk.background = a.rounded(if (!usOn) Obs.accent else Obs.surface, 3f, Obs.line)
-        btnAccentUk.setTextColor(if (!usOn) Obs.white else Obs.accent)
+        btnAccentUs.background = a.rounded(if (usOn) Pal.primary else Pal.card, 3f, Pal.line)
+        btnAccentUs.setTextColor(if (usOn) Pal.white else Pal.primary)
+        btnAccentUk.background = a.rounded(if (!usOn) Pal.primary else Pal.card, 3f, Pal.line)
+        btnAccentUk.setTextColor(if (!usOn) Pal.white else Pal.primary)
 
         val rates = listOf(0.7f, 1.0f, 1.3f)
         listOf(btnRateSlow, btnRateNormal, btnRateFast).forEachIndexed { i, b ->
             val on = a.db.speechRate == rates[i]
-            b.background = a.rounded(if (on) Obs.accent else Obs.surface, 3f, Obs.line)
-            b.setTextColor(if (on) Obs.white else Obs.accent)
+            b.background = a.rounded(if (on) Pal.primary else Pal.card, 3f, Pal.line)
+            b.setTextColor(if (on) Pal.white else Pal.primary)
         }
 
         val autoOn = a.db.autoIpa
         btnAutoIpa.text = "导入时自动补全音标：" + (if (autoOn) "开" else "关")
-        btnAutoIpa.background = a.rounded(if (autoOn) Obs.accentSoft else Obs.surface, 3f, Obs.line)
-        btnAutoIpa.setTextColor(if (autoOn) Obs.accent else Obs.sub)
+        btnAutoIpa.background = a.rounded(if (autoOn) Pal.softBlue else Pal.card, 3f, Pal.line)
+        btnAutoIpa.setTextColor(if (autoOn) Pal.primary else Pal.textSub)
+
+        val theme = ThemePrefs.mode(a)
+        listOf(btnThemeSystem, btnThemeLight, btnThemeDark).forEachIndexed { i, b ->
+            val on = theme == i
+            b.background = a.rounded(if (on) Pal.primary else Pal.card, 3f, Pal.line)
+            b.setTextColor(if (on) Pal.white else Pal.textSub)
+        }
     }
 }
