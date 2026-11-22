@@ -94,49 +94,165 @@
                 android:textColor="@color/text" />
 
             <TextView
-                android:id="@+id/btnExport"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="42dp"
-                android:layout_marginTop="14dp"
-                android:background="@drawable/bg_btn_primary"
-                android:gravity="center"
-                android:text="导出词库备份（JSON）"
-                android:textSize="13sp"
-                android:textColor="@color/white" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:lineSpacingExtra="3dp"
-                android:text="备份包含单词、释义、组别、学习进度与答题记录；换手机时用「选择文档并导入」选这个 JSON 恢复。建议每隔一段时间导出一份。"
+                android:layout_marginTop="4dp"
+                android:text="备份、重置或清空本机词库；所有操作只影响这台手机。"
                 android:textSize="11sp"
                 android:textColor="@color/text_sub" />
 
-            <TextView
-                android:id="@+id/btnReset"
+            <!-- 导出：左侧标题 + 说明，右侧小按钮 -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="42dp"
                 android:layout_marginTop="14dp"
-                android:background="@drawable/bg_btn_ghost"
-                android:gravity="center"
-                android:text="重置学习进度（保留单词）"
-                android:textSize="13sp"
-                android:textColor="@color/danger" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/btnClear"
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="导出词库备份"
+                        android:textColor="@color/text"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:lineSpacingExtra="2dp"
+                        android:text="JSON 格式，含单词、释义、组别、学习进度与答题记录；可在「导入」页选择该文件恢复。"
+                        android:textColor="@color/text_sub"
+                        android:textSize="11sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/btnExport"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="12dp"
+                    android:background="@drawable/bg_btn_ghost"
+                    android:gravity="center"
+                    android:minHeight="32dp"
+                    android:paddingLeft="14dp"
+                    android:paddingRight="14dp"
+                    android:text="导出"
+                    android:textColor="@color/primary"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="12dp"
+                android:background="@color/line" />
+
+            <!-- 重置学习进度 -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="42dp"
-                android:layout_marginTop="8dp"
-                android:background="@drawable/bg_btn_ghost"
-                android:gravity="center"
-                android:text="清空整个词库"
-                android:textSize="13sp"
-                android:textColor="@color/danger" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="重置学习进度"
+                        android:textColor="@color/text"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:lineSpacingExtra="2dp"
+                        android:text="保留单词和分组，把学习状态、连对和答题记录清零。"
+                        android:textColor="@color/text_sub"
+                        android:textSize="11sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/btnReset"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="12dp"
+                    android:background="@drawable/bg_btn_ghost"
+                    android:gravity="center"
+                    android:minHeight="32dp"
+                    android:paddingLeft="14dp"
+                    android:paddingRight="14dp"
+                    android:text="重置"
+                    android:textColor="@color/danger"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="12dp"
+                android:background="@color/line" />
+
+            <!-- 清空整个词库 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="清空整个词库"
+                        android:textColor="@color/text"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:lineSpacingExtra="2dp"
+                        android:text="删除全部单词与学习记录，无法撤销；建议先导出备份。"
+                        android:textColor="@color/text_sub"
+                        android:textSize="11sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/btnClear"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="12dp"
+                    android:background="@drawable/bg_btn_ghost"
+                    android:gravity="center"
+                    android:minHeight="32dp"
+                    android:paddingLeft="14dp"
+                    android:paddingRight="14dp"
+                    android:text="清空"
+                    android:textColor="@color/danger"
+                    android:textSize="12sp" />
+            </LinearLayout>
         </LinearLayout>
 
         <LinearLayout
