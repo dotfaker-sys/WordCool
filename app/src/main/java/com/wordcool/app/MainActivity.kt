@@ -223,7 +223,7 @@ class MainActivity : Activity() {
         var flags = window.decorView.systemUiVisibility
         val lightStatus = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
         flags = if (dark) flags and lightStatus.inv() else flags or lightStatus
-        if (Build.VERSION.SDK_INT >= 26) {
+        if (Build.VERSION.SDK_INT >= 27) {
             val lightNav = View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
             flags = if (dark) flags and lightNav.inv() else flags or lightNav
         }
@@ -1161,6 +1161,7 @@ class MainActivity : Activity() {
                     toast("没有拿到文件夹的读写权限，无法作为 Obsidian 词库")
                     return
                 }
+                VaultSync.resetForNewVault(this)
                 val files = VaultStore.list(this)
                 if (files == null) {
                     VaultStore.clear(this)

@@ -298,6 +298,11 @@ class WordDb(ctx: Context) : SQLiteOpenHelper(ctx.applicationContext, "wordcool.
         return c.use { if (it.moveToFirst()) it.readWord() else null }
     }
 
+    /** 从 Obsidian 侧确认文件已删除时，静默删掉本机行（不再回调删除文件） */
+    fun deleteWordByWord(word: String) {
+        writableDatabase.delete("words", "word=?", arrayOf(word.trim()))
+    }
+
     /** 用 Obsidian 文件内容覆盖本机行（含学习进度），不存在则新建 */
     fun upsertFromVault(w: Word): Long {
         val existing = getWordByWord(w.word)

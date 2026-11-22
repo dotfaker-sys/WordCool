@@ -229,9 +229,10 @@ object VaultStore {
 /** Word ↔ Obsidian Markdown（YAML frontmatter + 可读正文）。 */
 object VaultMarkdown {
 
-    private const val KEYS =
-        "word|phonetic|phonetic_uk|phonetic_us|meaning|example|note|group|" +
-            "state|streak|right|wrong|next_review|learned_day|created_at"
+    private val KEYS = setOf(
+        "word", "phonetic", "phonetic_uk", "phonetic_us", "meaning", "example", "note", "group",
+        "state", "streak", "right", "wrong", "next_review", "learned_day", "created_at"
+    )
 
     fun fileName(word: String): String {
         val base = word.trim().lowercase(Locale.ROOT)
@@ -280,11 +281,13 @@ object VaultMarkdown {
             val p = line.indexOf(':')
             if (p <= 0) continue
             val key = line.substring(0, p).trim()
-            if (!key.matches(Regex(KEYS))) continue
+            if (key !in KEYS) continue
             map[key] = unquote(line.substring(p + 1).trim())
         }
         val word = map["word"]?.trim().orEmpty()
         if (word.isEmpty()) return null
+        // 部分写入 / 外部随手建的笔记没有学习字段时不要覆盖本机进度
+        if (!map.containsKey("state") || !map.containsKey("next_review")) return null
         return Word(
             word = word,
             phonetic = map["phonetic"].orEmpty(),
