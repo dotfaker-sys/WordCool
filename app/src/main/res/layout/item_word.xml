@@ -5,6 +5,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:background="@drawable/bg_row"
+    android:foreground="@drawable/ripple_row"
     android:padding="14dp">
 
     <LinearLayout
@@ -26,19 +27,17 @@
 
         <TextView
             android:id="@+id/btnItemSpeak"
-            android:layout_width="wrap_content"
+            android:layout_width="38dp"
             android:layout_height="wrap_content"
-            android:minHeight="28dp"
+            android:minHeight="38dp"
             android:layout_marginLeft="8dp"
-            android:background="@drawable/bg_btn_ghost"
+            android:background="@drawable/bg_icon_glass"
             android:clickable="true"
+            android:contentDescription="发音"
+            android:drawableLeft="@drawable/ic_speaker"
             android:focusable="false"
             android:gravity="center"
-            android:paddingLeft="8dp"
-            android:paddingRight="8dp"
-            android:text="发音"
-            android:textSize="11sp"
-            android:textColor="@color/primary" />
+            android:padding="8dp" />
     </LinearLayout>
 
     <TextView
@@ -63,6 +62,7 @@
         android:textColor="@color/text_sub" />
 
     <LinearLayout
+        android:id="@+id/metaRow"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"

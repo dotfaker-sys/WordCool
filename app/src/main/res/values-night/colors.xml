@@ -44,4 +44,11 @@
     <color name="glass_pill_bottom">#267F6DF2</color>
     <color name="glass_pill_border">#997F6DF2</color>
     <color name="glass_nav">#14111D</color>
+    <color name="ripple">#33FFFFFF</color>
+    <color name="glass_sheet_top">#F22A2738</color>
+    <color name="glass_sheet_bottom">#E6211E2E</color>
+    <color name="glass_sheet_tint">#267F6DF2</color>
+    <color name="sheet_handle">#66A2A1B3</color>
+    <color name="sheet_bg_top">#242132</color>
+    <color name="sheet_bg_bottom">#17141F</color>
 </resources>

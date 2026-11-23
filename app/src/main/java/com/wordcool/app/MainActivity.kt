@@ -2,10 +2,12 @@ package com.wordcool.app
 
 import android.app.Activity
 import android.app.AlertDialog
+import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.Typeface
+import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.LayerDrawable
 import android.media.AudioAttributes
 import android.media.AudioManager
@@ -19,6 +21,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
+import android.view.Gravity
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.EditText
@@ -671,6 +674,78 @@ class MainActivity : Activity() {
             }
         }
         dlg.show()
+    }
+
+    /** 词库行点按后的玻璃详情层：大字、音标、释义、例句/笔记和学习数据 */
+    fun showWordDetail(word: Word) {
+        val current = db.getWord(word.id) ?: word
+        val v = layoutInflater.inflate(R.layout.dialog_word_detail, null)
+
+        v.findViewById<TextView>(R.id.tvDetailWord).text = current.word
+        val uk = current.phoneticUk.ifBlank { current.phonetic }
+        val us = current.phoneticUs
+        v.findViewById<TextView>(R.id.tvDetailIpaUk).apply {
+            text = "UK  $uk"
+            show(uk.isNotBlank())
+        }
+        v.findViewById<TextView>(R.id.tvDetailIpaUs).apply {
+            text = "US  $us"
+            show(us.isNotBlank())
+        }
+        v.findViewById<View>(R.id.ipaRow).show(uk.isNotBlank() || us.isNotBlank())
+
+        v.findViewById<TextView>(R.id.tvDetailMeaning).text =
+            current.meaning.ifBlank { "（暂无释义，点「编辑」补上）" }
+
+        val example = current.example.trim()
+        v.findViewById<TextView>(R.id.tvDetailExample).text = example
+        v.findViewById<View>(R.id.layoutExample).show(example.isNotEmpty())
+
+        val note = current.note.trim()
+        v.findViewById<TextView>(R.id.tvDetailNote).text = note
+        v.findViewById<View>(R.id.layoutNote).show(note.isNotEmpty())
+
+        val group = db.groupLabel(current.groupName)
+        val left = current.nextReview - WordDb.today()
+        val review = when {
+            current.state == 0 -> "还没有开始学习"
+            left > 0 -> "下次复习：$left 天后"
+            else -> "今天该复习"
+        }
+        v.findViewById<TextView>(R.id.tvDetailMeta).text =
+            "${stateName(current.state)} · $group\n" +
+                "连对 ${current.streak} 次 · 答对 ${current.right} / 答错 ${current.wrong}\n" +
+                review
+
+        val dlg = Dialog(this, R.style.GlassSheetDialog)
+        dlg.setContentView(v)
+        dlg.setCanceledOnTouchOutside(true)
+        dlg.window?.apply {
+            setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            setGravity(Gravity.BOTTOM)
+            attributes = attributes.apply {
+                dimAmount = 0.35f
+                windowAnimations = R.style.SheetAnimation
+            }
+        }
+
+        v.findViewById<TextView>(R.id.btnDetailClose).setOnClickListener { dlg.dismiss() }
+        v.findViewById<TextView>(R.id.btnDetailUk).setOnClickListener {
+            speak(current.word, ACCENT_UK)
+        }
+        v.findViewById<TextView>(R.id.btnDetailUs).setOnClickListener {
+            speak(current.word, ACCENT_US)
+        }
+        v.findViewById<TextView>(R.id.btnDetailEdit).setOnClickListener {
+            dlg.dismiss()
+            showWordDialog(db.getWord(current.id) ?: current)
+        }
+
+        dlg.show()
+        dlg.window?.setLayout(
+            android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+            android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+        )
     }
 
     fun showWordDialog(word: Word?) {

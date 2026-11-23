@@ -129,11 +129,15 @@ class LibraryView(private val a: MainActivity, private val root: View) {
 
         val left = w.nextReview - WordDb.today()
         // 词库列表不再显示锁定状态；只给已经开始的词显示复习时间
-        v.findViewById<TextView>(R.id.tvReview).text = when {
+        val reviewText = when {
             w.state == 0 -> ""
             left > 0 -> "$left 天后复习"
             else -> "今天该复习"
         }
+        v.findViewById<TextView>(R.id.tvReview).text = reviewText
+        // 新词没有学习数据时，整行 meta 直接收起，避免满屏「连对 0 · 答对 0 / 答错 0」
+        val hasProgress = w.state > 0 || w.streak > 0 || w.right > 0 || w.wrong > 0
+        v.findViewById<View>(R.id.metaRow).show(hasProgress || reviewText.isNotEmpty())
         return v
     }
 
@@ -194,8 +198,8 @@ class LibraryView(private val a: MainActivity, private val root: View) {
                     if (!foldedDays.add(row.key)) foldedDays.remove(row.key)
                     renderRows(keepScroll = true)
                 }
-                // 词库列表不再直接编辑 / 删除；编辑入口在「导入 → 编辑单词」
-                is Row.WordRow -> Unit
+                // 点单词打开玻璃详情页；编辑入口仍在「导入 → 编辑单词」和详情页
+                is Row.WordRow -> a.showWordDetail(row.word)
             }
         }
         list.adapter = adapter

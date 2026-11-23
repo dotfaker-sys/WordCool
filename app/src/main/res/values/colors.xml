@@ -45,6 +45,13 @@
     <color name="glass_pill_bottom">#24C2402F</color>
     <color name="glass_pill_border">#80C2402F</color>
     <color name="glass_nav">#DDE2EB</color>
+    <color name="ripple">#1FC2402F</color>
+    <color name="glass_sheet_top">#F2FFFFFF</color>
+    <color name="glass_sheet_bottom">#E6F8FAFF</color>
+    <color name="glass_sheet_tint">#1A7DD3FC</color>
+    <color name="sheet_handle">#665F6577</color>
+    <color name="sheet_bg_top">#F9FAFD</color>
+    <color name="sheet_bg_bottom">#E9EDF5</color>
 
     <!-- Obsidian 风深色（只用于设置页 / 导入页） -->
     <color name="obs_bg">#1E1E1E</color>

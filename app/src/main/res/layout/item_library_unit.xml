@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/bg_card"
+    android:foreground="@drawable/ripple_card"
     android:gravity="center_vertical"
     android:orientation="horizontal"
     android:paddingLeft="14dp"

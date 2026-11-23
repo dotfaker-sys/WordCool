@@ -85,6 +85,8 @@ class GlassSurfaceDrawable(
     override fun draw(canvas: Canvas) {
         val b = bounds
         if (b.isEmpty) return
+        paint.alpha = 255
+        borderPaint.alpha = 255
 
         val shadow = shadowDp * density
         val dy = shadowDyDp * density
