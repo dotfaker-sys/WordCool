@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 选中的底部 tab：品牌色玻璃胶囊 -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="270"
+                android:endColor="@color/glass_pill_bottom"
+                android:startColor="@color/glass_pill_border"
+                android:type="linear" />
+            <corners android:radius="18dp" />
+        </shape>
+    </item>
+    <item
+        android:bottom="1dp"
+        android:left="1dp"
+        android:right="1dp"
+        android:top="1dp">
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="315"
+                android:endColor="@color/glass_pill_bottom"
+                android:startColor="@color/glass_pill_top"
+                android:type="linear" />
+            <corners android:radius="17dp" />
+        </shape>
+    </item>
+</layer-list>

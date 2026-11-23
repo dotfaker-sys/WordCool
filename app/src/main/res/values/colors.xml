@@ -5,20 +5,46 @@
     <color name="primary">#C2402F</color>
     <color name="primary_dark">#9E3225</color>
     <color name="accent">#16181D</color>
-    <color name="bg">#F7F5F0</color>
-    <color name="card">#FDFCF9</color>
-    <color name="text">#16181D</color>
-    <color name="text_sub">#6B6F76</color>
-    <color name="line">#D8D3C9</color>
+    <color name="bg">#F3F6FD</color>
+    <color name="card">#B8FFFFFF</color>
+    <color name="text">#151821</color>
+    <color name="text_sub">#5F6577</color>
+    <color name="line">#59C9C4D8</color>
     <color name="white">#FFFFFF</color>
     <color name="locked">#5C6067</color>
     <color name="learning">#C2402F</color>
-    <color name="mastered">#16181D</color>
+    <color name="mastered">#151821</color>
     <color name="danger">#B23A2E</color>
-    <color name="soft_blue">#EDE9E1</color>
-    <color name="soft_grey">#EFECE6</color>
-    <color name="track">#DDD8CF</color>
-    <color name="ic_bg">#16181D</color>
+    <color name="soft_blue">#CCE9E5FA</color>
+    <color name="soft_grey">#B3F0F2F8</color>
+    <color name="track">#33C2402F</color>
+    <color name="ic_bg">#151821</color>
+
+    <!-- 玻璃拟态：干净的冷灰底 + 极淡柔光，玻璃感靠面板本身而不是彩色背景 -->
+    <color name="glass_bg_start">#E9EDF5</color>
+    <color name="glass_bg_end">#D5DBE6</color>
+    <color name="glass_glow_warm">#14FFFFFF</color>
+    <color name="glass_glow_cool">#1093C5FD</color>
+    <color name="glass_glow_extra">#0CFFFFFF</color>
+    <color name="glass_glow_violet">#0AFFFFFF</color>
+    <color name="glass_glow_rose">#08FFFFFF</color>
+    <color name="glass_card_top">#A6FFFFFF</color>
+    <color name="glass_card_bottom">#66F8FAFF</color>
+    <color name="glass_card_tint">#1A7DD3FC</color>
+    <color name="glass_border">#E6FFFFFF</color>
+    <color name="glass_border_bright">#F2FFFFFF</color>
+    <color name="glass_border_soft">#33FFFFFF</color>
+    <color name="glass_highlight">#4DFFFFFF</color>
+    <color name="glass_shine">#66FFFFFF</color>
+    <color name="glass_shadow">#331E2A4A</color>
+    <color name="glass_header">#99FBFCFF</color>
+    <color name="glass_tabbar">#C7FBFCFF</color>
+    <color name="glass_tabbar_bottom">#A6F3F5FB</color>
+    <color name="glass_row">#A6FFFFFF</color>
+    <color name="glass_pill_top">#4DC2402F</color>
+    <color name="glass_pill_bottom">#24C2402F</color>
+    <color name="glass_pill_border">#80C2402F</color>
+    <color name="glass_nav">#DDE2EB</color>
 
     <!-- Obsidian 风深色（只用于设置页 / 导入页） -->
     <color name="obs_bg">#1E1E1E</color>

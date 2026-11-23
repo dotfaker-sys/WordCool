@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 全局玻璃背景：柔和的纸感/深色渐变 + 三团柔光，半透明卡片叠在上面 -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="315"
+                android:endColor="@color/glass_bg_end"
+                android:startColor="@color/glass_bg_start"
+                android:type="linear" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:centerX="0.12"
+                android:centerY="0.04"
+                android:endColor="#00FFFFFF"
+                android:gradientRadius="560dp"
+                android:startColor="@color/glass_glow_warm"
+                android:type="radial" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:centerX="0.92"
+                android:centerY="0.38"
+                android:endColor="#00FFFFFF"
+                android:gradientRadius="520dp"
+                android:startColor="@color/glass_glow_cool"
+                android:type="radial" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:centerX="0.45"
+                android:centerY="0.92"
+                android:endColor="#00FFFFFF"
+                android:gradientRadius="460dp"
+                android:startColor="@color/glass_glow_extra"
+                android:type="radial" />
+        </shape>
+    </item>
+</layer-list>

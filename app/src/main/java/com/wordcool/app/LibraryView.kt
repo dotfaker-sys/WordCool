@@ -1,6 +1,5 @@
 package com.wordcool.app
 
-import android.graphics.Color
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -93,6 +92,9 @@ class LibraryView(private val a: MainActivity, private val root: View) {
 
     private fun bindUnit(convertView: View?, row: Row.UnitHeader, parent: ViewGroup?): View {
         val v = inflate(convertView, R.layout.item_library_unit, parent)
+        if (v.background !is GlassSurfaceDrawable) {
+            v.background = GlassSurfaceDrawable(a.resources, radiusDp = 20f, shadowDp = 4f)
+        }
         v.findViewById<TextView>(R.id.tvUnitTitle).text = row.title
         v.findViewById<TextView>(R.id.tvUnitInfo).text =
             "${row.total} 词 · 已解锁 ${row.unlocked}"
@@ -111,6 +113,9 @@ class LibraryView(private val a: MainActivity, private val root: View) {
 
     private fun bindWord(convertView: View?, w: Word, parent: ViewGroup?): View {
         val v = inflate(convertView, R.layout.item_word, parent)
+        if (v.background !is GlassSurfaceDrawable) {
+            v.background = GlassSurfaceDrawable(a.resources, radiusDp = 18f, shadowDp = 3f)
+        }
         v.findViewById<TextView>(R.id.tvWord).text = w.word
         v.findViewById<TextView>(R.id.tvPhonetic).text = phoneticShort(w)
         v.findViewById<TextView>(R.id.btnItemSpeak).setOnClickListener {
@@ -212,8 +217,12 @@ class LibraryView(private val a: MainActivity, private val root: View) {
         tvEmpty.show(items.isEmpty())
         chips.forEachIndexed { i, c ->
             val on = (i - 1) == filter
-            c.background = a.rounded(if (on) Pal.primary else Pal.softGrey, 18f)
-            c.setTextColor(if (on) Color.WHITE else Pal.textSub)
+            c.background = if (on) {
+                a.getDrawable(R.drawable.bg_tab_active)
+            } else {
+                a.getDrawable(R.drawable.bg_chip_soft)
+            }
+            c.setTextColor(if (on) Pal.text else Pal.textSub)
         }
         renderRows(keepScroll = false)
     }

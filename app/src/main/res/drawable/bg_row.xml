@@ -1,14 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 词库列表行：纸白底 + 仅底边 1px 细线，无卡片、无阴影 -->
+<!-- 词库行：小号玻璃卡片，描边和磨砂面与 bg_card 同源 -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
         <shape android:shape="rectangle">
-            <solid android:color="@color/card" />
+            <gradient
+                android:angle="270"
+                android:endColor="@color/glass_border_soft"
+                android:startColor="@color/glass_border_bright"
+                android:type="linear" />
+            <corners android:radius="18dp" />
         </shape>
     </item>
-    <item android:gravity="bottom" android:height="1px">
+    <item
+        android:bottom="1dp"
+        android:left="1dp"
+        android:right="1dp"
+        android:top="1dp">
         <shape android:shape="rectangle">
-            <solid android:color="@color/line" />
+            <gradient
+                android:angle="315"
+                android:endColor="@color/glass_card_bottom"
+                android:startColor="@color/glass_card_top"
+                android:type="linear" />
+            <corners android:radius="17dp" />
+        </shape>
+    </item>
+    <item
+        android:bottom="1dp"
+        android:left="1dp"
+        android:right="1dp"
+        android:top="1dp">
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="315"
+                android:endColor="@color/glass_card_tint"
+                android:startColor="#00FFFFFF"
+                android:type="linear" />
+            <corners android:radius="17dp" />
+        </shape>
+    </item>
+    <item
+        android:bottom="1dp"
+        android:left="1dp"
+        android:right="1dp"
+        android:top="1dp">
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="270"
+                android:centerColor="#00FFFFFF"
+                android:endColor="#00FFFFFF"
+                android:startColor="@color/glass_shine"
+                android:type="linear" />
+            <corners android:radius="17dp" />
         </shape>
     </item>
 </layer-list>

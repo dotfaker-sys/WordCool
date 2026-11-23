@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/bg">
+    android:background="@drawable/bg_glass_app">
 
     <LinearLayout
         android:id="@+id/headerBar"
@@ -14,8 +15,21 @@
         android:background="@drawable/bg_header"
         android:paddingLeft="18dp"
         android:paddingRight="18dp"
-        android:paddingTop="16dp"
+        android:paddingTop="14dp"
         android:paddingBottom="14dp">
+
+        <TextView
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:minHeight="40dp"
+            android:layout_marginRight="12dp"
+            android:background="@drawable/bg_logo"
+            android:gravity="center"
+            android:fontFamily="serif"
+            android:text="词"
+            android:textColor="@color/white"
+            android:textSize="19sp"
+            android:textStyle="bold" />
 
         <LinearLayout
             android:layout_width="0dp"
@@ -62,11 +76,14 @@
         android:id="@+id/tabBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="12dp"
+        android:layout_marginRight="12dp"
+        android:layout_marginBottom="10dp"
         android:orientation="horizontal"
         android:background="@drawable/bg_tabbar"
-        android:elevation="0dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="10dp"
+        android:elevation="10dp"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp"
         android:paddingLeft="6dp"
         android:paddingRight="6dp">
 
@@ -75,8 +92,11 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:layout_marginLeft="1dp"
+            android:layout_marginRight="1dp"
             android:gravity="center"
-            android:padding="9dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
             android:text="@string/tab_library"
             android:textSize="13sp"
             android:textColor="@color/primary" />
@@ -86,8 +106,11 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:layout_marginLeft="1dp"
+            android:layout_marginRight="1dp"
             android:gravity="center"
-            android:padding="9dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
             android:text="@string/tab_learn"
             android:textSize="13sp"
             android:textColor="@color/text_sub" />
@@ -97,8 +120,11 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:layout_marginLeft="1dp"
+            android:layout_marginRight="1dp"
             android:gravity="center"
-            android:padding="9dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
             android:text="@string/tab_stats"
             android:textSize="13sp"
             android:textColor="@color/text_sub" />
@@ -108,8 +134,11 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:layout_marginLeft="1dp"
+            android:layout_marginRight="1dp"
             android:gravity="center"
-            android:padding="9dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
             android:text="@string/tab_import"
             android:textSize="13sp"
             android:textColor="@color/text_sub" />
@@ -119,8 +148,11 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:layout_marginLeft="1dp"
+            android:layout_marginRight="1dp"
             android:gravity="center"
-            android:padding="9dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
             android:text="@string/tab_settings"
             android:textSize="13sp"
             android:textColor="@color/text_sub" />

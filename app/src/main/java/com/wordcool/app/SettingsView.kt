@@ -128,27 +128,27 @@ class SettingsView(private val a: MainActivity, private val root: View) {
 
         val accent = a.db.accent
         val usOn = accent == MainActivity.ACCENT_US
-        btnAccentUs.background = a.rounded(if (usOn) Pal.primary else Pal.card, 3f, Pal.line)
+        btnAccentUs.background = a.glassToggle(usOn)
         btnAccentUs.setTextColor(if (usOn) Pal.white else Pal.primary)
-        btnAccentUk.background = a.rounded(if (!usOn) Pal.primary else Pal.card, 3f, Pal.line)
+        btnAccentUk.background = a.glassToggle(!usOn)
         btnAccentUk.setTextColor(if (!usOn) Pal.white else Pal.primary)
 
         val rates = listOf(0.7f, 1.0f, 1.3f)
         listOf(btnRateSlow, btnRateNormal, btnRateFast).forEachIndexed { i, b ->
             val on = a.db.speechRate == rates[i]
-            b.background = a.rounded(if (on) Pal.primary else Pal.card, 3f, Pal.line)
+            b.background = a.glassToggle(on)
             b.setTextColor(if (on) Pal.white else Pal.primary)
         }
 
         val autoOn = a.db.autoIpa
         btnAutoIpa.text = "导入时自动补全音标：" + (if (autoOn) "开" else "关")
-        btnAutoIpa.background = a.rounded(if (autoOn) Pal.softBlue else Pal.card, 3f, Pal.line)
-        btnAutoIpa.setTextColor(if (autoOn) Pal.primary else Pal.textSub)
+        btnAutoIpa.background = a.glassToggle(autoOn)
+        btnAutoIpa.setTextColor(if (autoOn) Pal.white else Pal.textSub)
 
         val theme = ThemePrefs.mode(a)
         listOf(btnThemeSystem, btnThemeLight, btnThemeDark).forEachIndexed { i, b ->
             val on = theme == i
-            b.background = a.rounded(if (on) Pal.primary else Pal.card, 3f, Pal.line)
+            b.background = a.glassToggle(on)
             b.setTextColor(if (on) Pal.white else Pal.textSub)
         }
     }

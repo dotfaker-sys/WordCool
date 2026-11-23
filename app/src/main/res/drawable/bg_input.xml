@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 只保留底边 1px 细线：其余三边用负偏移裁掉 -->
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:left="-2dp" android:right="-2dp" android:top="-2dp">
-        <shape android:shape="rectangle">
-            <solid android:color="@android:color/transparent" />
-            <stroke android:width="1dp" android:color="@color/line" />
-            <padding android:left="10dp" android:top="8dp" android:right="10dp" android:bottom="8dp" />
-        </shape>
-    </item>
-</layer-list>
+<!-- 输入框：圆角磨砂玻璃 + 细亮边，替换原来的单底边下划线 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <gradient
+        android:angle="270"
+        android:endColor="@color/glass_card_bottom"
+        android:startColor="@color/glass_card_top"
+        android:type="linear" />
+    <corners android:radius="12dp" />
+    <stroke android:width="1dp" android:color="@color/glass_border" />
+    <padding
+        android:bottom="9dp"
+        android:left="12dp"
+        android:right="12dp"
+        android:top="9dp" />
+</shape>

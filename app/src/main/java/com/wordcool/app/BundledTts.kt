@@ -1,6 +1,7 @@
 package com.wordcool.app
 
 import android.content.Context
+import android.content.pm.ApplicationInfo
 import android.media.AudioAttributes
 import android.media.AudioFormat
 import android.media.AudioTrack
@@ -11,6 +12,8 @@ import com.k2fsa.sherpa.onnx.OfflineTtsConfig
 import com.k2fsa.sherpa.onnx.OfflineTtsModelConfig
 import com.k2fsa.sherpa.onnx.OfflineTtsVitsModelConfig
 import java.util.concurrent.Executors
+import kotlin.math.abs
+import kotlin.math.tanh
 
 /**
  * v1.11：随 APK 内置的离线 TTS。
@@ -40,6 +43,15 @@ object BundledTts {
     @Synchronized
     fun init(context: Context) {
         if (engine != null || initializing) return
+        // Release 只打包 ARM 原生库；x86 模拟器/设备上直接回退系统 TTS，避免加载 .so 时崩溃
+        val primaryAbi = android.os.Build.SUPPORTED_ABIS.firstOrNull().orEmpty()
+        val debuggable = (context.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
+        if (!debuggable && !primaryAbi.startsWith("arm")) {
+            failed = true
+            lastError = "当前设备架构 $primaryAbi 不在内置语音支持范围"
+            Log.w(TAG, lastError + "，将回退系统 TTS")
+            return
+        }
         initializing = true
         val app = context.applicationContext
         executor.execute {
@@ -104,8 +116,40 @@ object BundledTts {
     }
 
     private fun play(audio: GeneratedAudio) {
-        val samples = audio.samples
+        val raw = audio.samples
         val rate = audio.sampleRate
+        if (raw.isEmpty()) return
+
+        // 模型输出通常只有 0.1~0.3 峰值，直接播会很轻；峰值归一化 + 软限幅，最多放大 12 倍
+        var peak = 0f
+        var sumSq = 0.0
+        for (s in raw) {
+            val a = abs(s)
+            if (a > peak) peak = a
+            sumSq += a.toDouble() * a
+        }
+        val rms = if (raw.isNotEmpty()) kotlin.math.sqrt(sumSq / raw.size).toFloat() else 0f
+        val peakGain = if (peak > 0.005f) 0.98f / peak else 1f
+        // 目标 RMS 约 0.10；对很轻的短词再补一点响度，但不超过 12 倍
+        val rmsGain = if (rms > 0.003f) 0.10f / rms else 1f
+        // 1.25 倍响度补偿后再软限幅：比单纯峰值归一听起来更响，但不硬削波
+        val gain = (maxOf(peakGain, rmsGain) * 1.25f).coerceIn(1f, 12f)
+        val samples = FloatArray(raw.size) { i ->
+            val x = raw[i] * gain
+            // 软限幅：0.90 以下原样，超过的部分用 tanh 压回，避免硬削波的破音
+            when {
+                x > 0.90f -> 0.90f + 0.10f * tanh((x - 0.90f) / 0.10f)
+                x < -0.90f -> -0.90f - 0.10f * tanh((-x - 0.90f) / 0.10f)
+                else -> x
+            }
+        }
+        var outPeak = 0f
+        for (s in samples) {
+            val a = abs(s)
+            if (a > outPeak) outPeak = a
+        }
+        Log.i(TAG, "peak=$peak rms=$rms gain=$gain outPeak=$outPeak rate=$rate")
+
         val durationMs = (samples.size.toLong() * 1000L / rate).coerceAtLeast(50L)
         val t = AudioTrack.Builder()
             .setAudioAttributes(
@@ -125,6 +169,10 @@ object BundledTts {
             .setTransferMode(AudioTrack.MODE_STATIC)
             .build()
         track = t
+        try {
+            t.setVolume(1.0f)
+        } catch (ignored: Exception) {
+        }
         t.write(samples, 0, samples.size, AudioTrack.WRITE_BLOCKING)
         t.play()
         try {

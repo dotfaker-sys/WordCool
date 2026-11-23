@@ -45,13 +45,15 @@ class FastScrollBar @JvmOverloads constructor(
 
     private var thumbTop = 0f
     private var thumbHeight = 0f
+    private var showThumb = false
     private var dragging = false
     private var grabOffset = 0f
 
     fun attach(l: ListView) {
         list = l
-        trackPaint.color = (Pal.line and 0x00FFFFFF) or 0x66000000
-        thumbPaint.color = (Pal.textSub and 0x00FFFFFF) or 0xB3000000.toInt()
+        // 细轨道几乎透明；滑块用 35% 文字色，避免一条灰线压住右上角的「添加」按钮
+        trackPaint.color = 0x00000000
+        thumbPaint.color = (Pal.textSub and 0x00FFFFFF) or 0x59000000
         l.setOnScrollListener(object : AbsListView.OnScrollListener {
             override fun onScrollStateChanged(view: AbsListView?, scrollState: Int) = Unit
 
@@ -84,6 +86,7 @@ class FastScrollBar @JvmOverloads constructor(
         val maxFirst = (total - visible).coerceAtLeast(1)
         val progress = (l.firstVisiblePosition / maxFirst.toFloat()).coerceIn(0f, 1f)
         thumbTop = maxTop * progress
+        showThumb = l.firstVisiblePosition > 0
         invalidate()
     }
 
@@ -94,7 +97,7 @@ class FastScrollBar @JvmOverloads constructor(
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        if (thumbHeight <= 0f) return
+        if (!showThumb || thumbHeight <= 0f) return
 
         val cx = width / 2f
         canvas.drawRoundRect(
@@ -107,7 +110,7 @@ class FastScrollBar @JvmOverloads constructor(
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
         val l = list ?: return false
-        if (thumbHeight <= 0f) return false
+        if (!showThumb || thumbHeight <= 0f) return false
 
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> {

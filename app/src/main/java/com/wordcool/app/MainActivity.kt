@@ -4,6 +4,9 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.Typeface
+import android.graphics.drawable.LayerDrawable
 import android.media.AudioAttributes
 import android.media.AudioManager
 import android.net.Uri
@@ -22,6 +25,7 @@ import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ListView
 import android.widget.TextView
+import android.view.ViewGroup
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -69,7 +73,10 @@ class MainActivity : Activity() {
         setTheme(R.style.AppTheme)
         setContentView(R.layout.activity_main)
         Pal.init(this)
+        // 用自绘的极光背景替换 XML 里的 layer-list：更多柔光、噪点和斜向反光
+        findViewById<View>(R.id.root).background = GlassBackdropDrawable(resources)
         applySystemBars()
+        applyHeaderInset()
         db = WordDb(this)
 
         content = findViewById(R.id.content)
@@ -92,6 +99,7 @@ class MainActivity : Activity() {
         statsPage = StatsView(this, p2)
         importPage = ImportView(this, p3)
         settingsPage = SettingsView(this, p4)
+        listOf(p0, p1, p2, p3, p4).forEach { applyGlassDepth(it) }
 
         tabs.add(findViewById<TextView>(R.id.tabLibrary))
         tabs.add(findViewById<TextView>(R.id.tabLearn))
@@ -99,6 +107,15 @@ class MainActivity : Activity() {
         tabs.add(findViewById<TextView>(R.id.tabImport))
         tabs.add(findViewById<TextView>(R.id.tabSettings))
         tabs.forEachIndexed { i, t -> t.setOnClickListener { switchTo(i) } }
+        findViewById<View>(R.id.tabBar).background = GlassSurfaceDrawable(
+            resources,
+            radiusDp = 26f,
+            shadowDp = 8f,
+            shadowDyDp = 3f,
+            fillTopColor = getColor(R.color.glass_card_top),
+            fillBottomColor = getColor(R.color.glass_tabbar),
+            tintColor = getColor(R.color.glass_card_tint)
+        )
 
         initTts()
         BundledTts.init(this)
@@ -202,7 +219,8 @@ class MainActivity : Activity() {
         tabs.forEachIndexed { i, t ->
             val on = i == index
             t.setTextColor(if (on) Pal.primary else Pal.textSub)
-            t.background = if (on) rounded(Pal.softBlue, 10f) else null
+            t.setTypeface(null, if (on) Typeface.BOLD else Typeface.NORMAL)
+            if (on) t.setBackgroundResource(R.drawable.bg_tab_active) else t.background = null
         }
         refreshCurrent()
     }
@@ -213,14 +231,17 @@ class MainActivity : Activity() {
             android.content.res.Configuration.UI_MODE_NIGHT_MASK) ==
             android.content.res.Configuration.UI_MODE_NIGHT_YES
 
-        window.statusBarColor = getColor(R.color.bg)
-        window.navigationBarColor = if (dark || Build.VERSION.SDK_INT >= 27) {
-            getColor(R.color.bg)
-        } else {
+        window.statusBarColor = Color.TRANSPARENT
+        // API 23–26 没有浅色导航栏图标，亮色主题下退回深底白图标，避免图标看不见
+        window.navigationBarColor = if (!dark && Build.VERSION.SDK_INT < 27) {
             getColor(R.color.text)
+        } else {
+            getColor(R.color.glass_nav)
         }
 
         var flags = window.decorView.systemUiVisibility
+        // 状态栏透明并让玻璃背景延伸到状态栏后面；header 自己加 inset，避免出现白色接缝
+        flags = flags or View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
         val lightStatus = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
         flags = if (dark) flags and lightStatus.inv() else flags or lightStatus
         if (Build.VERSION.SDK_INT >= 27) {
@@ -230,11 +251,37 @@ class MainActivity : Activity() {
         window.decorView.systemUiVisibility = flags
     }
 
+    /** 状态栏改为透明后，把 header 的内容整体下移状态栏高度，背景仍铺到屏幕最顶部 */
+    private fun applyHeaderInset() {
+        val header = findViewById<View>(R.id.headerBar)
+        val baseTop = header.paddingTop
+        header.setOnApplyWindowInsetsListener { v, insets ->
+            v.setPadding(
+                v.paddingLeft,
+                baseTop + insets.systemWindowInsetTop,
+                v.paddingRight,
+                v.paddingBottom
+            )
+            insets
+        }
+        header.requestApplyInsets()
+    }
+
+    /** 把 XML 的 layer-list 卡片换成自绘玻璃面：阴影画在卡片外侧，不会被半透明面透出来 */
+    private fun applyGlassDepth(v: View) {
+        if (v is ViewGroup && v.background is LayerDrawable) {
+            v.background = GlassSurfaceDrawable(resources, radiusDp = 20f, shadowDp = 4f)
+        }
+        if (v is ViewGroup) {
+            for (i in 0 until v.childCount) applyGlassDepth(v.getChildAt(i))
+        }
+    }
+
     private fun refreshCurrent() {
         val s = db.stats()
         badge.text = "已解锁 ${s.unlocked} / ${s.total}"
         badge.setTextColor(Pal.primary)
-        badge.background = rounded(Pal.softBlue, 18f)
+        badge.setBackgroundResource(R.drawable.bg_badge)
         when (current) {
             0 -> library.refresh()
             1 -> learn.refresh()

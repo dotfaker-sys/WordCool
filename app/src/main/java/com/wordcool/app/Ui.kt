@@ -38,8 +38,8 @@ object Pal {
 fun Context.dp(value: Int): Int = (value * resources.displayMetrics.density + 0.5f).toInt()
 
 /**
- * 全站圆角统一收敛为微圆角（约原值的 1/3，最小 2dp）。
- * 签名与默认值保持不变，旧调用点（12f / 18f / 10f）自动获得一致的编辑式观感。
+ * 全站圆角统一收敛为玻璃圆角；签名与默认值保持不变，
+ * 旧调用点（12f / 18f / 10f）自动获得一致的圆润观感。
  */
 fun Context.rounded(
     fill: Int,
@@ -48,8 +48,25 @@ fun Context.rounded(
     strokePx: Int = 1
 ): GradientDrawable = GradientDrawable().apply {
     setColor(fill)
-    cornerRadius = (radiusDp * 0.35f).coerceAtLeast(2f) * resources.displayMetrics.density
+    cornerRadius = radiusDp * resources.displayMetrics.density
     if (strokeColor != null) setStroke(strokePx, strokeColor)
+}
+
+/** 设置页 / 学习页的程序化开关：选中用品牌渐变，未选中用半透明玻璃渐变 */
+fun Context.glassToggle(selected: Boolean, radiusDp: Float = 12f): GradientDrawable {
+    val density = resources.displayMetrics.density
+    val colors = if (selected) {
+        intArrayOf(getColor(R.color.primary), getColor(R.color.primary_dark))
+    } else {
+        intArrayOf(getColor(R.color.glass_card_top), getColor(R.color.glass_card_bottom))
+    }
+    return GradientDrawable(GradientDrawable.Orientation.TL_BR, colors).apply {
+        cornerRadius = radiusDp * density
+        setStroke(
+            density.toInt().coerceAtLeast(1),
+            getColor(if (selected) R.color.glass_border_bright else R.color.glass_border)
+        )
+    }
 }
 
 fun Context.toast(message: String) {
