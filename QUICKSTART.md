@@ -4,7 +4,9 @@
 
 > 仓库里是源码工程，不放已签名的 APK。最省事是直接从 [Releases](https://github.com/dotfaker-sys/WordCool/releases) 下载最新 Release 里的 APK；想自己编译见下面两条路径。**GitHub Actions 工作流已移除，push 不再自动出包**。完整命令见 [`README.md`](README.md) 一、和 [`UPLOAD.md`](UPLOAD.md)。
 
-**v1.11.1 · 交互修整（当前源码 v1.11.1 / versionCode 14；已发 Release v1.11.1）**：词库右侧滚动条可上下拖动快速跳转；学习时单词 / 小测 / 拼写卡在「今日计划」上方，空闲时计划卡仍最上面。
+**v1.12.0 · 玻璃界面 + 单词详情（当前源码 v1.12.0 / versionCode 15；已发 Release v1.12.0）**：全站玻璃拟态与干净冷灰蓝背景；词库行减负，点单词打开底部玻璃详情层（UK/US 音标、释义、例句 / 记忆提示、学习数据、英 / 美音试听）；发音增加响度补偿与软限幅。
+>
+> **v1.11.1 · 交互修整（v1.11.1 / versionCode 14）**：词库右侧滚动条可上下拖动快速跳转；学习时单词 / 小测 / 拼写卡在「今日计划」上方，空闲时计划卡仍最上面。
 >
 > **v1.11 · 内置离线语音（v1.11.0，已发 Release v1.11.0）**：APK 自带 sherpa-onnx + Piper Amy 美音模型，安装后不需要系统语音包、不需要联网就能读；系统 TTS 只作兜底。安装包约 73 MB，在 [Releases](https://github.com/dotfaker-sys/WordCool/releases) 的 **v1.11.0 → Assets → WordCool.apk**。
 >
@@ -52,7 +54,7 @@
 ## 拿到 APK 的最快路径
 
 ### 直接下载（推荐）
-打开 <https://github.com/dotfaker-sys/WordCool/releases> → 最新一条 **v1.11.1** → Assets → **WordCool-v1.11.1.apk** → 传到手机安装。v1.11.1 内置离线语音（约 69.5 MB），Debug 签名，可直接使用；旧版 v1.0.0 / v1.1.0 / v1.2.0 / v1.10.x / v1.11.0 也都保留。
+打开 <https://github.com/dotfaker-sys/WordCool/releases> → 最新一条 **v1.12.0** → Assets → **WordCool-v1.12.0.apk** → 传到手机安装。v1.12.0 内置离线语音（约 73 MB），Debug 签名，可直接使用；旧版 v1.0.0 / v1.1.0 / v1.2.0 / v1.10.x / v1.11.x 也都保留。
 
 ### 有电脑：Android Studio（约 5 分钟）
 1. 安装 [Android Studio](https://developer.android.com/studio)
